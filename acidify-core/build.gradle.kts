@@ -15,6 +15,7 @@ kotlin {
             implementation(libs.ktorSerializationKotlinxJson)
             implementation(libs.kmpBigNum)
             implementation(libs.bundles.crypto)
+            implementation(libs.bundles.korlibs)
             implementation(libs.kermit)
         }
     }

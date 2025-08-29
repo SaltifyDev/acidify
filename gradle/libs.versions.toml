@@ -10,6 +10,7 @@ kotlinxIO = "0.8.0"
 ktor = "3.2.3"
 kmpBigNum = "0.3.10"
 crypto = "0.5.0"
+korlibs = "6.0.0"
 kermit = "2.0.8"
 
 [libraries]
@@ -28,10 +29,13 @@ kmpBigNum = { module = "com.ionspin.kotlin:bignum", version.ref = "kmpBigNum" }
 cryptoCore = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "crypto" }
 cryptoProviderOptimal = { module = "dev.whyoleg.cryptography:cryptography-provider-optimal", version.ref = "crypto" }
 
+korlibsCompression = { module = "com.soywiz:korlibs-compression", version.ref = "korlibs" }
+
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 [bundles]
 crypto = ["cryptoCore", "cryptoProviderOptimal"]
+korlibs = ["korlibsCompression"]
 
 [plugins]
 kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

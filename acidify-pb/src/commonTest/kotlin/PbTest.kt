@@ -4,24 +4,25 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 object TestSchema1 : PbSchema() {
-    val intField = PbInt32(1)
-    val longField = PbInt64(2)
-    val repeatedIntField = PbRepeatedInt32(3)
-    val repeatedLongField = PbRepeatedInt64(4)
+    val intField = pb int32 1
+    val longField = pb int64 2
+    val repeatedIntField = pb.repeated int32 3
+    val repeatedLongField = pb.repeated int64 4
+    // Explicitly non-packed repeated field
     val notPackedRepeatedIntField = PbRepeatedInt32(5, encodePacked = false)
-    val bytesField = PbBytes(6)
-    val stringField = PbString(7)
-    val repeatedStringField = PbRepeatedString(8)
-    val nestedMessageField = PbMessage(9, TestSchema2)
-    val repeatedNestedMessageField = PbRepeatedMessage(10, TestSchema2)
-    val optionalIntField = PbOptional(PbInt32(11))
+    val bytesField = pb bytes 6
+    val stringField = pb string 7
+    val repeatedStringField = pb.repeated string 8
+    val nestedMessageField = pb message TestSchema2 field 9
+    val repeatedNestedMessageField = pb.repeated message TestSchema2 field 10
+    val optionalIntField = pb.optional int32 11
 }
 
 object TestSchema2 : PbSchema() {
-    val intField = PbInt32(1)
-    val longField = PbInt64(2)
-    val bytesField = PbBytes(3)
-    val stringField = PbString(4)
+    val intField = pb int32 1
+    val longField = pb int64 2
+    val bytesField = pb bytes 3
+    val stringField = pb string 4
 }
 
 class PbTest {

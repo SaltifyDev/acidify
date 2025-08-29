@@ -6,7 +6,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            project(":acidify-pb")
+            implementation(project(":acidify-pb"))
             implementation(libs.kotlinxIO)
             implementation(libs.kotlinxCoroutines)
             implementation(libs.kotlinxSerialization)

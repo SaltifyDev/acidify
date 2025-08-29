@@ -7,6 +7,7 @@ import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.MD5
 import io.ktor.utils.io.core.*
 import kotlinx.io.*
+import kotlinx.io.Buffer
 
 val provider = CryptographyProvider.Default
 val md5 = provider.get(MD5).hasher()
@@ -55,7 +56,7 @@ internal fun Sink.writeBytes(value: ByteArray, prefix: Prefix = (Prefix.NONE)) {
 }
 
 internal fun Sink.barrier(prefix: Prefix, addition: Int = 0, target: ((Sink).() -> Unit)) {
-    val written = io.ktor.utils.io.core.Buffer()
+    val written = Buffer()
     target(written)
 
     writeLength(written.size.toUInt() + addition.toUInt(), prefix)

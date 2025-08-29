@@ -31,7 +31,7 @@ class PbObject<S : PbSchema> internal constructor(
         return type.decode(tokenList)
     }
 
-    fun <T> get(supplier: S.() -> PbType<T>): T {
+    inline fun <T> get(supplier: S.() -> PbType<T>): T {
         val type = schema.supplier()
         return get(type)
     }
@@ -40,7 +40,7 @@ class PbObject<S : PbSchema> internal constructor(
         tokens[type.fieldNumber] = type.encode(value)
     }
 
-    fun <T> set(supplier: S.() -> Pair<PbType<T>, T>) {
+    inline fun <T> set(supplier: S.() -> Pair<PbType<T>, T>) {
         val (type, value) = schema.supplier()
         set(type, value)
     }

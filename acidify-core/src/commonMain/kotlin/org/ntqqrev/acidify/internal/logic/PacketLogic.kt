@@ -19,7 +19,7 @@ import korlibs.io.compression.uncompress
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.ntqqrev.acidify.internal.Client
+import org.ntqqrev.acidify.internal.LagrangeClient
 import kotlin.random.Random
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
@@ -31,7 +31,7 @@ import org.ntqqrev.acidify.internal.util.*
 import org.ntqqrev.acidify.internal.util.crypto.TEA
 import org.ntqqrev.acidify.pb.PbObject
 
-internal class PacketLogic(client: Client) : AbstractLogic(client) {
+internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private var sequence = Random.nextInt(0x10000, 0x20000)
     private val host = "msfwifi.3g.qq.com"
     private val port = 8080

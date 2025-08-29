@@ -7,7 +7,7 @@ import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.internal.logic.LoginLogic
 import org.ntqqrev.acidify.internal.logic.PacketLogic
 
-internal class Client(
+internal class LagrangeClient(
     val appInfo: AppInfo,
     val sessionStore: SessionStore,
     val signProvider: SignProvider,

@@ -4,7 +4,7 @@ import io.ktor.util.date.getTimeMillis
 import io.ktor.utils.io.core.*
 import kotlinx.io.*
 import kotlinx.io.Buffer
-import org.ntqqrev.acidify.internal.Client
+import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.util.BinaryReader
 import org.ntqqrev.acidify.internal.util.Prefix
 import org.ntqqrev.acidify.internal.util.crypto.ECDH
@@ -15,7 +15,7 @@ import org.ntqqrev.acidify.internal.util.reader
 import org.ntqqrev.acidify.internal.util.writeBytes
 import kotlin.random.Random
 
-internal class LoginLogic(client: Client) : AbstractLogic(client) {
+internal class LoginLogic(client: LagrangeClient) : AbstractLogic(client) {
     private val ecdhKey =
         "04928D8850673088B343264E0C6BACB8496D697799F37211DEB25BB73906CB089FEA9639B4E0260498B51A992D50813DA8".fromHex()
 

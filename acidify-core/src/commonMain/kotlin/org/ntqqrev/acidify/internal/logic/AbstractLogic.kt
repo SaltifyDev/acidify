@@ -1,7 +1,7 @@
 package org.ntqqrev.acidify.internal.logic
 
-import org.ntqqrev.acidify.internal.Client
+import org.ntqqrev.acidify.internal.LagrangeClient
 
 internal abstract class AbstractLogic(
-    internal val client: Client
+    internal val client: LagrangeClient
 )

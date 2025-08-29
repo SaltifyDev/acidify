@@ -21,7 +21,7 @@ internal class TEAImpl {
     private var prePlain: ByteArray = ByteArray(0)
     private var header = true
 
-    private fun decipher(bArr: ByteArray?, i2: Int = 0): ByteArray? {
+    private fun decipher(bArr: ByteArray?, i2: Int = 0): ByteArray {
         var i3 = 16
         var unsignedInt = getUnsignedInt(bArr, i2, 4)
         var unsignedInt2 = getUnsignedInt(bArr, i2 + 4, 4)
@@ -58,9 +58,6 @@ internal class TEAImpl {
                 this.pos = i4 + 1
             } else {
                 val decipher = decipher(this.prePlain)
-                if (decipher == null) {
-                    return false
-                }
                 this.prePlain = decipher
                 this.contextStart += 8
                 this.crypt += 8
@@ -226,7 +223,7 @@ internal class TEAImpl {
             return null
         }
         val decipher = decipher(bArr, i2)
-        this.prePlain = decipher!!
+        this.prePlain = decipher
         val i6 = decipher[0].toInt() and 7
         this.pos = i6
         var i7 = (i3 - i6) - 10

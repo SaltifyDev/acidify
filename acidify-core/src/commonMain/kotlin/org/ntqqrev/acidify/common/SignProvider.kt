@@ -1,6 +1,6 @@
 package org.ntqqrev.acidify.common
 
-internal fun interface SignProvider {
+fun interface SignProvider {
     suspend fun sign(cmd: String, seq: Int, src: ByteArray): Result
 
     class Result(

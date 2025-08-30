@@ -7,7 +7,7 @@ import kotlin.jvm.JvmField
 import kotlin.random.Random
 
 @Serializable
-internal class SessionStore(
+class SessionStore(
     @JvmField var uin: Long,
     @JvmField var uid: String,
 

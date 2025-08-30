@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal class AppInfo(
+class AppInfo(
     @SerialName("Os") val os: String,
     @SerialName("Kernel") val kernel: String,
     @SerialName("VendorOs") val vendorOs: String,

@@ -19,14 +19,14 @@ class PbObject<S : PbSchema> internal constructor(
         }.readTokens()
     )
 
-    constructor(schema: S, block: PbObject<S>.() -> Unit) : this(
+    constructor(schema: S, block: S.(PbObject<S>) -> Unit) : this(
         schema,
         multiMapOf()
     ) {
-        this.block()
+        schema.block(this)
     }
 
-    fun <T> get(type: PbType<T>): T {
+    operator fun <T> get(type: PbType<T>): T {
         val tokenList = tokens[type.fieldNumber] ?: return type.defaultValue
         return type.decode(tokenList)
     }
@@ -36,13 +36,21 @@ class PbObject<S : PbSchema> internal constructor(
         return get(type)
     }
 
-    fun <T> set(type: PbType<T>, value: T) {
+    operator fun <T> set(type: PbType<T>, value: T) {
         tokens[type.fieldNumber] = type.encode(value)
     }
 
     inline fun <T> set(supplier: S.() -> Pair<PbType<T>, T>) {
         val (type, value) = schema.supplier()
         set(type, value)
+    }
+
+    operator fun invoke(block: S.(PbObject<S>) -> Unit) {
+        schema.block(this)
+    }
+
+    operator fun <T> invoke(block: S.() -> T): T {
+        return schema.block()
     }
 
     fun toByteArray(): ByteArray {

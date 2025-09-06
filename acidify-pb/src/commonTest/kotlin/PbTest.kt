@@ -28,39 +28,36 @@ object TestSchema2 : PbSchema() {
 class PbTest {
     @Test
     fun `correctly encodes and decodes various field types`() {
-        val message = PbObject(TestSchema1) {
-            set { intField to 42 }
-            set { longField to 12345678901234L }
-            set { repeatedIntField to listOf(1, 2, 3, 4, 5) }
-            set { repeatedLongField to listOf(10000000000L, 20000000000L) }
-            set { notPackedRepeatedIntField to listOf(10, 20, 30) }
-            set { bytesField to byteArrayOf(0x01, 0x02, 0x03) }
-            set { stringField to "Hello, World!" }
-            set { repeatedStringField to listOf("foo", "bar", "baz") }
-            set {
-                nestedMessageField to PbObject(TestSchema2) {
-                    set { intField to 7 }
-                    set { longField to 9876543210L }
-                    set { bytesField to byteArrayOf(0x0A, 0x0B, 0x0C) }
-                    set { stringField to "Nested" }
-                }
+        val message = TestSchema1 {
+            it[intField] = 42
+            it[longField] = 12345678901234L
+            it[repeatedIntField] = listOf(1, 2, 3, 4, 5)
+            it[repeatedLongField] = listOf(10000000000L, 20000000000L)
+            it[notPackedRepeatedIntField] = listOf(10, 20, 30)
+            it[bytesField] = byteArrayOf(0x01, 0x02, 0x03)
+            it[stringField] = "Hello, World!"
+            it[repeatedStringField] = listOf("foo", "bar", "baz")
+            it[nestedMessageField] = TestSchema2 {
+                it[intField] = 7
+                it[longField] = 9876543210L
+                it[bytesField] = byteArrayOf(0x0A, 0x0B, 0x0C)
+                it[stringField] = "Nested"
             }
-            set {
-                repeatedNestedMessageField to listOf(
-                    PbObject(TestSchema2) {
-                        set { intField to 1 }
-                        set { longField to 111L }
-                        set { bytesField to byteArrayOf(0x2A) }
-                        set { stringField to "First" }
-                    },
-                    PbObject(TestSchema2) {
-                        set { intField to 2 }
-                        set { longField to 222L }
-                        set { bytesField to byteArrayOf(0x2B) }
-                        set { stringField to "Second" }
-                    },
-                )
-            }
+            it[repeatedNestedMessageField] = listOf(
+                TestSchema2 {
+                    it[intField] = 1
+                    it[longField] = 111L
+                    it[bytesField] = byteArrayOf(0x2A)
+                    it[stringField] = "First"
+                },
+                TestSchema2 {
+                    it[intField] = 2
+                    it[longField] = 222L
+                    it[bytesField] = byteArrayOf(0x2B)
+                    it[stringField] = "Second"
+                },
+            )
+            // optionalIntField is left unset to test default behavior
         }
         val encoded = message.toByteArray()
         println("Encoded size: ${encoded.size} bytes")

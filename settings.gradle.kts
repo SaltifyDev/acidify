@@ -17,6 +17,7 @@ plugins {
 }
 
 include(":acidify-core")
+include(":acidify-crypto")
 include(":acidify-pb")
 
 rootProject.name = "acidify"

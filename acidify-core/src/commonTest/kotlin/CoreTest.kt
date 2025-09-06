@@ -28,7 +28,7 @@ val defaultAppInfo = AppInfo(
     ntLoginType = 1
 )
 
-val defaultSignProvider = UrlSignProvider("https://sign.lagrangecore.org/api/sign/30366")
+val defaultSignProvider = UrlSignProvider("https://sign.lagrangecore.org/api/sign/39038")
 
 class CoreTest {
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -37,7 +37,7 @@ class CoreTest {
     @BeforeTest
     fun setup() {
         client = LagrangeClient(
-            appInfo = defaultAppInfo,
+            appInfo = defaultSignProvider.getAppInfo() ?: defaultAppInfo,
             sessionStore = SessionStore.empty(),
             signProvider = defaultSignProvider,
             scope = scope

@@ -24,11 +24,11 @@ kotlin {
         mingwMain.dependencies {
             implementation(libs.ktorClientWinhttp)
         }
+        macosMain.dependencies {
+            implementation(libs.ktorClientDarwin)
+        }
         linuxMain.dependencies {
             implementation(libs.ktorClientCurl)
-        }
-        appleMain.dependencies {
-            implementation(libs.ktorClientDarwin)
         }
     }
 }

@@ -30,6 +30,7 @@ import org.ntqqrev.acidify.internal.packet.system.SsoReservedFields
 import org.ntqqrev.acidify.internal.packet.system.SsoSecureInfo
 import org.ntqqrev.acidify.internal.util.*
 import org.ntqqrev.acidify.pb.PbObject
+import org.ntqqrev.acidify.pb.invoke
 
 internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private var sequence = Random.nextInt(0x10000, 0x20000)
@@ -197,24 +198,14 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     }
 
     private suspend fun buildSsoReserved(command: String, payload: ByteArray, sequence: Int): ByteArray {
-        var result: SignProvider.Result? = null
+        val result: SignProvider.Result? = if (signRequiredCommand.contains(command)) {
+            client.signProvider.sign(command, sequence, payload)
+        } else null
 
-        if (signRequiredCommand.contains(command)) {
-            result = client.signProvider.sign(command, sequence, payload)
-        }
-
-        return PbObject(SsoReservedFields) {
-            set { trace to generateTrace() }
-            set { uid to client.sessionStore.uid }
-            if (result != null) {
-                set {
-                    secureInfo to PbObject(SsoSecureInfo) {
-                        set { sign to result.sign }
-                        set { token to result.token }
-                        set { extra to result.extra }
-                    }
-                }
-            }
+        return SsoReservedFields {
+            it[trace] = generateTrace()
+            it[uid] = client.sessionStore.uid
+            it[secureInfo] = result?.toSsoSecureInfo()
         }.toByteArray()
     }
 
@@ -257,6 +248,14 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
             1.toByte() -> TeaProvider.decrypt(encrypted, client.sessionStore.d2Key)
             2.toByte() -> TeaProvider.decrypt(encrypted, ByteArray(16))
             else -> throw Exception("Unrecognized auth flag: $authFlag")
+        }
+    }
+
+    private fun SignProvider.Result.toSsoSecureInfo(): PbObject<SsoSecureInfo> {
+        return SsoSecureInfo {
+            it[sign] = this@toSsoSecureInfo.sign
+            it[token] = this@toSsoSecureInfo.token
+            it[extra] = this@toSsoSecureInfo.extra
         }
     }
 }

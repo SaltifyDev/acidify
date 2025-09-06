@@ -4,9 +4,12 @@ import io.ktor.utils.io.core.*
 import kotlinx.io.*
 import kotlinx.io.Buffer
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.util.*
-import org.ntqqrev.acidify.pb.PbObject
+import org.ntqqrev.acidify.internal.util.Prefix
+import org.ntqqrev.acidify.internal.util.barrier
+import org.ntqqrev.acidify.internal.util.fromHex
+import org.ntqqrev.acidify.internal.util.writeString
 import org.ntqqrev.acidify.pb.PbSchema
+import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.pb.pb
 
 internal class TlvQrCode(val client: LagrangeClient) {
@@ -55,14 +58,12 @@ internal class TlvQrCode(val client: LagrangeClient) {
     }
 
     fun tlvD1() = defineTlv(0xd1u) {
-        val body = PbObject(BodyD1) {
-            set {
-                system to PbObject(BodyD1.System) {
-                    set { os to client.appInfo.os }
-                    set { deviceName to client.sessionStore.deviceName }
-                }
+        val body = BodyD1 {
+            it[system] = BodyD1.System {
+                it[os] = client.appInfo.os
+                it[deviceName] = client.sessionStore.deviceName
             }
-            set { typeBuf to "3001".fromHex() }
+            it[typeBuf] = "3001".fromHex()
         }
         writeFully(body.toByteArray())
     }

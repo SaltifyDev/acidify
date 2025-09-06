@@ -12,11 +12,15 @@ kotlin {
             implementation(libs.kotlinxSerialization)
             implementation(libs.ktorClientCore)
             implementation(libs.ktorClientCIO)
+            implementation(libs.ktorClientContentNegotiation)
             implementation(libs.ktorSerializationKotlinxJson)
             implementation(libs.kmpBigNum)
             implementation(libs.bundles.crypto)
             implementation(libs.bundles.korlibs)
             implementation(libs.kermit)
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
         }
     }
 }

@@ -17,6 +17,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.internal.util.fromHex
@@ -29,7 +30,9 @@ class UrlSignProvider(val url: String, val httpProxy: String? = null) : SignProv
     )
 
     private val client = HttpClient {
-        install(ContentNegotiation) { json() }
+        install(ContentNegotiation) {
+            json(Json { ignoreUnknownKeys = true })
+        }
         engine {
             if (!httpProxy.isNullOrEmpty()) {
                 proxy = ProxyBuilder.http(httpProxy)

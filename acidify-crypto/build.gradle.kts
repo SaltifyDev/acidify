@@ -1,6 +1,6 @@
 plugins {
     id("buildsrc.convention.kotlin-multiplatform")
-    id("org.jetbrains.kotlinx.atomicfu") version "0.29.0"
+    alias(libs.plugins.kotlinxAtomicfu)
 }
 
 kotlin {

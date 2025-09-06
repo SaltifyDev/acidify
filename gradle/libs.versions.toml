@@ -7,6 +7,7 @@ kotlin = "2.2.10"
 kotlinxSerializationJSON = "1.9.0"
 kotlinxCoroutines = "1.10.2"
 kotlinxIO = "0.8.0"
+kotlinxAtomicfu = "0.29.0"
 ktor = "3.2.3"
 korlibs = "6.0.0"
 kermit = "2.0.8"
@@ -35,3 +36,4 @@ korlibs = ["korlibsCompression"]
 
 [plugins]
 kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinxAtomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kotlinxAtomicfu" }

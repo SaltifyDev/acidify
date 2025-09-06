@@ -21,5 +21,14 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
+        mingwMain.dependencies {
+            implementation(libs.ktorClientWinhttp)
+        }
+        linuxMain.dependencies {
+            implementation(libs.ktorClientCurl)
+        }
+        appleMain.dependencies {
+            implementation(libs.ktorClientDarwin)
+        }
     }
 }

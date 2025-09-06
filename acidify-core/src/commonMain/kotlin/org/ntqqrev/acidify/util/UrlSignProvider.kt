@@ -6,7 +6,6 @@ import co.touchlab.kermit.platformLogWriter
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.ProxyBuilder
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.http
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
@@ -29,7 +28,7 @@ class UrlSignProvider(val url: String, val httpProxy: String? = null) : SignProv
         "UrlSignProvider"
     )
 
-    private val client = HttpClient(CIO) {
+    private val client = HttpClient {
         install(ContentNegotiation) { json() }
         engine {
             if (!httpProxy.isNullOrEmpty()) {

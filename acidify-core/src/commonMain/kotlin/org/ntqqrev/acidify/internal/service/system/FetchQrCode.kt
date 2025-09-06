@@ -1,10 +1,6 @@
 package org.ntqqrev.acidify.internal.service.system
 
-import kotlinx.io.Buffer
-import kotlinx.io.readByteArray
-import kotlinx.io.writeUInt
-import kotlinx.io.writeULong
-import kotlinx.io.writeUShort
+import kotlinx.io.*
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.login.TlvQrCode
 import org.ntqqrev.acidify.internal.service.NoInputService
@@ -13,9 +9,7 @@ import org.ntqqrev.acidify.internal.util.reader
 import org.ntqqrev.acidify.internal.util.writeBytes
 import org.ntqqrev.acidify.pb.PbObject
 
-internal object FetchQrCode : NoInputService<FetchQrCode.Result> {
-    override val cmd = "wtlogin.trans_emp"
-
+internal object FetchQrCode : NoInputService<FetchQrCode.Result>("wtlogin.trans_emp") {
     override fun build(client: LagrangeClient, payload: Unit): ByteArray {
         val tlvPack = TlvQrCode(client).apply {
             tlv16()

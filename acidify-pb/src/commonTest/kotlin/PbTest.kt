@@ -62,7 +62,7 @@ class PbTest {
         val encoded = message.toByteArray()
         println("Encoded size: ${encoded.size} bytes")
         println("Encoded data: ${encoded.toHexString()}")
-        val decodedMessage = PbObject(TestSchema1, encoded)
+        val decodedMessage = TestSchema1(encoded)
         assertEquals(message.get { intField }, decodedMessage.get { intField })
         assertEquals(message.get { longField }, decodedMessage.get { longField })
         assertEquals(message.get { repeatedIntField }, decodedMessage.get { repeatedIntField })

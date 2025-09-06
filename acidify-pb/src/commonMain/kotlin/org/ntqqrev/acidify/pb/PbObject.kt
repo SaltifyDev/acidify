@@ -45,14 +45,6 @@ class PbObject<S : PbSchema> internal constructor(
         set(type, value)
     }
 
-    operator fun invoke(block: S.(PbObject<S>) -> Unit) {
-        schema.block(this)
-    }
-
-    operator fun <T> invoke(block: S.() -> T): T {
-        return schema.block()
-    }
-
     fun toByteArray(): ByteArray {
         return tokens.encodeToBuffer().readByteArray()
     }

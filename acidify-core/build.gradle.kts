@@ -6,6 +6,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(project(":acidify-crypto"))
             implementation(project(":acidify-pb"))
             implementation(libs.kotlinxIO)
             implementation(libs.kotlinxCoroutines)
@@ -14,8 +15,6 @@ kotlin {
             implementation(libs.ktorClientCIO)
             implementation(libs.ktorClientContentNegotiation)
             implementation(libs.ktorSerializationKotlinxJson)
-            implementation(libs.kmpBigNum)
-            implementation(libs.bundles.crypto)
             implementation(libs.bundles.korlibs)
             implementation(libs.kermit)
         }

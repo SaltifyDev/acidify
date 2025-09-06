@@ -8,8 +8,6 @@ kotlinxSerializationJSON = "1.9.0"
 kotlinxCoroutines = "1.10.2"
 kotlinxIO = "0.8.0"
 ktor = "3.2.3"
-kmpBigNum = "0.3.10"
-crypto = "0.5.0"
 korlibs = "6.0.0"
 kermit = "2.0.8"
 
@@ -25,17 +23,11 @@ ktorClientCIO = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktorClientContentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktorSerializationKotlinxJson = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
-kmpBigNum = { module = "com.ionspin.kotlin:bignum", version.ref = "kmpBigNum" }
-
-cryptoCore = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "crypto" }
-cryptoProviderOptimal = { module = "dev.whyoleg.cryptography:cryptography-provider-optimal", version.ref = "crypto" }
-
 korlibsCompression = { module = "com.soywiz:korlibs-compression", version.ref = "korlibs" }
 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 [bundles]
-crypto = ["cryptoCore", "cryptoProviderOptimal"]
 korlibs = ["korlibsCompression"]
 
 [plugins]

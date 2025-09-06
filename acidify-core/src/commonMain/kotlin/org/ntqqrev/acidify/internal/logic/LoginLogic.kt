@@ -4,11 +4,11 @@ import io.ktor.util.date.getTimeMillis
 import io.ktor.utils.io.core.*
 import kotlinx.io.*
 import kotlinx.io.Buffer
+import org.lagrange.library.crypto.ecdh.Ecdh
+import org.lagrange.library.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.util.BinaryReader
 import org.ntqqrev.acidify.internal.util.Prefix
-import org.ntqqrev.acidify.internal.util.crypto.ECDH
-import org.ntqqrev.acidify.internal.util.crypto.TEA
 import org.ntqqrev.acidify.internal.util.barrier
 import org.ntqqrev.acidify.internal.util.fromHex
 import org.ntqqrev.acidify.internal.util.reader
@@ -18,6 +18,7 @@ import kotlin.random.Random
 internal class LoginLogic(client: LagrangeClient) : AbstractLogic(client) {
     private val ecdhKey =
         "04928D8850673088B343264E0C6BACB8496D697799F37211DEB25BB73906CB089FEA9639B4E0260498B51A992D50813DA8".fromHex()
+    private val ecdhProvider = Ecdh.generateKeyPair(Ecdh.Secp192K1)
 
     fun buildCode2DPacket(tlvPack: ByteArray, command: UShort): ByteArray {
         val newPacket = Buffer().apply {
@@ -65,7 +66,7 @@ internal class LoginLogic(client: LagrangeClient) : AbstractLogic(client) {
     }
 
     fun buildWtLogin(payload: ByteArray, command: UShort): ByteArray {
-        val encrypted = TEA.encrypt(payload, ECDH.secp192k1.keyExchange(ecdhKey, true))
+        val encrypted = TeaProvider.encrypt(payload, Ecdh.keyExchange(ecdhProvider, ecdhKey, true))
         val packet = Buffer()
         packet.writeByte(2)
         packet.barrier(Prefix.UINT_16 or Prefix.INCLUDE_PREFIX, 1) {
@@ -105,9 +106,9 @@ internal class LoginLogic(client: LagrangeClient) : AbstractLogic(client) {
         reader.skip(15)
 
         val encrypted = reader.readByteArray(reader.remaining - 1)
-        val decrypted = TEA.decrypt(
+        val decrypted = TeaProvider.decrypt(
             encrypted,
-            ECDH.secp192k1.keyExchange(ecdhKey, true)
+            Ecdh.keyExchange(ecdhProvider, ecdhKey, true)
         )
         if (reader.readByte() != 0x03.toByte()) throw Exception("Packet end not found")
 
@@ -119,7 +120,7 @@ internal class LoginLogic(client: LagrangeClient) : AbstractLogic(client) {
         writeByte(1)
         writeBytes(Random.nextBytes(16))
         writeUShort(0x102u) // unknown const
-        writeBytes(ECDH.secp192k1.getPublicKey(true), Prefix.UINT_16 or Prefix.LENGTH_ONLY)
+        writeBytes(ecdhProvider.packPublic(true), Prefix.UINT_16 or Prefix.LENGTH_ONLY)
     }.readByteArray()
 
     fun readTlv(reader: BinaryReader): Map<UShort, ByteArray> {

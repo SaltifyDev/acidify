@@ -4,8 +4,8 @@ import io.ktor.util.date.getTimeMillis
 import io.ktor.utils.io.core.*
 import kotlinx.io.*
 import kotlinx.io.Buffer
+import org.lagrange.library.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.util.crypto.TEA
 import org.ntqqrev.acidify.internal.util.*
 import org.ntqqrev.acidify.pb.PbSchema
 import org.ntqqrev.acidify.pb.pb
@@ -66,7 +66,7 @@ internal class Tlv(val client: LagrangeClient) {
         buf.writeFully(ByteArray(4))
         buf.writeFully(md5pass)
 
-        writeBytes(TEA.encrypt(body.readByteArray(), buf.readByteArray()))
+        writeBytes(TeaProvider.encrypt(body.readByteArray(), buf.readByteArray()))
     }
 
     fun tlv107() = defineTlv(0x107u) {
@@ -116,7 +116,7 @@ internal class Tlv(val client: LagrangeClient) {
             tlv124()
         }
 
-        writeBytes(TEA.encrypt(tlvPack.build(), client.sessionStore.tgtgt))
+        writeBytes(TeaProvider.encrypt(tlvPack.build(), client.sessionStore.tgtgt))
     }
 
     fun tlv145() = defineTlv(0x145u) {

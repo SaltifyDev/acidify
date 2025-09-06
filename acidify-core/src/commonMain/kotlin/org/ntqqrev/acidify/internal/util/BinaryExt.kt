@@ -1,18 +1,11 @@
-@file:OptIn(DelicateCryptographyApi::class)
-
 package org.ntqqrev.acidify.internal.util
 
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.DelicateCryptographyApi
-import dev.whyoleg.cryptography.algorithms.MD5
 import io.ktor.utils.io.core.*
 import kotlinx.io.*
 import kotlinx.io.Buffer
+import org.lagrange.library.crypto.hash.MD5
 
-val provider = CryptographyProvider.Default
-val md5 = provider.get(MD5).hasher()
-
-internal fun ByteArray.md5(): ByteArray = md5.hashBlocking(this)
+internal fun ByteArray.md5(): ByteArray = MD5.hash(this)
 
 internal fun ByteArray.toHex(): String {
     return joinToString("") {

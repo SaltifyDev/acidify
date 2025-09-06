@@ -23,12 +23,12 @@ import org.ntqqrev.acidify.internal.LagrangeClient
 import kotlin.random.Random
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
+import org.lagrange.library.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.internal.packet.SsoResponse
 import org.ntqqrev.acidify.internal.packet.system.SsoReservedFields
 import org.ntqqrev.acidify.internal.packet.system.SsoSecureInfo
 import org.ntqqrev.acidify.internal.util.*
-import org.ntqqrev.acidify.internal.util.crypto.TEA
 import org.ntqqrev.acidify.pb.PbObject
 
 internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
@@ -161,7 +161,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
             writeBytes(client.sessionStore.d2, Prefix.UINT_32 or Prefix.INCLUDE_PREFIX)
             writeByte(0) // unknown
             writeString(client.sessionStore.uin.toString(), Prefix.UINT_32 or Prefix.INCLUDE_PREFIX)
-            writeBytes(TEA.encrypt(sso, client.sessionStore.d2Key))
+            writeBytes(TeaProvider.encrypt(sso, client.sessionStore.d2Key))
         }
 
         return packet
@@ -254,8 +254,8 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
         val encrypted = reader.readByteArray()
         return when (authFlag) {
             0.toByte() -> encrypted
-            1.toByte() -> TEA.decrypt(encrypted, client.sessionStore.d2Key)
-            2.toByte() -> TEA.decrypt(encrypted, ByteArray(16))
+            1.toByte() -> TeaProvider.decrypt(encrypted, client.sessionStore.d2Key)
+            2.toByte() -> TeaProvider.decrypt(encrypted, ByteArray(16))
             else -> throw Exception("Unrecognized auth flag: $authFlag")
         }
     }

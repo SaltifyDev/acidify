@@ -8,9 +8,7 @@ import org.ntqqrev.acidify.internal.util.Prefix
 import org.ntqqrev.acidify.internal.util.barrier
 import org.ntqqrev.acidify.internal.util.fromHex
 import org.ntqqrev.acidify.internal.util.writeString
-import org.ntqqrev.acidify.pb.PbSchema
-import org.ntqqrev.acidify.pb.invoke
-import org.ntqqrev.acidify.pb.pb
+import org.ntqqrev.acidify.pb.*
 
 internal class TlvQrCode(val client: LagrangeClient) {
     private val builder = Buffer()
@@ -83,17 +81,17 @@ internal class TlvQrCode(val client: LagrangeClient) {
     }
 
     object BodyD1 : PbSchema() {
-        val system = pb message System field 1
-        val typeBuf = pb bytes 4
+        val system = System[1]
+        val typeBuf = PbBytes[4]
 
         object System : PbSchema() {
-            val os = pb string 1
-            val deviceName = pb string 2
+            val os = PbString[1]
+            val deviceName = PbString[2]
         }
     }
 
     object BodyD1Response : PbSchema() {
-        val qrCodeUrl = pb string 2
-        val qrSig = pb string 3
+        val qrCodeUrl = PbString[2]
+        val qrSig = PbString[3]
     }
 }

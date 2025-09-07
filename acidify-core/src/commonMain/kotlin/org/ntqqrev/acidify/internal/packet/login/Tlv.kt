@@ -1,14 +1,18 @@
 package org.ntqqrev.acidify.internal.packet.login
 
-import io.ktor.util.date.getTimeMillis
+import io.ktor.util.date.*
 import io.ktor.utils.io.core.*
 import kotlinx.io.*
 import kotlinx.io.Buffer
 import org.lagrange.library.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.util.*
+import org.ntqqrev.acidify.internal.util.Prefix
+import org.ntqqrev.acidify.internal.util.barrier
+import org.ntqqrev.acidify.internal.util.writeBytes
+import org.ntqqrev.acidify.internal.util.writeString
 import org.ntqqrev.acidify.pb.PbSchema
-import org.ntqqrev.acidify.pb.pb
+import org.ntqqrev.acidify.pb.PbString
+import org.ntqqrev.acidify.pb.get
 import kotlin.random.Random
 
 internal class Tlv(val client: LagrangeClient) {
@@ -175,13 +179,13 @@ internal class Tlv(val client: LagrangeClient) {
     }
 
     object Body543 : PbSchema() {
-        val layer1 = pb message Layer1 field 9
+        val layer1 = Layer1[9]
 
         object Layer1 : PbSchema() {
-            val layer2 = pb message Layer2 field 11
+            val layer2 = Layer2[11]
 
             object Layer2 : PbSchema() {
-                val uid = pb string 1
+                val uid = PbString[11]
             }
         }
     }

@@ -1,10 +1,12 @@
 package org.ntqqrev.acidify.internal.packet.system
 
+import org.ntqqrev.acidify.pb.PbOptional
 import org.ntqqrev.acidify.pb.PbSchema
-import org.ntqqrev.acidify.pb.pb
+import org.ntqqrev.acidify.pb.PbString
+import org.ntqqrev.acidify.pb.get
 
 object SsoReservedFields : PbSchema() {
-    val trace = pb string 15
-    val uid = pb.optional string 16
-    val secureInfo = pb.optional message SsoSecureInfo field 24
+    val trace = PbString[15]
+    val uid = PbOptional[PbString[5]]
+    val secureInfo = PbOptional[SsoSecureInfo[24]]
 }

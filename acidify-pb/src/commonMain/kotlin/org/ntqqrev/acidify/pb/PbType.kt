@@ -26,6 +26,10 @@ class PbInt32(fieldNumber: Int) : PbType<Int>(fieldNumber) {
     }
 
     override val defaultValue: Int = 0
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbInt32(fieldNumber)
+    }
 }
 
 class PbRepeatedInt32(
@@ -62,6 +66,10 @@ class PbRepeatedInt32(
     }
 
     override val defaultValue: List<Int> = emptyList()
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbRepeatedInt32(fieldNumber)
+    }
 }
 
 class PbInt64(fieldNumber: Int) : PbType<Long>(fieldNumber) {
@@ -74,6 +82,10 @@ class PbInt64(fieldNumber: Int) : PbType<Long>(fieldNumber) {
     }
 
     override val defaultValue: Long = 0L
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbInt64(fieldNumber)
+    }
 }
 
 class PbRepeatedInt64(
@@ -110,6 +122,10 @@ class PbRepeatedInt64(
     }
 
     override val defaultValue: List<Long> = emptyList()
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbRepeatedInt64(fieldNumber)
+    }
 }
 
 class PbBoolean(fieldNumber: Int) : PbType<Boolean>(fieldNumber) {
@@ -123,6 +139,10 @@ class PbBoolean(fieldNumber: Int) : PbType<Boolean>(fieldNumber) {
     }
 
     override val defaultValue: Boolean = false
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbBoolean(fieldNumber)
+    }
 }
 
 class PbBytes(fieldNumber: Int) : PbType<ByteArray>(fieldNumber) {
@@ -135,6 +155,10 @@ class PbBytes(fieldNumber: Int) : PbType<ByteArray>(fieldNumber) {
     }
 
     override val defaultValue: ByteArray = ByteArray(0)
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbBytes(fieldNumber)
+    }
 }
 
 class PbRepeatedBytes(fieldNumber: Int) : PbType<List<ByteArray>>(fieldNumber) {
@@ -147,6 +171,10 @@ class PbRepeatedBytes(fieldNumber: Int) : PbType<List<ByteArray>>(fieldNumber) {
     }
 
     override val defaultValue: List<ByteArray> = emptyList()
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbRepeatedBytes(fieldNumber)
+    }
 }
 
 class PbString(fieldNumber: Int) : PbType<String>(fieldNumber) {
@@ -160,6 +188,10 @@ class PbString(fieldNumber: Int) : PbType<String>(fieldNumber) {
     }
 
     override val defaultValue: String = ""
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbString(fieldNumber)
+    }
 }
 
 class PbRepeatedString(fieldNumber: Int) : PbType<List<String>>(fieldNumber) {
@@ -172,6 +204,10 @@ class PbRepeatedString(fieldNumber: Int) : PbType<List<String>>(fieldNumber) {
     }
 
     override val defaultValue: List<String> = emptyList()
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbRepeatedString(fieldNumber)
+    }
 }
 
 class PbMessage<S : PbSchema>(fieldNumber: Int, val schema: S) : PbType<PbObject<S>>(fieldNumber) {
@@ -187,6 +223,8 @@ class PbMessage<S : PbSchema>(fieldNumber: Int, val schema: S) : PbType<PbObject
 
     override val defaultValue: PbObject<S> = PbObject(schema) { }
 }
+
+operator fun <S : PbSchema> S.get(fieldNumber: Int) = PbMessage(fieldNumber, this)
 
 class PbRepeatedMessage<S : PbSchema>(fieldNumber: Int, val schema: S) : PbType<List<PbObject<S>>>(fieldNumber) {
     override fun encode(value: List<PbObject<S>>): MutableList<DataToken> {
@@ -206,6 +244,10 @@ class PbRepeatedMessage<S : PbSchema>(fieldNumber: Int, val schema: S) : PbType<
     override val defaultValue: List<PbObject<S>> = emptyList()
 }
 
+object PbRepeated {
+    operator fun <S : PbSchema> get(pbMsg: PbMessage<S>) = PbRepeatedMessage(pbMsg.fieldNumber, pbMsg.schema)
+}
+
 class PbOptional<T>(private val wrapped: PbType<T>) : PbType<T?>(wrapped.fieldNumber) {
     override fun encode(value: T?): MutableList<DataToken> {
         return if (value == null) {
@@ -221,4 +263,8 @@ class PbOptional<T>(private val wrapped: PbType<T>) : PbType<T?>(wrapped.fieldNu
     }
 
     override val defaultValue: T? = null
+
+    companion object {
+        operator fun <T> get(pbType: PbType<T>) = PbOptional(pbType)
+    }
 }

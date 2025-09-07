@@ -1,10 +1,10 @@
 package org.ntqqrev.acidify.internal.packet.system
 
+import org.ntqqrev.acidify.pb.PbBytes
 import org.ntqqrev.acidify.pb.PbSchema
-import org.ntqqrev.acidify.pb.pb
 
 object SsoSecureInfo : PbSchema() {
-    val sign = pb bytes 1
-    val token = pb bytes 2
-    val extra = pb bytes 3
+    val sign = PbBytes[1]
+    val token = PbBytes[2]
+    val extra = PbBytes[3]
 }

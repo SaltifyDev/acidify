@@ -82,20 +82,18 @@ internal class TlvQrCode(val client: LagrangeClient) {
         }
     }
 
-    companion object {
-        object BodyD1 : PbSchema() {
-            val system = pb message System field 1
-            val typeBuf = pb bytes 4
+    object BodyD1 : PbSchema() {
+        val system = pb message System field 1
+        val typeBuf = pb bytes 4
 
-            object System : PbSchema() {
-                val os = pb string 1
-                val deviceName = pb string 2
-            }
+        object System : PbSchema() {
+            val os = pb string 1
+            val deviceName = pb string 2
         }
+    }
 
-        object BodyD1Response : PbSchema() {
-            val qrCodeUrl = pb string 2
-            val qrSig = pb string 3
-        }
+    object BodyD1Response : PbSchema() {
+        val qrCodeUrl = pb string 2
+        val qrSig = pb string 3
     }
 }

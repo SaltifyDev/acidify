@@ -40,7 +40,7 @@ internal object FetchQrCode : NoInputService<FetchQrCode.Result>("wtlogin.trans_
         val sig = reader.readPrefixedBytes(Prefix.UINT_16 or Prefix.LENGTH_ONLY)
         val tlv = client.loginLogic.readTlv(reader)
         client.sessionStore.qrSig = sig
-        val respD1Body = TlvQrCode.Companion.BodyD1Response(tlv.getValue(0xD1u))
+        val respD1Body = TlvQrCode.BodyD1Response(tlv.getValue(0xD1u))
         return Result(
             qrCodeUrl = respD1Body.get { qrCodeUrl },
             qrCodePng = tlv.getValue(0x17u)

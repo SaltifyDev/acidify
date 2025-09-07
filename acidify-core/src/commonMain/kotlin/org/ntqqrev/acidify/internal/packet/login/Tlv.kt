@@ -174,16 +174,14 @@ internal class Tlv(val client: LagrangeClient) {
         }
     }
 
-    companion object {
-        object Body543 : PbSchema() {
-            val layer1 = pb message Layer1 field 9
+    object Body543 : PbSchema() {
+        val layer1 = pb message Layer1 field 9
 
-            object Layer1 : PbSchema() {
-                val layer2 = pb message Layer2 field 11
+        object Layer1 : PbSchema() {
+            val layer2 = pb message Layer2 field 11
 
-                object Layer2 : PbSchema() {
-                    val uid = pb string 1
-                }
+            object Layer2 : PbSchema() {
+                val uid = pb string 1
             }
         }
     }

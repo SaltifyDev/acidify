@@ -23,6 +23,11 @@ import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.internal.util.fromHex
 import org.ntqqrev.acidify.internal.util.toHex
 
+/**
+ * 通过 HTTP 接口进行签名的 [SignProvider] 实现
+ * @param url 签名服务的 URL 地址
+ * @param httpProxy 可选的 HTTP 代理地址，例如 `http://127.0.0.1:7890`
+ */
 class UrlSignProvider(val url: String, val httpProxy: String? = null) : SignProvider {
     private val logger = Logger(
         loggerConfigInit(platformLogWriter()),
@@ -50,6 +55,9 @@ class UrlSignProvider(val url: String, val httpProxy: String? = null) : SignProv
         return SignProvider.Result(value.sign.fromHex(), value.token.fromHex(), value.extra.fromHex())
     }
 
+    /**
+     * 通过 Lagrange 的签名服务提供的额外的 `/appinfo` 接口获取 [AppInfo]，若未提供则返回 `null`
+     */
     fun getAppInfo(): AppInfo? {
         return runBlocking {
             val response = client.get("$url/appinfo")

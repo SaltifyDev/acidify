@@ -1,7 +1,13 @@
 package org.ntqqrev.acidify.exception
 
+/**
+ * 服务调用异常
+ * @property cmd 服务的 `cmd`
+ * @property retCode 错误码，为非 0 值
+ * @property extra 额外信息
+ */
 class ServiceException(
-    cmd: String,
-    retCode: Int,
-    extra: String
+    val cmd: String,
+    val retCode: Int,
+    val extra: String
 ) : Exception("Service ($cmd) call failed with code $retCode: $extra")

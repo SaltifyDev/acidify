@@ -3,6 +3,9 @@ package org.ntqqrev.acidify.common
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Bot 登录所模拟的 QQ 客户端信息
+ */
 @Serializable
 class AppInfo(
     @SerialName("Os") val os: String,

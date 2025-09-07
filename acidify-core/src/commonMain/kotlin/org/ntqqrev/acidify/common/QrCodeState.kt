@@ -1,14 +1,40 @@
 package org.ntqqrev.acidify.common
 
+/**
+ * 二维码状态
+ */
 enum class QrCodeState(val value: Byte) {
+    /**
+     * 未知状态
+     */
     UNKNOWN(-1),
+
+    /**
+     * 用户已确认
+     */
     CONFIRMED(0),
+
+    /**
+     * 二维码已过期
+     */
     CODE_EXPIRED(17),
+
+    /**
+     * 二维码已生成，等待扫描
+     */
     WAITING_FOR_SCAN(48),
+
+    /**
+     * 二维码已扫描，等待用户确认
+     */
     WAITING_FOR_CONFIRMATION(53),
+
+    /**
+     * 用户取消登录
+     */
     CANCELLED(54);
 
     companion object {
-        fun fromByte(value: Byte): QrCodeState = entries.find { it.value == value } ?: UNKNOWN
+        internal fun fromByte(value: Byte): QrCodeState = entries.find { it.value == value } ?: UNKNOWN
     }
 }

@@ -59,7 +59,11 @@ class BotTest {
             }
         }
         runBlocking {
-            bot.tryLogin()
+            if (session.a2.isEmpty()) {
+                bot.qrCodeLogin()
+            } else {
+                bot.tryLogin()
+            }
         }
     }
 

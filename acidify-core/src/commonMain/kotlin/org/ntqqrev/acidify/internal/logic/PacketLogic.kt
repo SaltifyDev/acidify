@@ -1,30 +1,20 @@
 package org.ntqqrev.acidify.internal.logic
 
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.loggerConfigInit
-import co.touchlab.kermit.platformLogWriter
-import io.ktor.network.selector.SelectorManager
-import io.ktor.network.sockets.aSocket
-import io.ktor.network.sockets.openReadChannel
-import io.ktor.network.sockets.openWriteChannel
-import io.ktor.util.collections.ConcurrentMap
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.ByteWriteChannel
-import io.ktor.utils.io.cancel
-import io.ktor.utils.io.core.writeFully
-import io.ktor.utils.io.readByteArray
-import io.ktor.utils.io.writePacket
+import io.ktor.network.selector.*
+import io.ktor.network.sockets.*
+import io.ktor.util.collections.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
 import korlibs.io.compression.deflate.ZLib
 import korlibs.io.compression.uncompress
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.ntqqrev.acidify.internal.LagrangeClient
-import kotlin.random.Random
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import org.lagrange.library.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.common.SignProvider
+import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.SsoResponse
 import org.ntqqrev.acidify.internal.packet.system.SsoReservedFields
 import org.ntqqrev.acidify.internal.packet.system.SsoSecureInfo
@@ -32,6 +22,7 @@ import org.ntqqrev.acidify.internal.util.*
 import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.util.createLogger
+import kotlin.random.Random
 
 internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private var sequence = Random.nextInt(0x10000, 0x20000)

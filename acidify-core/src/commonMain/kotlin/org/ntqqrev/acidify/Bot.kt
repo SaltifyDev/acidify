@@ -22,6 +22,7 @@ import org.ntqqrev.acidify.internal.service.system.WtLogin
  */
 class Bot internal constructor(internal val client: LagrangeClient) {
     internal val sharedEventFlow = MutableSharedFlow<AcidifyEvent>(
+        extraBufferCapacity = 100,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 

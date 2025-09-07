@@ -12,6 +12,7 @@ import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QrCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QrCodeStateQueryEvent
+import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.system.FetchQrCode
 import org.ntqqrev.acidify.internal.service.system.QueryQrCodeState
@@ -73,6 +74,7 @@ class Bot internal constructor(internal val client: LagrangeClient) {
         }
 
         client.callService(WtLogin)
+        sharedEventFlow.emit(SessionStoreUpdatedEvent(client.sessionStore))
         // todo: implement bot online
     }
 

@@ -59,11 +59,7 @@ class BotTest {
             }
         }
         runBlocking {
-            if (session.a2.isNotEmpty()) {
-                println("Logging in with uin ${session.uin}")
-            } else {
-                bot.qrCodeLogin()
-            }
+            bot.tryLogin()
         }
     }
 

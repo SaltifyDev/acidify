@@ -185,7 +185,7 @@ internal class Tlv(val client: LagrangeClient) {
             val layer2 = Layer2[11]
 
             object Layer2 : PbSchema() {
-                val uid = PbString[11]
+                val uid = PbString[1]
             }
         }
     }

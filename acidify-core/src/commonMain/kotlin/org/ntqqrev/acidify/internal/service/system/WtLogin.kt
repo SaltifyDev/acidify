@@ -6,7 +6,7 @@ import kotlinx.io.readByteArray
 import kotlinx.io.writeUShort
 import org.lagrange.library.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.exception.WtLoginException
+import org.ntqqrev.acidify.exception.WtLoginException
 import org.ntqqrev.acidify.internal.packet.login.Tlv
 import org.ntqqrev.acidify.internal.service.NoInputService
 import org.ntqqrev.acidify.internal.util.Prefix

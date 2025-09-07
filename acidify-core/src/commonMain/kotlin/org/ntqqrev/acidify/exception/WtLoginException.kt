@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.internal.exception
+package org.ntqqrev.acidify.exception
 
 class WtLoginException(
     code: Int,

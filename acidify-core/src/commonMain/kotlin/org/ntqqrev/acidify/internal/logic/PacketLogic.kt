@@ -31,6 +31,7 @@ import org.ntqqrev.acidify.internal.packet.system.SsoSecureInfo
 import org.ntqqrev.acidify.internal.util.*
 import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
+import org.ntqqrev.acidify.util.createLogger
 
 internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private var sequence = Random.nextInt(0x10000, 0x20000)
@@ -44,7 +45,6 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private val pending = ConcurrentMap<Int, CompletableDeferred<SsoResponse>>()
     private val headerLength = 4
     var connected = false
-
     val signRequiredCommand = setOf(
         "trpc.o3.ecdh_access.EcdhAccess.SsoEstablishShareKey",
         "trpc.o3.ecdh_access.EcdhAccess.SsoSecureAccess",
@@ -86,10 +86,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
         "OidbSvcTrpcTcp.0x6d9_4"
     )
 
-    private val logger = Logger(
-        loggerConfigInit(platformLogWriter()),
-        "PacketLogic"
-    )
+    private val logger = createLogger(this)
 
     suspend fun connect() {
         val s = socket.connect(host, port)

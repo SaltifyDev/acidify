@@ -29,11 +29,7 @@ import org.ntqqrev.acidify.internal.util.toHex
  * @param httpProxy 可选的 HTTP 代理地址，例如 `http://127.0.0.1:7890`
  */
 class UrlSignProvider(val url: String, val httpProxy: String? = null) : SignProvider {
-    private val logger = Logger(
-        loggerConfigInit(platformLogWriter()),
-        "UrlSignProvider"
-    )
-
+    private val logger = createLogger(this)
     private val client = HttpClient {
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })

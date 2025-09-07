@@ -19,11 +19,13 @@ import org.ntqqrev.acidify.internal.service.system.BotOnline
 import org.ntqqrev.acidify.internal.service.system.FetchQrCode
 import org.ntqqrev.acidify.internal.service.system.QueryQrCodeState
 import org.ntqqrev.acidify.internal.service.system.WtLogin
+import org.ntqqrev.acidify.util.createLogger
 
 /**
  * Acidify Bot 实例
  */
 class Bot internal constructor(internal val client: LagrangeClient) {
+    private val logger = createLogger(this)
     internal val sharedEventFlow = MutableSharedFlow<AcidifyEvent>(
         extraBufferCapacity = 100,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
@@ -98,14 +100,16 @@ class Bot internal constructor(internal val client: LagrangeClient) {
     }
 
     /**
-     * 先尝试使用现有的 Session 信息登录，若失败则需要调用 [qrCodeLogin] 重新登录。
+     * 先尝试使用现有的 Session 信息登录，若失败则调用 [qrCodeLogin] 重新登录。
      * 如果是第一次登录，请务必调用 [qrCodeLogin]。
      */
     suspend fun tryLogin() {
         try {
             online()
-        } catch (e: BotOnlineException) {
-            // todo: log e
+        } catch (e: Exception) {
+            logger.w(e) { "使用现有 Session 登录失败，尝试二维码登录" }
+            client.sessionStore.clear()
+            sharedEventFlow.emit(SessionStoreUpdatedEvent(client.sessionStore))
             qrCodeLogin()
         }
     }

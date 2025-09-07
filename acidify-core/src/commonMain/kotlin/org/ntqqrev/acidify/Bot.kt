@@ -13,7 +13,9 @@ import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QrCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QrCodeStateQueryEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
+import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
+import org.ntqqrev.acidify.internal.service.system.BotOnline
 import org.ntqqrev.acidify.internal.service.system.FetchQrCode
 import org.ntqqrev.acidify.internal.service.system.QueryQrCodeState
 import org.ntqqrev.acidify.internal.service.system.WtLogin
@@ -75,7 +77,37 @@ class Bot internal constructor(internal val client: LagrangeClient) {
 
         client.callService(WtLogin)
         sharedEventFlow.emit(SessionStoreUpdatedEvent(client.sessionStore))
-        // todo: implement bot online
+        online()
+    }
+
+    /**
+     * 尝试使用现有的 Session 信息上线。
+     * 请优先调用 [tryLogin]，该方法会在现有 Session 失效时自动调用 [qrCodeLogin]。
+     * 若确定 Session 有效且不希望进行二维码登录，可调用此方法。
+     */
+    suspend fun online() {
+        val result = client.callService(BotOnline)
+        if (result != "register success") {
+            throw BotOnlineException(result)
+        }
+        // todo: post online logic
+        // - heartbeat
+        // - fetch friends/groups
+        // - get face details
+        // - get highway url
+    }
+
+    /**
+     * 先尝试使用现有的 Session 信息登录，若失败则需要调用 [qrCodeLogin] 重新登录。
+     * 如果是第一次登录，请务必调用 [qrCodeLogin]。
+     */
+    suspend fun tryLogin() {
+        try {
+            online()
+        } catch (e: BotOnlineException) {
+            // todo: log e
+            qrCodeLogin()
+        }
     }
 
     companion object {

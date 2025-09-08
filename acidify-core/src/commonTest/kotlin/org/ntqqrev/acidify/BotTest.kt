@@ -2,6 +2,7 @@
 
 package org.ntqqrev.acidify
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.buffered
@@ -15,6 +16,7 @@ import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.event.QrCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QrCodeStateQueryEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
+import org.ntqqrev.acidify.util.createLogger
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -68,8 +70,18 @@ class BotTest {
     }
 
     @Test
-    fun dummyTest() {
-        // just a dummy test to make the test framework happy
-        assertTrue(true)
+    fun logColorTest() {
+        val logger = createLogger(this)
+        logger.v { "Verbose (trace) message" }
+        logger.d { "Debug message" }
+        logger.i { "Info message" }
+        logger.w { "Warning message" }
+        logger.e { "Error message" }
+        logger.a { "Assert (fatal) message" }
+    }
+
+    @Test
+    fun packetReceivingTest() = runBlocking {
+        delay(30_000L)
     }
 }

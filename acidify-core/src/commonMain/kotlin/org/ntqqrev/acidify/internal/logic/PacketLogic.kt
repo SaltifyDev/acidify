@@ -113,7 +113,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
         pending[sequence] = deferred
 
         output.writePacket(service)
-        logger.d { "[seq=$sequence] -> $cmd" }
+        logger.t { "[seq=$sequence] -> $cmd" }
 
         return deferred.await()
     }

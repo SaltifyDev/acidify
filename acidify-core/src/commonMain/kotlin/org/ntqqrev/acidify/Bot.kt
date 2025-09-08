@@ -15,6 +15,7 @@ import org.ntqqrev.acidify.event.QrCodeStateQueryEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
+import org.ntqqrev.acidify.internal.service.system.BotOffline
 import org.ntqqrev.acidify.internal.service.system.BotOnline
 import org.ntqqrev.acidify.internal.service.system.FetchQrCode
 import org.ntqqrev.acidify.internal.service.system.QueryQrCodeState
@@ -97,6 +98,13 @@ class Bot internal constructor(internal val client: LagrangeClient) {
         // - fetch friends/groups
         // - get face details
         // - get highway url
+    }
+
+    /**
+     * 下线 Bot，释放资源。
+     */
+    suspend fun offline() {
+        client.callService(BotOffline)
     }
 
     /**

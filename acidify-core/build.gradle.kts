@@ -17,6 +17,7 @@ kotlin {
             implementation(libs.ktorSerializationKotlinxJson)
             implementation(libs.bundles.korlibs)
             implementation(libs.kermit)
+            implementation(libs.mordant)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

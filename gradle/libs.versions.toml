@@ -11,6 +11,7 @@ kotlinxAtomicfu = "0.29.0"
 ktor = "3.2.3"
 korlibs = "6.0.0"
 kermit = "2.0.8"
+mordant = "3.0.2"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -30,6 +31,8 @@ ktorSerializationKotlinxJson = { module = "io.ktor:ktor-serialization-kotlinx-js
 korlibsCompression = { module = "com.soywiz:korlibs-compression", version.ref = "korlibs" }
 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+
+mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
 
 [bundles]
 korlibs = ["korlibsCompression"]

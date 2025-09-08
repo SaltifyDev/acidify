@@ -81,6 +81,14 @@ class BotTest {
     }
 
     @Test
+    fun fetchFriendsTest() = runBlocking {
+        val (friends, friendCategories) = bot.fetchFriends()
+        assertTrue(friends.isNotEmpty())
+        friends.forEach { println(it) }
+        friendCategories.forEach { println(it) }
+    }
+
+    @Test
     fun packetReceivingTest() = runBlocking {
         delay(30_000L)
     }

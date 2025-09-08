@@ -1,0 +1,26 @@
+package org.ntqqrev.acidify.common.enum
+
+/**
+ * 用户性别枚举
+ */
+enum class UserInfoGender(val value: Int) {
+    /**
+     * 未设置
+     */
+    UNSET(0),
+
+    /**
+     * 男性
+     */
+    MALE(1),
+
+    /**
+     * 女性
+     */
+    FEMALE(2),
+
+    /**
+     * 未知
+     */
+    UNKNOWN(255);
+}

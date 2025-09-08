@@ -7,7 +7,6 @@ import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.exception.ServiceException
 import org.ntqqrev.acidify.internal.logic.LoginLogic
 import org.ntqqrev.acidify.internal.logic.PacketLogic
-import org.ntqqrev.acidify.internal.service.NoInputService
 import org.ntqqrev.acidify.internal.service.Service
 
 internal class LagrangeClient(

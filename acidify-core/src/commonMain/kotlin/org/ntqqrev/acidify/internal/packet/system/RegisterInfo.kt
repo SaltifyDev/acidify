@@ -2,7 +2,7 @@ package org.ntqqrev.acidify.internal.packet.system
 
 import org.ntqqrev.acidify.pb.*
 
-object RegisterInfo : PbSchema() {
+internal object RegisterInfo : PbSchema() {
     val guid = PbString[1]
     val kickPc = PbOptional[PbBoolean[2]]
     val currentVersion = PbString[3]

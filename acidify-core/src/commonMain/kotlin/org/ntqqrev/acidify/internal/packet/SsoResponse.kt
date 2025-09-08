@@ -1,6 +1,6 @@
 package org.ntqqrev.acidify.internal.packet
 
-class SsoResponse(
+internal class SsoResponse(
     val retCode: Int,
     val command: String,
     val response: ByteArray,

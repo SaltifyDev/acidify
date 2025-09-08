@@ -4,7 +4,7 @@ import org.ntqqrev.acidify.pb.PbOptional
 import org.ntqqrev.acidify.pb.PbSchema
 import org.ntqqrev.acidify.pb.PbString
 
-object DeviceInfo : PbSchema() {
+internal object DeviceInfo : PbSchema() {
     val devName = PbString[1]
     val devType = PbString[2]
     val osVer = PbString[3]

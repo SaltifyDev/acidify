@@ -83,7 +83,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
         val s = socket.connect(host, port)
         input = s.openReadChannel()
         output = s.openWriteChannel(autoFlush = true)
-        logger.i { "Connected to $host:$port" }
+        logger.d { "Connected to $host:$port" }
         connected = true
 
         client.scope.launch {
@@ -126,7 +126,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
                 val packet = input.readByteArray(packetLength.toInt() - 4)
                 val service = parseService(packet)
                 val sso = parseSso(service)
-                logger.d { "[seq=${sso.sequence}] <- ${sso.command} (code=${sso.retCode})" }
+                logger.v { "[seq=${sso.sequence}] <- ${sso.command} (code=${sso.retCode})" }
                 pending.remove(sso.sequence).also {
                     if (it != null) {
                         it.complete(sso)

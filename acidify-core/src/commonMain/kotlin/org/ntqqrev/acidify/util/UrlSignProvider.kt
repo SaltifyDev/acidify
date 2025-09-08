@@ -34,12 +34,12 @@ class UrlSignProvider(val url: String, val httpProxy: String? = null) : SignProv
     }
 
     override suspend fun sign(cmd: String, seq: Int, src: ByteArray): SignProvider.Result {
-        logger.d { "Requesting sign for cmd=$cmd, seq=$seq, src=${src.toHex()}" }
+        logger.v { "Requesting sign for cmd=$cmd, seq=$seq" }
         val value = client.post(url) {
             contentType(ContentType.Application.Json)
             setBody(UrlSignRequest(cmd, seq, src.toHex()))
         }.body<UrlSignResponse>().value
-        logger.d { "Received sign result" }
+        logger.v { "Received sign result for cmd=$cmd, seq=$seq" }
         return SignProvider.Result(value.sign.fromHex(), value.token.fromHex(), value.extra.fromHex())
     }
 

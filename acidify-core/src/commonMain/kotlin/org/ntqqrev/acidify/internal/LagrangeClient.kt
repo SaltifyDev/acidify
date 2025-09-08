@@ -32,7 +32,7 @@ internal class LagrangeClient(
         return service.parse(this, resp.response)
     }
 
-    suspend fun <R> callService(service: NoInputService<R>): R {
+    suspend fun <R> callService(service: Service<Unit, R>): R {
         return callService(service, Unit)
     }
 }

@@ -12,6 +12,7 @@ ktor = "3.2.3"
 korlibs = "6.0.0"
 kermit = "2.0.8"
 mordant = "3.0.2"
+slf4j = "2.0.17"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -33,6 +34,8 @@ korlibsCompression = { module = "com.soywiz:korlibs-compression", version.ref = 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
+
+slf4jNop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
 
 [bundles]
 korlibs = ["korlibsCompression"]

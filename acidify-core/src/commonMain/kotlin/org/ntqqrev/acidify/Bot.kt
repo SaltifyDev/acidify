@@ -80,10 +80,12 @@ class Bot internal constructor(internal val client: LagrangeClient) {
     suspend fun qrCodeLogin(queryInterval: Long = 3000L) {
         require(queryInterval >= 1000L) { "查询间隔不能小于 1000 毫秒" }
         val qrCode = client.callService(FetchQrCode)
+        logger.i { "二维码 URL：${qrCode.qrCodeUrl}" }
         sharedEventFlow.emit(QrCodeGeneratedEvent(qrCode.qrCodeUrl, qrCode.qrCodePng))
 
         while (true) {
             val state = client.callService(QueryQrCodeState)
+            logger.d { "二维码状态：${state.name} (${state.value})" }
             sharedEventFlow.emit(QrCodeStateQueryEvent(state))
             when (state) {
                 QrCodeState.CONFIRMED -> break
@@ -96,6 +98,7 @@ class Bot internal constructor(internal val client: LagrangeClient) {
         }
 
         client.callService(WtLogin)
+        logger.d { "成功获取 $uin 的登录凭据" }
         sharedEventFlow.emit(SessionStoreUpdatedEvent(client.sessionStore))
         online()
     }
@@ -110,6 +113,7 @@ class Bot internal constructor(internal val client: LagrangeClient) {
         if (result != "register success") {
             throw BotOnlineException(result)
         }
+        logger.i { "用户 $uin 已上线" }
         // todo: post online logic
         // - heartbeat
         // - fetch friends/groups
@@ -122,6 +126,7 @@ class Bot internal constructor(internal val client: LagrangeClient) {
      */
     suspend fun offline() {
         client.callService(BotOffline)
+        logger.i { "用户 $uin 已下线" }
     }
 
     /**

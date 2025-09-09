@@ -41,17 +41,6 @@ class BotTest {
         defaultScope.launch {
             bot.eventFlow.collect {
                 when (it) {
-                    is QrCodeGeneratedEvent -> {
-                        println("QR Code URL: ${it.url}")
-                    }
-
-                    is QrCodeStateQueryEvent -> {
-                        println("QR Code State: ${it.state}")
-                        if (it.state == QrCodeState.CONFIRMED) {
-                            println("Login confirmed by user.")
-                        }
-                    }
-
                     is SessionStoreUpdatedEvent -> {
                         SystemFileSystem.sink(sessionStorePath).buffered().use { sink ->
                             Json.encodeToSink(it.sessionStore, sink)

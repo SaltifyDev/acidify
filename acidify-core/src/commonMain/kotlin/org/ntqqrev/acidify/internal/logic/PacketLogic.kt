@@ -83,7 +83,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
         val s = socket.connect(host, port)
         input = s.openReadChannel()
         output = s.openWriteChannel(autoFlush = true)
-        logger.d { "Connected to $host:$port" }
+        logger.d { "已连接到 $host:$port" }
         connected = true
 
         client.scope.launch {
@@ -135,7 +135,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
                     }
                 }
             } catch (e: Exception) {
-                logger.e(e) { "Error receiving packet" }
+                logger.e(e) { "接收数据包时出现错误" }
                 disconnect()
             }
         }

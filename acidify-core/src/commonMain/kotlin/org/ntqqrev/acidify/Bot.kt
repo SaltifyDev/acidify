@@ -55,6 +55,20 @@ class Bot internal constructor(internal val client: LagrangeClient) {
         get() = sharedEventFlow
 
     /**
+     * 当前登录用户的 uin（QQ 号）
+     */
+    val uin: Long
+        get() = client.sessionStore.uin.takeIf { it != 0L }
+            ?: throw IllegalStateException("用户尚未登录")
+
+    /**
+     * 当前登录用户的 uid
+     */
+    val uid: String
+        get() = client.sessionStore.uid.takeIf { it.isNotEmpty() }
+            ?: throw IllegalStateException("用户尚未登录")
+
+    /**
      * 发起二维码登录请求。过程中会触发事件：
      * - [QrCodeGeneratedEvent]：当二维码生成时触发，包含二维码链接和 PNG 图片数据
      * - [QrCodeStateQueryEvent]：每次查询二维码状态时触发，包含当前二维码状态（例如未扫码、已扫码未确认、已确认等）

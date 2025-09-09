@@ -24,6 +24,7 @@ internal object FetchFriends : OidbService<FetchFriends.Req, FetchFriends.Resp>(
         it[cookie] = FetchFriendsCookie {
             it[nextUin] = payload.nextUin
         }
+        it[flag] = 1
         it[requestBiz] = listOf(
             IncPull.Biz {
                 it[bizType] = 1

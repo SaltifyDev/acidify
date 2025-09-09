@@ -21,10 +21,8 @@ internal object FetchFriends : OidbService<FetchFriends.Req, FetchFriends.Resp>(
 
     override fun buildOidb(client: LagrangeClient, payload: Req): ByteArray = IncPull {
         it[reqCount] = 300
-        it[cookie] = payload.nextUin?.let {
-            FetchFriendsCookie {
-                it[nextUin] = payload.nextUin
-            }
+        it[cookie] = FetchFriendsCookie {
+            it[nextUin] = payload.nextUin
         }
         it[requestBiz] = listOf(
             IncPull.Biz {

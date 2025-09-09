@@ -6,7 +6,7 @@ internal object IncPull : PbSchema() {
     val reqCount = PbInt32[2]
     val time = PbInt64[3]
     val localSeq = PbInt32[4]
-    val cookie = PbOptional[FetchFriendsCookie[1]]
+    val cookie = FetchFriendsCookie[5]
     val flag = PbInt32[6]
     val proxySeq = PbInt32[7]
     val requestBiz = PbRepeated[Biz[10001]]

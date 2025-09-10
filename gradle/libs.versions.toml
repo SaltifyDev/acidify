@@ -29,6 +29,7 @@ ktorClientDarwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor"
 ktorClientCurl = { module = "io.ktor:ktor-client-curl", version.ref = "ktor" }
 
 ktorServerCore = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktorServerDI = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
 ktorServerCIO = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 ktorServerContentNegotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktorServerSSE = { module = "io.ktor:ktor-server-sse", version.ref = "ktor" }
@@ -52,6 +53,7 @@ ktorClient = [
 ]
 ktorServer = [
     "ktorServerCore",
+    "ktorServerDI",
     "ktorServerCIO",
     "ktorServerContentNegotiation",
     "ktorServerSSE",

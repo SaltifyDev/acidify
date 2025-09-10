@@ -45,8 +45,6 @@ kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
 
-slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
-
 [bundles]
 ktor-client = [
     "ktor-client-core",

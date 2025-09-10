@@ -20,9 +20,6 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
-        jvmMain.dependencies {
-            implementation(libs.slf4j.nop)
-        }
         mingwMain.dependencies {
             implementation(libs.ktor.client.winhttp)
         }

@@ -10,14 +10,21 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.decodeFromSource
 import kotlinx.serialization.json.io.encodeToSink
+import org.ntqqrev.acidify.common.log.LogLevel
 
 @Serializable
 class YogurtConfig(
     val signApiUrl: String = "https://sign.lagrangecore.org/api/sign/39038",
     val reportSelfMessage: Boolean = true,
     val httpConfig: MilkyHttpConfig = MilkyHttpConfig(),
-    val webhookConfig: MilkyWebhookConfig = MilkyWebhookConfig()
+    val webhookConfig: MilkyWebhookConfig = MilkyWebhookConfig(),
+    val logging: LoggingConfig = LoggingConfig()
 ) {
+    @Serializable
+    class LoggingConfig(
+        val coreLogLevel: LogLevel = LogLevel.INFO
+    )
+
     @Serializable
     class MilkyHttpConfig(
         val host: String = "127.0.0.1",

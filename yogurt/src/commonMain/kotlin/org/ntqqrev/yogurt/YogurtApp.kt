@@ -18,10 +18,8 @@ import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.UrlSignProvider
-import org.ntqqrev.acidify.util.createLogger
 
 object YogurtApp {
-    val logger = createLogger(this)
     val config = YogurtConfig.loadFromFile()
     val signProvider = UrlSignProvider(config.signApiUrl)
     val appInfo = signProvider.getAppInfo()!!
@@ -45,7 +43,14 @@ object YogurtApp {
             port = config.httpConfig.port,
             host = config.httpConfig.host
         ) {
-            val bot = Bot.create(appInfo, sessionStore, signProvider, scope)
+            val bot = Bot.create(
+                appInfo = appInfo,
+                sessionStore = sessionStore,
+                signProvider = signProvider,
+                scope = scope,
+                minLogLevel = config.logging.coreLogLevel,
+                logHandler = logHandler
+            )
             dependencies {
                 provide<Bot> { bot }
             }
@@ -62,8 +67,6 @@ object YogurtApp {
                 bot.tryLogin()
             }
         }.start()
-
-        logger.i { "服务器已在 ${config.httpConfig.host}:${config.httpConfig.port} 启动" }
 
         delay(Long.MAX_VALUE)
     }

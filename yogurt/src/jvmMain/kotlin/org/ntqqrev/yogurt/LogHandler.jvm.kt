@@ -1,0 +1,28 @@
+package org.ntqqrev.yogurt
+
+import io.ktor.util.logging.*
+import org.ntqqrev.acidify.common.log.LogHandler
+import org.ntqqrev.acidify.common.log.LogLevel
+
+private fun Logger.toAcidifyLogHandler(): LogHandler =
+    LogHandler { level, tag, message, throwable ->
+        val trueMessage = "[$tag] $message"
+        when (level) {
+            LogLevel.VERBOSE -> trace(trueMessage)
+            LogLevel.DEBUG -> debug(trueMessage)
+            LogLevel.INFO -> info(trueMessage)
+            LogLevel.WARN -> if (throwable == null) {
+                warn(trueMessage)
+            } else {
+                warn(trueMessage, throwable)
+            }
+
+            LogLevel.ERROR -> if (throwable == null) {
+                error(trueMessage)
+            } else {
+                error(trueMessage, throwable)
+            }
+        }
+    }
+
+actual val logHandler: LogHandler = KtorSimpleLogger("Core").toAcidifyLogHandler()

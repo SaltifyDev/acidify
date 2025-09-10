@@ -11,10 +11,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.decodeFromSource
 import kotlinx.serialization.json.io.encodeToSink
-import org.ntqqrev.acidify.common.QrCodeState
 import org.ntqqrev.acidify.common.SessionStore
-import org.ntqqrev.acidify.event.QrCodeGeneratedEvent
-import org.ntqqrev.acidify.event.QrCodeStateQueryEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.createLogger
 import kotlin.test.Test

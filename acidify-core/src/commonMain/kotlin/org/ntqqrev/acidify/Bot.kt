@@ -18,11 +18,7 @@ import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.common.FetchFriends
-import org.ntqqrev.acidify.internal.service.system.BotOffline
-import org.ntqqrev.acidify.internal.service.system.BotOnline
-import org.ntqqrev.acidify.internal.service.system.FetchQrCode
-import org.ntqqrev.acidify.internal.service.system.QueryQrCodeState
-import org.ntqqrev.acidify.internal.service.system.WtLogin
+import org.ntqqrev.acidify.internal.service.system.*
 import org.ntqqrev.acidify.util.createLogger
 
 /**

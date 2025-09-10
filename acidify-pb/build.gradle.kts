@@ -5,7 +5,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.kotlinxIO)
+            implementation(libs.kotlinx.io)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

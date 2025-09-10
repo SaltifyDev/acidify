@@ -4,11 +4,12 @@
 
 [versions]
 kotlin = "2.2.10"
-kotlinxSerializationJSON = "1.9.0"
-kotlinxCoroutines = "1.10.2"
-kotlinxIO = "0.8.0"
-kotlinxDatetime = "0.7.1"
-kotlinxAtomicfu = "0.29.0"
+
+kx-serialization = "1.9.0"
+kx-coroutines = "1.10.2"
+kx-io = "0.8.0"
+kx-atomicfu = "0.29.0"
+
 ktor = "3.2.3"
 korlibs = "6.0.0"
 kermit = "2.0.8"
@@ -16,55 +17,54 @@ mordant = "3.0.2"
 slf4j = "2.0.17"
 
 [libraries]
-kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
-kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
-kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
-kotlinxIO = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinxIO" }
-kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kx-serialization" }
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kx-coroutines" }
+kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kx-io" }
 
-ktorClientCore = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktorClientContentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktorClientCIO = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktorClientWinhttp = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor" }
-ktorClientDarwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-ktorClientCurl = { module = "io.ktor:ktor-client-curl", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-winhttp = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-curl = { module = "io.ktor:ktor-client-curl", version.ref = "ktor" }
 
-ktorServerCore = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
-ktorServerDI = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
-ktorServerCIO = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
-ktorServerContentNegotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
-ktorServerSSE = { module = "io.ktor:ktor-server-sse", version.ref = "ktor" }
-ktorServerWebsockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-di = { module = "io.ktor:ktor-server-di", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-server-sse = { module = "io.ktor:ktor-server-sse", version.ref = "ktor" }
+ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 
-ktorSerializationKotlinxJson = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
-korlibsCompression = { module = "com.soywiz:korlibs-compression", version.ref = "korlibs" }
+korlibs-compression = { module = "com.soywiz:korlibs-compression", version.ref = "korlibs" }
 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
 
-slf4jNop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
+slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
 
 [bundles]
-ktorClient = [
-    "ktorClientCore",
-    "ktorClientContentNegotiation",
-    "ktorClientCIO",
+ktor-client = [
+    "ktor-client-core",
+    "ktor-client-content-negotiation",
+    "ktor-client-cio",
 ]
-ktorServer = [
-    "ktorServerCore",
-    "ktorServerDI",
-    "ktorServerCIO",
-    "ktorServerContentNegotiation",
-    "ktorServerSSE",
-    "ktorServerWebsockets"
+ktor-server = [
+    "ktor-server-core",
+    "ktor-server-di",
+    "ktor-server-cio",
+    "ktor-server-content-negotiation",
+    "ktor-server-sse",
+    "ktor-server-websockets"
 ]
 korlibs = [
-    "korlibsCompression"
+    "korlibs-compression"
 ]
 
 [plugins]
-kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kotlinxAtomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kotlinxAtomicfu" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinx-atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "kx-atomicfu" }

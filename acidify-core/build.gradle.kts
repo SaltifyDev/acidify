@@ -1,6 +1,6 @@
 plugins {
     id("buildsrc.convention.kotlin-multiplatform")
-    alias(libs.plugins.kotlinPluginSerialization)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -8,11 +8,11 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":acidify-crypto"))
             implementation(project(":acidify-pb"))
-            implementation(libs.kotlinxSerialization)
-            implementation(libs.kotlinxCoroutines)
-            implementation(libs.kotlinxIO)
-            implementation(libs.bundles.ktorClient)
-            implementation(libs.ktorSerializationKotlinxJson)
+            implementation(libs.kotlinx.serialization)
+            implementation(libs.kotlinx.coroutines)
+            implementation(libs.kotlinx.io)
+            implementation(libs.bundles.ktor.client)
+            implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.bundles.korlibs)
             api(libs.kermit)
             implementation(libs.mordant)
@@ -21,16 +21,16 @@ kotlin {
             implementation(kotlin("test"))
         }
         jvmMain.dependencies {
-            implementation(libs.slf4jNop)
+            implementation(libs.slf4j.nop)
         }
         mingwMain.dependencies {
-            implementation(libs.ktorClientWinhttp)
+            implementation(libs.ktor.client.winhttp)
         }
         macosMain.dependencies {
-            implementation(libs.ktorClientDarwin)
+            implementation(libs.ktor.client.darwin)
         }
         linuxMain.dependencies {
-            implementation(libs.ktorClientCurl)
+            implementation(libs.ktor.client.curl)
         }
     }
 }

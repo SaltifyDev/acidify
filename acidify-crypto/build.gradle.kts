@@ -1,12 +1,12 @@
 plugins {
     id("buildsrc.convention.kotlin-multiplatform")
-    alias(libs.plugins.kotlinxAtomicfu)
+    alias(libs.plugins.kotlinx.atomicfu)
 }
 
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.kotlinxIO)
+            implementation(libs.kotlinx.io)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

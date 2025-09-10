@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
+import org.ntqqrev.acidify.common.log.Logger
 import org.ntqqrev.acidify.exception.ServiceException
 import org.ntqqrev.acidify.internal.logic.LoginLogic
 import org.ntqqrev.acidify.internal.logic.PacketLogic
@@ -13,7 +14,8 @@ internal class LagrangeClient(
     val appInfo: AppInfo,
     val sessionStore: SessionStore,
     val signProvider: SignProvider,
-    val scope: CoroutineScope
+    val scope: CoroutineScope,
+    val createLogger: (Any) -> Logger
 ) {
     val loginLogic = LoginLogic(this)
     val packetLogic = PacketLogic(this)

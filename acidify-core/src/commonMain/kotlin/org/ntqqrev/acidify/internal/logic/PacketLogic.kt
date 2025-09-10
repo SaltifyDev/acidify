@@ -12,8 +12,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
-import org.ntqqrev.acidify.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.common.SignProvider
+import org.ntqqrev.acidify.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.SsoResponse
 import org.ntqqrev.acidify.internal.packet.system.SsoReservedFields
@@ -21,7 +21,6 @@ import org.ntqqrev.acidify.internal.packet.system.SsoSecureInfo
 import org.ntqqrev.acidify.internal.util.*
 import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
-import org.ntqqrev.acidify.util.createLogger
 import kotlin.random.Random
 
 internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
@@ -77,7 +76,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
         "OidbSvcTrpcTcp.0x6d9_4"
     )
 
-    private val logger = createLogger(this)
+    private val logger = client.createLogger(this)
 
     suspend fun connect() {
         val s = socket.connect(host, port)

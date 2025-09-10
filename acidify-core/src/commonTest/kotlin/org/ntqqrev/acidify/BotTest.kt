@@ -12,8 +12,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.decodeFromSource
 import kotlinx.serialization.json.io.encodeToSink
 import org.ntqqrev.acidify.common.SessionStore
+import org.ntqqrev.acidify.common.log.LogLevel
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
-import org.ntqqrev.acidify.util.createLogger
+import org.ntqqrev.acidify.util.SimpleColoredLogHandler
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -30,7 +31,9 @@ class BotTest {
             appInfo = defaultSignProvider.getAppInfo()!!,
             sessionStore = session,
             signProvider = defaultSignProvider,
-            scope = defaultScope
+            scope = defaultScope,
+            minLogLevel = LogLevel.VERBOSE,
+            logHandler = SimpleColoredLogHandler,
         )
     }
 
@@ -56,14 +59,13 @@ class BotTest {
     }
 
     @Test
-    fun logColorTest() {
-        val logger = createLogger(this)
+    fun logLevelTest() {
+        val logger = bot.createLogger(this)
         logger.v { "Verbose (trace) message" }
         logger.d { "Debug message" }
         logger.i { "Info message" }
         logger.w { "Warning message" }
         logger.e { "Error message" }
-        logger.a { "Assert (fatal) message" }
     }
 
     @Test

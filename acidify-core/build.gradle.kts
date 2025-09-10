@@ -8,9 +8,9 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":acidify-crypto"))
             implementation(project(":acidify-pb"))
-            implementation(libs.kotlinxIO)
-            implementation(libs.kotlinxCoroutines)
             implementation(libs.kotlinxSerialization)
+            implementation(libs.kotlinxCoroutines)
+            implementation(libs.kotlinxIO)
             implementation(libs.bundles.ktorClient)
             implementation(libs.ktorSerializationKotlinxJson)
             implementation(libs.bundles.korlibs)

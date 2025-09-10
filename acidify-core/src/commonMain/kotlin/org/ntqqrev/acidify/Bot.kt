@@ -5,10 +5,16 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.QrCodeState
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
+import org.ntqqrev.acidify.common.log.LogHandler
+import org.ntqqrev.acidify.common.log.LogLevel
+import org.ntqqrev.acidify.common.log.LogMessage
+import org.ntqqrev.acidify.common.log.Logger
 import org.ntqqrev.acidify.common.struct.BotFriendCategoryData
 import org.ntqqrev.acidify.common.struct.BotFriendData
 import org.ntqqrev.acidify.event.AcidifyEvent
@@ -19,17 +25,37 @@ import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.common.FetchFriends
 import org.ntqqrev.acidify.internal.service.system.*
-import org.ntqqrev.acidify.util.createLogger
 
 /**
  * Acidify Bot 实例
  */
-class Bot internal constructor(internal val client: LagrangeClient) {
-    private val logger = createLogger(this)
+class Bot internal constructor(
+    appInfo: AppInfo,
+    sessionStore: SessionStore,
+    signProvider: SignProvider,
+    scope: CoroutineScope
+) {
+    private val logger = this.createLogger(this)
+    internal val client = LagrangeClient(
+        appInfo, sessionStore, signProvider, scope,
+        this::createLogger
+    )
     internal val sharedEventFlow = MutableSharedFlow<AcidifyEvent>(
         extraBufferCapacity = 100,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+    internal val sharedLogFlow = MutableSharedFlow<LogMessage>(
+        extraBufferCapacity = 100,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
+    internal fun createLogger(fromObject: Any): Logger {
+        return Logger(
+            this,
+            fromObject::class.qualifiedName
+                ?: throw IllegalStateException("Cannot create logger for anonymous class")
+        )
+    }
 
     /**
      * [AcidifyEvent] 流，可用于监听各种事件
@@ -164,10 +190,23 @@ class Bot internal constructor(internal val client: LagrangeClient) {
             appInfo: AppInfo,
             sessionStore: SessionStore,
             signProvider: SignProvider,
-            scope: CoroutineScope
+            scope: CoroutineScope,
+            minLogLevel: LogLevel,
+            logHandler: LogHandler,
         ): Bot {
-            val client = LagrangeClient(appInfo, sessionStore, signProvider, scope)
-            val bot = Bot(client)
+            val bot = Bot(appInfo, sessionStore, signProvider, scope)
+            scope.launch {
+                bot.sharedLogFlow
+                    .filter { it.level >= minLogLevel }
+                    .collect {
+                        logHandler.handleLog(
+                            it.level,
+                            it.tag,
+                            it.messageSupplier(),
+                            it.throwable
+                        )
+                    }
+            }
             bot.client.packetLogic.connect()
             return bot
         }

@@ -4,7 +4,7 @@ import io.ktor.util.date.*
 import io.ktor.utils.io.core.*
 import kotlinx.io.*
 import kotlinx.io.Buffer
-import org.lagrange.library.crypto.tea.TeaProvider
+import org.ntqqrev.acidify.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.util.Prefix
 import org.ntqqrev.acidify.internal.util.barrier

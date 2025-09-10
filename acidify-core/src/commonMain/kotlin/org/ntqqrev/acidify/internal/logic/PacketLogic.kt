@@ -12,7 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
-import org.lagrange.library.crypto.tea.TeaProvider
+import org.ntqqrev.acidify.crypto.tea.TeaProvider
 import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.SsoResponse

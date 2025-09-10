@@ -3,7 +3,7 @@ package org.ntqqrev.acidify.internal.util
 import io.ktor.utils.io.core.*
 import kotlinx.io.*
 import kotlinx.io.Buffer
-import org.lagrange.library.crypto.hash.MD5
+import org.ntqqrev.acidify.crypto.hash.MD5
 
 internal fun ByteArray.md5(): ByteArray = MD5.hash(this)
 

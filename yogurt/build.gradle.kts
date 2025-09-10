@@ -1,5 +1,8 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 plugins {
     id("buildsrc.convention.kotlin-multiplatform")
+    alias(libs.plugins.kotlinPluginSerialization)
 }
 
 kotlin {
@@ -18,6 +21,12 @@ kotlin {
         }
         linuxMain.dependencies {
             implementation(libs.ktorClientCurl)
+        }
+    }
+
+    targets.withType<KotlinNativeTarget> {
+        binaries {
+            executable()
         }
     }
 }

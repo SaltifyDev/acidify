@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package org.ntqqrev.acidify.util
 
 import co.touchlab.kermit.LogWriter
@@ -5,6 +7,13 @@ import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.loggerConfigInit
 import com.github.ajalt.mordant.rendering.TextColors.*
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.io.decodeFromSource
 
 internal class PrintlnLogWriter : LogWriter() {
     private fun shortenPackageName(tag: String): String {
@@ -64,7 +73,30 @@ internal class PrintlnLogWriter : LogWriter() {
     }
 }
 
+@Serializable
+class LoggerConfig(
+    val minSeverity: Severity = Severity.Verbose
+)
+
+private val loggerConfigPath = Path("logger-config.json")
+
+private val loggerConfig = loggerConfigPath.takeIf { SystemFileSystem.exists(it) }
+    ?.let {
+        try {
+            SystemFileSystem.source(it).buffered().use { source ->
+                Json.decodeFromSource(LoggerConfig.serializer(), source)
+            }
+        } catch (e: Exception) {
+            println("Failed to read logger config, using default. Error: ${e.message}")
+            e.printStackTrace()
+            LoggerConfig()
+        }
+    } ?: LoggerConfig()
+
 internal fun createLogger(obj: Any): Logger = Logger(
-    loggerConfigInit(PrintlnLogWriter()),
+    loggerConfigInit(
+        PrintlnLogWriter(),
+        minSeverity = loggerConfig.minSeverity
+    ),
     obj::class.qualifiedName ?: throw IllegalArgumentException("Cannot create logger for anonymous class")
 )

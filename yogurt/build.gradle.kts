@@ -13,6 +13,9 @@ kotlin {
             implementation(libs.bundles.ktor.server)
             implementation(libs.ktor.serialization.kotlinx.json)
         }
+        jvmMain.dependencies {
+            implementation(libs.logback.classic)
+        }
         mingwMain.dependencies {
             implementation(libs.ktor.client.winhttp)
         }

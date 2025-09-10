@@ -12,6 +12,7 @@ PC NTQQ 协议的 Kotlin 实现，支持 JVM 和 Native 平台
 - `acidify-crypto` - 加密与 Hash 算法的高效实现
 - `acidify-pb` - Protobuf 编解码基础设施
 - `yogurt` - 基于 Acidify 的 [Milky](https://milky.ntqqrev.org/) 实现
+- `yogurt-jvm` - Yogurt 的 JVM 平台实现 (Workaround for Ktor plugin's incompatibility issue)
 
 ## 支持平台
 

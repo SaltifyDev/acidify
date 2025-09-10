@@ -20,5 +20,6 @@ include(":acidify-core")
 include(":acidify-crypto")
 include(":acidify-pb")
 include(":yogurt")
+include(":yogurt-jvm")
 
 rootProject.name = "acidify"

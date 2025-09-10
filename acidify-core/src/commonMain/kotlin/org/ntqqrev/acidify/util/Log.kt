@@ -93,7 +93,7 @@ private val loggerConfig = loggerConfigPath.takeIf { SystemFileSystem.exists(it)
         }
     } ?: LoggerConfig()
 
-internal fun createLogger(obj: Any): Logger = Logger(
+fun createLogger(obj: Any): Logger = Logger(
     loggerConfigInit(
         PrintlnLogWriter(),
         minSeverity = loggerConfig.minSeverity

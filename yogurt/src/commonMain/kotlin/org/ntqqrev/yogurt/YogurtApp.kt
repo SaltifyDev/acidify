@@ -38,36 +38,41 @@ object YogurtApp {
     val scope = CoroutineScope(Dispatchers.IO)
 
     fun start() = runBlocking {
+        val bot = Bot.create(
+            appInfo = appInfo,
+            sessionStore = sessionStore,
+            signProvider = signProvider,
+            scope = scope,
+            minLogLevel = config.logging.coreLogLevel,
+            logHandler = logHandler
+        )
+
+        scope.launch {
+            bot.eventFlow.filterIsInstance(SessionStoreUpdatedEvent::class).collect {
+                SystemFileSystem.sink(sessionStorePath).buffered().use { source ->
+                    Json.encodeToSink(it.sessionStore, source)
+                }
+            }
+        }
+
+        if (sessionStore.a2.isEmpty()) {
+            bot.qrCodeLogin()
+        } else {
+            bot.tryLogin()
+        }
+
         embeddedServer(
             factory = CIO,
             port = config.httpConfig.port,
             host = config.httpConfig.host
         ) {
-            val bot = Bot.create(
-                appInfo = appInfo,
-                sessionStore = sessionStore,
-                signProvider = signProvider,
-                scope = scope,
-                minLogLevel = config.logging.coreLogLevel,
-                logHandler = logHandler
-            )
             dependencies {
-                provide<Bot> { bot }
-            }
-            scope.launch {
-                bot.eventFlow.filterIsInstance(SessionStoreUpdatedEvent::class).collect {
-                    SystemFileSystem.sink(sessionStorePath).buffered().use { source ->
-                        Json.encodeToSink(it.sessionStore, source)
-                    }
+                provide { bot } cleanup {
+                    // Throws a JobCancellationException here.
+                    // This is a bug tracked as KTOR-8785
+                    // and will be fixed at next minor release (3.3.0).
                 }
             }
-            if (sessionStore.a2.isEmpty()) {
-                bot.qrCodeLogin()
-            } else {
-                bot.tryLogin()
-            }
         }.start()
-
-        delay(Long.MAX_VALUE)
     }
 }

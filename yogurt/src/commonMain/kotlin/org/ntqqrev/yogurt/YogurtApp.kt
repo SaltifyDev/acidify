@@ -16,8 +16,10 @@ import kotlinx.serialization.json.io.decodeFromSource
 import kotlinx.serialization.json.io.encodeToSink
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.common.SessionStore
+import org.ntqqrev.acidify.event.QrCodeGeneratedEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.UrlSignProvider
+import org.ntqqrev.yogurt.util.generateTerminalQRCode
 import org.ntqqrev.yogurt.util.logHandler
 
 object YogurtApp {
@@ -37,6 +39,7 @@ object YogurtApp {
         emptySessionStore
     }
     val scope = CoroutineScope(Dispatchers.IO)
+    val qrCodePath = Path("qrcode.png")
 
     fun start() = runBlocking {
         val bot = Bot.create(
@@ -49,10 +52,20 @@ object YogurtApp {
         )
 
         scope.launch {
-            bot.eventFlow.filterIsInstance(SessionStoreUpdatedEvent::class).collect {
+            bot.eventFlow.filterIsInstance<SessionStoreUpdatedEvent>().collect {
                 SystemFileSystem.sink(sessionStorePath).buffered().use { source ->
                     Json.encodeToSink(it.sessionStore, source)
                 }
+            }
+        }
+
+        scope.launch {
+            bot.eventFlow.filterIsInstance<QrCodeGeneratedEvent>().collect {
+                print(generateTerminalQRCode(it.url))
+                SystemFileSystem.sink(qrCodePath).buffered().use { sink ->
+                    sink.write(it.png)
+                }
+                println("二维码文件已保存至 ${SystemFileSystem.resolve(qrCodePath)}")
             }
         }
 

@@ -30,10 +30,10 @@ import org.ntqqrev.acidify.internal.service.system.*
  * Acidify Bot 实例
  */
 class Bot internal constructor(
-    appInfo: AppInfo,
-    sessionStore: SessionStore,
-    signProvider: SignProvider,
-    scope: CoroutineScope
+    val appInfo: AppInfo,
+    val sessionStore: SessionStore,
+    val signProvider: SignProvider,
+    val scope: CoroutineScope
 ) {
     private val logger = this.createLogger(this)
     internal val client = LagrangeClient(
@@ -80,14 +80,14 @@ class Bot internal constructor(
      * 当前登录用户的 uin（QQ 号）
      */
     val uin: Long
-        get() = client.sessionStore.uin.takeIf { it != 0L }
+        get() = sessionStore.uin.takeIf { it != 0L }
             ?: throw IllegalStateException("用户尚未登录")
 
     /**
      * 当前登录用户的 uid
      */
     val uid: String
-        get() = client.sessionStore.uid.takeIf { it.isNotEmpty() }
+        get() = sessionStore.uid.takeIf { it.isNotEmpty() }
             ?: throw IllegalStateException("用户尚未登录")
 
     /**
@@ -121,7 +121,7 @@ class Bot internal constructor(
 
         client.callService(WtLogin)
         logger.d { "成功获取 $uin 的登录凭据" }
-        sharedEventFlow.emit(SessionStoreUpdatedEvent(client.sessionStore))
+        sharedEventFlow.emit(SessionStoreUpdatedEvent(sessionStore))
         online()
     }
 
@@ -160,8 +160,8 @@ class Bot internal constructor(
             online()
         } catch (e: Exception) {
             logger.w(e) { "使用现有 Session 登录失败，尝试二维码登录" }
-            client.sessionStore.clear()
-            sharedEventFlow.emit(SessionStoreUpdatedEvent(client.sessionStore))
+            sessionStore.clear()
+            sharedEventFlow.emit(SessionStoreUpdatedEvent(sessionStore))
             qrCodeLogin()
         }
     }

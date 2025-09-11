@@ -18,6 +18,7 @@ import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.UrlSignProvider
+import org.ntqqrev.yogurt.util.logHandler
 
 object YogurtApp {
     val config = YogurtConfig.loadFromFile()

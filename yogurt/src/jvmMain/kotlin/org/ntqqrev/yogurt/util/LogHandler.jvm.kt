@@ -1,4 +1,4 @@
-package org.ntqqrev.yogurt
+package org.ntqqrev.yogurt.util
 
 import io.ktor.util.logging.*
 import org.ntqqrev.acidify.common.log.LogHandler

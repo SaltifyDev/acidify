@@ -10,7 +10,7 @@ import org.ntqqrev.acidify.internal.util.fromHex
 import org.ntqqrev.acidify.internal.util.writeString
 import org.ntqqrev.acidify.pb.*
 
-internal class TlvQrCode(val client: LagrangeClient) {
+internal class TlvQRCode(val client: LagrangeClient) {
     private val builder = Buffer()
 
     private var tlvCount: UShort = 0u

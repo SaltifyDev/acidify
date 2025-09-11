@@ -1,14 +1,14 @@
 package org.ntqqrev.acidify.internal.service.system
 
 import kotlinx.io.*
-import org.ntqqrev.acidify.common.QrCodeState
+import org.ntqqrev.acidify.common.QRCodeState
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.NoInputService
 import org.ntqqrev.acidify.internal.util.Prefix
 import org.ntqqrev.acidify.internal.util.reader
 import org.ntqqrev.acidify.internal.util.writeBytes
 
-internal object QueryQrCodeState : NoInputService<QrCodeState>("wtlogin.trans_emp") {
+internal object QueryQRCodeState : NoInputService<QRCodeState>("wtlogin.trans_emp") {
     override fun build(client: LagrangeClient, payload: Unit): ByteArray {
         val packet = Buffer().apply {
             writeUShort(0u)
@@ -22,11 +22,11 @@ internal object QueryQrCodeState : NoInputService<QrCodeState>("wtlogin.trans_em
         return client.loginLogic.buildCode2DPacket(packet.readByteArray(), 0x12u)
     }
 
-    override fun parse(client: LagrangeClient, payload: ByteArray): QrCodeState {
+    override fun parse(client: LagrangeClient, payload: ByteArray): QRCodeState {
         val wtlogin = client.loginLogic.parseWtLogin(payload)
         val reader = client.loginLogic.parseCode2DPacket(wtlogin).reader()
-        val state = QrCodeState.fromByte(reader.readByte())
-        if (state == QrCodeState.CONFIRMED) {
+        val state = QRCodeState.fromByte(reader.readByte())
+        if (state == QRCodeState.CONFIRMED) {
             reader.discard(4)
             client.sessionStore.uin = reader.readUInt().toLong()
             reader.discard(4)

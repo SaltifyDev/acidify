@@ -3,7 +3,7 @@ package org.ntqqrev.acidify.common
 /**
  * 二维码状态
  */
-enum class QrCodeState(val value: Byte) {
+enum class QRCodeState(val value: Byte) {
     /**
      * 未知状态
      */
@@ -35,6 +35,6 @@ enum class QrCodeState(val value: Byte) {
     CANCELLED(54);
 
     companion object {
-        internal fun fromByte(value: Byte): QrCodeState = entries.find { it.value == value } ?: UNKNOWN
+        internal fun fromByte(value: Byte): QRCodeState = entries.find { it.value == value } ?: UNKNOWN
     }
 }

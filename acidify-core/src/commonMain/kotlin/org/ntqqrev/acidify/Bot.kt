@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.common.AppInfo
-import org.ntqqrev.acidify.common.QrCodeState
+import org.ntqqrev.acidify.common.QRCodeState
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.common.log.LogHandler
@@ -18,8 +18,8 @@ import org.ntqqrev.acidify.common.log.Logger
 import org.ntqqrev.acidify.common.struct.BotFriendCategoryData
 import org.ntqqrev.acidify.common.struct.BotFriendData
 import org.ntqqrev.acidify.event.AcidifyEvent
-import org.ntqqrev.acidify.event.QrCodeGeneratedEvent
-import org.ntqqrev.acidify.event.QrCodeStateQueryEvent
+import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
+import org.ntqqrev.acidify.event.QRCodeStateQueryEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
@@ -64,7 +64,7 @@ class Bot internal constructor(
      * ```
      * bot.eventFlow.collect { event ->
      *     when (event) {
-     *         is QrCodeGeneratedEvent -> {
+     *         is QRCodeGeneratedEvent -> {
      *             println("QR Code URL: ${event.url}")
      *         }
      *     }
@@ -92,28 +92,28 @@ class Bot internal constructor(
 
     /**
      * 发起二维码登录请求。过程中会触发事件：
-     * - [QrCodeGeneratedEvent]：当二维码生成时触发，包含二维码链接和 PNG 图片数据
-     * - [QrCodeStateQueryEvent]：每次查询二维码状态时触发，包含当前二维码状态（例如未扫码、已扫码未确认、已确认等）
+     * - [QRCodeGeneratedEvent]：当二维码生成时触发，包含二维码链接和 PNG 图片数据
+     * - [QRCodeStateQueryEvent]：每次查询二维码状态时触发，包含当前二维码状态（例如未扫码、已扫码未确认、已确认等）
      * @param queryInterval 查询间隔（单位 ms），不能小于 `1000`
      * @throws org.ntqqrev.acidify.exception.WtLoginException 当二维码扫描成功，但后续登录失败时抛出
      * @throws IllegalStateException 当二维码过期或用户取消登录时抛出
-     * @see QrCodeState
+     * @see QRCodeState
      */
     suspend fun qrCodeLogin(queryInterval: Long = 3000L) {
         require(queryInterval >= 1000L) { "查询间隔不能小于 1000 毫秒" }
-        val qrCode = client.callService(FetchQrCode)
+        val qrCode = client.callService(FetchQRCode)
         logger.i { "二维码 URL：${qrCode.qrCodeUrl}" }
-        sharedEventFlow.emit(QrCodeGeneratedEvent(qrCode.qrCodeUrl, qrCode.qrCodePng))
+        sharedEventFlow.emit(QRCodeGeneratedEvent(qrCode.qrCodeUrl, qrCode.qrCodePng))
 
         while (true) {
-            val state = client.callService(QueryQrCodeState)
+            val state = client.callService(QueryQRCodeState)
             logger.d { "二维码状态：${state.name} (${state.value})" }
-            sharedEventFlow.emit(QrCodeStateQueryEvent(state))
+            sharedEventFlow.emit(QRCodeStateQueryEvent(state))
             when (state) {
-                QrCodeState.CONFIRMED -> break
-                QrCodeState.CODE_EXPIRED -> throw IllegalStateException("二维码已过期")
-                QrCodeState.CANCELLED -> throw IllegalStateException("用户取消了登录")
-                QrCodeState.UNKNOWN -> throw IllegalStateException("未知的二维码状态")
+                QRCodeState.CONFIRMED -> break
+                QRCodeState.CODE_EXPIRED -> throw IllegalStateException("二维码已过期")
+                QRCodeState.CANCELLED -> throw IllegalStateException("用户取消了登录")
+                QRCodeState.UNKNOWN -> throw IllegalStateException("未知的二维码状态")
                 else -> {} // pass
             }
             delay(queryInterval)

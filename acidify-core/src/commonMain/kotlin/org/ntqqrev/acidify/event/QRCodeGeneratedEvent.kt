@@ -5,4 +5,4 @@ package org.ntqqrev.acidify.event
  * @property url 二维码链接
  * @property png 二维码 PNG 图片数据
  */
-class QrCodeGeneratedEvent(val url: String, val png: ByteArray) : AcidifyEvent
+class QRCodeGeneratedEvent(val url: String, val png: ByteArray) : AcidifyEvent

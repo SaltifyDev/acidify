@@ -16,7 +16,7 @@ import kotlinx.serialization.json.io.decodeFromSource
 import kotlinx.serialization.json.io.encodeToSink
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.common.SessionStore
-import org.ntqqrev.acidify.event.QrCodeGeneratedEvent
+import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.UrlSignProvider
 import org.ntqqrev.yogurt.util.generateTerminalQRCode
@@ -60,7 +60,7 @@ object YogurtApp {
         }
 
         scope.launch {
-            bot.eventFlow.filterIsInstance<QrCodeGeneratedEvent>().collect {
+            bot.eventFlow.filterIsInstance<QRCodeGeneratedEvent>().collect {
                 print(generateTerminalQRCode(it.url))
                 SystemFileSystem.sink(qrCodePath).buffered().use { sink ->
                     sink.write(it.png)

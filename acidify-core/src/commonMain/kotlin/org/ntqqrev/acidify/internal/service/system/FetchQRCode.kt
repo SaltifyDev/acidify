@@ -2,16 +2,16 @@ package org.ntqqrev.acidify.internal.service.system
 
 import kotlinx.io.*
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.login.TlvQrCode
+import org.ntqqrev.acidify.internal.packet.login.TlvQRCode
 import org.ntqqrev.acidify.internal.service.NoInputService
 import org.ntqqrev.acidify.internal.util.Prefix
 import org.ntqqrev.acidify.internal.util.reader
 import org.ntqqrev.acidify.internal.util.writeBytes
 import org.ntqqrev.acidify.pb.invoke
 
-internal object FetchQrCode : NoInputService<FetchQrCode.Result>("wtlogin.trans_emp") {
+internal object FetchQRCode : NoInputService<FetchQRCode.Result>("wtlogin.trans_emp") {
     override fun build(client: LagrangeClient, payload: Unit): ByteArray {
-        val tlvPack = TlvQrCode(client).apply {
+        val tlvPack = TlvQRCode(client).apply {
             tlv16()
             tlv1b()
             tlv1d()
@@ -40,7 +40,7 @@ internal object FetchQrCode : NoInputService<FetchQrCode.Result>("wtlogin.trans_
         val sig = reader.readPrefixedBytes(Prefix.UINT_16 or Prefix.LENGTH_ONLY)
         val tlv = client.loginLogic.readTlv(reader)
         client.sessionStore.qrSig = sig
-        val respD1Body = TlvQrCode.BodyD1Response(tlv.getValue(0xD1u))
+        val respD1Body = TlvQRCode.BodyD1Response(tlv.getValue(0xD1u))
         return Result(
             qrCodeUrl = respD1Body.get { qrCodeUrl },
             qrCodePng = tlv.getValue(0x17u)

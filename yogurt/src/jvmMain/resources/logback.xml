@@ -1,10 +1,11 @@
 <configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%ex</pattern>
+            <pattern>%boldGreen(%d{HH:mm:ss}) %highlight(%-5level) %cyan(%logger{36}) %msg%n%ex</pattern>
         </encoder>
     </appender>
-    <root level="info">
-        <appender-ref ref="STDOUT"/>
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

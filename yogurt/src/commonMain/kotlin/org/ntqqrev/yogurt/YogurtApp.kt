@@ -2,9 +2,13 @@
 
 package org.ntqqrev.yogurt
 
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.di.*
+import io.ktor.server.routing.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.io.buffered
@@ -19,6 +23,8 @@ import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.UrlSignProvider
+import org.ntqqrev.yogurt.api.apiRoutingList
+import org.ntqqrev.yogurt.protocol.milkyJsonModule
 import org.ntqqrev.yogurt.util.generateTerminalQRCode
 import org.ntqqrev.yogurt.util.logHandler
 
@@ -80,12 +86,23 @@ object YogurtApp {
             port = config.httpConfig.port,
             host = config.httpConfig.host
         ) {
+            install(ContentNegotiation) {
+                json(milkyJsonModule)
+            }
+
             dependencies {
                 provide { bot } cleanup {
                     // Throws a JobCancellationException here.
                     // This is a bug tracked as KTOR-8785
                     // and will be fixed at next minor release (3.3.0).
                 }
+            }
+
+            routing {
+                // todo: setup authentication
+                apiRoutingList.forEach { it() }
+
+                // todo: setup event APIs
             }
         }.start()
     }

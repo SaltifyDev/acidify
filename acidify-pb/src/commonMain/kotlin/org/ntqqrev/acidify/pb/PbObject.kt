@@ -7,10 +7,11 @@ import org.ntqqrev.acidify.pb.util.MultiMap
 import org.ntqqrev.acidify.pb.util.encodeToBuffer
 import org.ntqqrev.acidify.pb.util.multiMapOf
 import org.ntqqrev.acidify.pb.util.readTokens
+import kotlin.jvm.JvmField
 
 class PbObject<S : PbSchema> internal constructor(
-    val schema: S,
-    internal val tokens: MultiMap<Int, DataToken>
+    @JvmField val schema: S,
+    @JvmField internal val tokens: MultiMap<Int, DataToken>
 ) {
     constructor(schema: S, byteArray: ByteArray) : this(
         schema,

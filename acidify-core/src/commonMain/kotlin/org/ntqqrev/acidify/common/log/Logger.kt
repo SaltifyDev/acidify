@@ -6,7 +6,7 @@ import org.ntqqrev.acidify.Bot
 
 typealias MessageSupplier = () -> String
 
-internal class Logger(private val bot: Bot, val tag: String) {
+class Logger(private val bot: Bot, val tag: String) {
     private fun MutableSharedFlow<LogMessage>.emitAsync(message: LogMessage) {
         bot.scope.launch {
             emit(message)

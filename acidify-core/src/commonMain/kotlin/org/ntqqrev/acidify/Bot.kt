@@ -49,14 +49,6 @@ class Bot internal constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    internal fun createLogger(fromObject: Any): Logger {
-        return Logger(
-            this,
-            fromObject::class.qualifiedName
-                ?: throw IllegalStateException("Cannot create logger for anonymous class")
-        )
-    }
-
     /**
      * [AcidifyEvent] 流，可用于监听各种事件
      *
@@ -95,6 +87,17 @@ class Bot internal constructor(
      */
     var isLoggedIn: Boolean = false
         internal set
+
+    /**
+     * 创建一个 [Logger] 实例，通常用于库内部日志记录，并将产生的日志发送到提供的 [LogHandler]。
+     */
+    fun createLogger(fromObject: Any): Logger {
+        return Logger(
+            this,
+            fromObject::class.qualifiedName
+                ?: throw IllegalStateException("Cannot create logger for anonymous class")
+        )
+    }
 
     /**
      * 发起二维码登录请求。过程中会触发事件：

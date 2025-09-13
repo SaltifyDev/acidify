@@ -2,12 +2,14 @@
 
 package org.ntqqrev.yogurt
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.di.*
+import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterIsInstance
@@ -99,8 +101,21 @@ object YogurtApp {
             }
 
             routing {
-                // todo: setup authentication
-                apiRoutingList.forEach { it() }
+                route("/api") {
+                    if (config.httpConfig.accessToken.isNotEmpty()) {
+                        val auth = createRouteScopedPlugin("Auth") {
+                            onCall { call ->
+                                if (call.request.headers["Authorization"] != "Bearer ${config.httpConfig.accessToken}") {
+                                    call.respond(HttpStatusCode.Unauthorized)
+                                    return@onCall
+                                }
+                            }
+                        }
+                        install(auth)
+                    }
+
+                    apiRoutingList.forEach { it() }
+                }
 
                 // todo: setup event APIs
             }

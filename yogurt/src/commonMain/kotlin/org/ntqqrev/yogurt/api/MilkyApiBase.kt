@@ -16,7 +16,7 @@ inline fun <reified T : Any, reified R : Any> routeMilkyApi(
     endpoint: String,
     crossinline handler: MilkyApiHandler<T, R>
 ): Route.() -> Unit = {
-    post("/api/$endpoint") {
+    post("/$endpoint") {
         val payload = call.receive<T>()
         val bot: Bot by application.dependencies
         try {

@@ -91,6 +91,12 @@ class Bot internal constructor(
             ?: throw IllegalStateException("用户尚未登录")
 
     /**
+     * 表示当前 Bot 是否已登录
+     */
+    var isLoggedIn: Boolean = false
+        internal set
+
+    /**
      * 发起二维码登录请求。过程中会触发事件：
      * - [QRCodeGeneratedEvent]：当二维码生成时触发，包含二维码链接和 PNG 图片数据
      * - [QRCodeStateQueryEvent]：每次查询二维码状态时触发，包含当前二维码状态（例如未扫码、已扫码未确认、已确认等）
@@ -135,6 +141,7 @@ class Bot internal constructor(
         if (result != "register success") {
             throw BotOnlineException(result)
         }
+        isLoggedIn = true
         logger.i { "用户 $uin 已上线" }
         // todo: post online logic
         // - heartbeat

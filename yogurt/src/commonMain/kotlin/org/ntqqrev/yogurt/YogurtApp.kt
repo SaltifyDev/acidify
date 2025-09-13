@@ -2,17 +2,18 @@
 
 package org.ntqqrev.yogurt
 
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.di.*
-import io.ktor.server.response.respond
+import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.take
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -68,22 +69,6 @@ object YogurtApp {
             }
         }
 
-        scope.launch {
-            bot.eventFlow.filterIsInstance<QRCodeGeneratedEvent>().collect {
-                print(generateTerminalQRCode(it.url))
-                SystemFileSystem.sink(qrCodePath).buffered().use { sink ->
-                    sink.write(it.png)
-                }
-                println("二维码文件已保存至 ${SystemFileSystem.resolve(qrCodePath)}")
-            }
-        }
-
-        if (sessionStore.a2.isEmpty()) {
-            bot.qrCodeLogin()
-        } else {
-            bot.tryLogin()
-        }
-
         embeddedServer(
             factory = CIO,
             port = config.httpConfig.port,
@@ -137,5 +122,25 @@ object YogurtApp {
                 // todo: setup event APIs
             }
         }.start()
+
+        val logger = bot.createLogger(this@YogurtApp)
+
+        scope.launch {
+            bot.eventFlow.filterIsInstance<QRCodeGeneratedEvent>()
+                .take(1)
+                .collect {
+                    logger.i { "请用手机 QQ 扫描二维码：\n" + generateTerminalQRCode(it.url) }
+                    SystemFileSystem.sink(qrCodePath).buffered().use { sink ->
+                        sink.write(it.png)
+                    }
+                    logger.i { "二维码文件已保存至 ${SystemFileSystem.resolve(qrCodePath)}" }
+                }
+        }
+
+        if (sessionStore.a2.isEmpty()) {
+            bot.qrCodeLogin()
+        } else {
+            bot.tryLogin()
+        }
     }
 }

@@ -17,31 +17,41 @@ inline fun <reified T : Any, reified R : Any> routeMilkyApi(
     crossinline handler: MilkyApiHandler<T, R>
 ): Route.() -> Unit = {
     post("/$endpoint") {
-        val payload = call.receive<T>()
-        val bot: Bot by application.dependencies
         try {
-            val result = bot.handler(payload)
-            call.respond(
-                ApiGeneralResponse(
-                    status = "ok",
-                    retcode = 0,
-                    data = milkyJsonModule.encodeToJsonElement(result)
+            val payload = call.receive<T>()
+            val bot: Bot by application.dependencies
+            try {
+                val result = bot.handler(payload)
+                call.respond(
+                    ApiGeneralResponse(
+                        status = "ok",
+                        retcode = 0,
+                        data = milkyJsonModule.encodeToJsonElement(result)
+                    )
                 )
-            )
-        } catch (e: MilkyApiException) {
-            call.respond(
-                ApiGeneralResponse(
-                    status = "failed",
-                    retcode = e.retcode,
-                    message = e.message
+            } catch (e: MilkyApiException) {
+                call.respond(
+                    ApiGeneralResponse(
+                        status = "failed",
+                        retcode = e.retcode,
+                        message = e.message
+                    )
                 )
-            )
+            } catch (e: Exception) {
+                call.respond(
+                    ApiGeneralResponse(
+                        status = "failed",
+                        retcode = -500,
+                        message = "Internal error: ${e.message}"
+                    )
+                )
+            }
         } catch (e: Exception) {
             call.respond(
                 ApiGeneralResponse(
                     status = "failed",
-                    retcode = -500,
-                    message = "Internal error: ${e.message}"
+                    retcode = -400,
+                    message = "Bad request: ${e.message}"
                 )
             )
         }

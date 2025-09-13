@@ -26,6 +26,7 @@ import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.UrlSignProvider
 import org.ntqqrev.yogurt.api.apiRoutingList
+import org.ntqqrev.yogurt.protocol.ApiGeneralResponse
 import org.ntqqrev.yogurt.protocol.milkyJsonModule
 import org.ntqqrev.yogurt.util.generateTerminalQRCode
 import org.ntqqrev.yogurt.util.logHandler
@@ -113,6 +114,22 @@ object YogurtApp {
                         }
                         install(auth)
                     }
+
+                    val protectNotLoggedIn = createRouteScopedPlugin("ProtectNotLoggedIn") {
+                        onCall { call ->
+                            if (!bot.isLoggedIn) {
+                                call.respond(
+                                    ApiGeneralResponse(
+                                        status = "failed",
+                                        retcode = -403,
+                                        message = "Bot is not logged in"
+                                    )
+                                )
+                                return@onCall
+                            }
+                        }
+                    }
+                    install(protectNotLoggedIn)
 
                     apiRoutingList.forEach { it() }
                 }

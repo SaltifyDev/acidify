@@ -4,6 +4,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.encodeToJsonElement
+import org.ntqqrev.yogurt.api.system.GetFriendInfoApi
+import org.ntqqrev.yogurt.api.system.GetFriendListApi
 import org.ntqqrev.yogurt.api.system.GetLoginInfoApi
 import org.ntqqrev.yogurt.protocol.ApiGeneralResponse
 import org.ntqqrev.yogurt.protocol.milkyJsonModule
@@ -52,4 +54,6 @@ private inline fun <reified T : Any, reified R> Route.serve(api: MilkyApi<T, R>)
 
 fun Route.configureMilkyApi() {
     serve(GetLoginInfoApi)
+    serve(GetFriendListApi)
+    serve(GetFriendInfoApi)
 }

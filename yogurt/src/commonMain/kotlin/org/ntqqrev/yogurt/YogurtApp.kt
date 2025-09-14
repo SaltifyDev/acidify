@@ -29,6 +29,7 @@ import org.ntqqrev.acidify.util.UrlSignProvider
 import org.ntqqrev.yogurt.api.configureMilkyApi
 import org.ntqqrev.yogurt.protocol.ApiGeneralResponse
 import org.ntqqrev.yogurt.protocol.milkyJsonModule
+import org.ntqqrev.yogurt.util.YogurtCache
 import org.ntqqrev.yogurt.util.generateTerminalQRCode
 import org.ntqqrev.yogurt.util.logHandler
 
@@ -83,6 +84,16 @@ object YogurtApp {
                     // Throws a JobCancellationException here.
                     // This is a bug tracked as KTOR-8785
                     // and will be fixed at next minor release (3.3.0).
+                }
+
+                provide {
+                    YogurtCache /* <FriendCacheType> */(scope) {
+                        val (friendList, friendCategoryList) = bot.fetchFriends()
+                        Pair(
+                            friendList.associateBy { it.uin },
+                            friendCategoryList.associateBy { it.id }
+                        )
+                    }
                 }
             }
 

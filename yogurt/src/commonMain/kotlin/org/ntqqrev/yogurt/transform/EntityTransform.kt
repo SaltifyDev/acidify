@@ -3,8 +3,8 @@ package org.ntqqrev.yogurt.transform
 import org.ntqqrev.acidify.common.enum.UserInfoGender
 import org.ntqqrev.acidify.common.struct.BotFriendCategoryData
 import org.ntqqrev.acidify.common.struct.BotFriendData
-import org.ntqqrev.yogurt.protocol.FriendCategoryEntity
-import org.ntqqrev.yogurt.protocol.FriendEntity
+import org.ntqqrev.milky.FriendCategoryEntity
+import org.ntqqrev.milky.FriendEntity
 
 fun BotFriendData.toMilkyEntity(friendCacheMap: Map<Int, BotFriendCategoryData>) =
     FriendEntity(

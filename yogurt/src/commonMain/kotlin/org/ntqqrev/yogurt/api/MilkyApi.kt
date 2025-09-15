@@ -4,17 +4,27 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.encodeToJsonElement
+import org.ntqqrev.milky.ApiEndpoint
+import org.ntqqrev.milky.ApiGeneralResponse
+import org.ntqqrev.milky.milkyJsonModule
 import org.ntqqrev.yogurt.api.system.GetFriendInfoApi
 import org.ntqqrev.yogurt.api.system.GetFriendListApi
-import org.ntqqrev.yogurt.api.system.GetLoginInfoApi
-import org.ntqqrev.yogurt.protocol.ApiGeneralResponse
-import org.ntqqrev.yogurt.protocol.milkyJsonModule
+import org.ntqqrev.yogurt.api.system.GetLoginInfo
 
-abstract class MilkyApi<T : Any, R>(val endpoint: String) {
+abstract class MilkyApi<T : Any, R : Any>(api: ApiEndpoint<T, R>) {
+    val endpoint: String = api.path
     abstract suspend fun Route.call(payload: T): R
 }
 
-private inline fun <reified T : Any, reified R> Route.serve(api: MilkyApi<T, R>) {
+inline fun <reified T : Any, reified R : Any> MilkyApi(
+    api: ApiEndpoint<T, R>,
+    crossinline handler: suspend Route.(T) -> R
+) =
+    object : MilkyApi<T, R>(api) {
+        override suspend fun Route.call(payload: T): R = handler(payload)
+    }
+
+private inline fun <reified T : Any, reified R : Any> Route.serve(api: MilkyApi<T, R>) {
     post("/${api.endpoint}") {
         try {
             val payload = call.receive<T>()
@@ -53,7 +63,7 @@ private inline fun <reified T : Any, reified R> Route.serve(api: MilkyApi<T, R>)
 }
 
 fun Route.configureMilkyApi() {
-    serve(GetLoginInfoApi)
+    serve(GetLoginInfo)
     serve(GetFriendListApi)
     serve(GetFriendInfoApi)
 }

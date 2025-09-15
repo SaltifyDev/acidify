@@ -1,8 +1,7 @@
-// Generated via https://milky.ntqqrev.org/raw/kotlin
-
+// Auto-generated file
 @file:OptIn(ExperimentalSerializationApi::class)
 
-package org.ntqqrev.yogurt.protocol
+package org.ntqqrev.milky
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -1805,3 +1804,197 @@ class DeleteGroupFolderInput(
 )
 
 typealias DeleteGroupFolderOutput = ApiEmptyStruct
+
+// ####################################
+// API Endpoint Constants
+// ####################################
+
+sealed class ApiEndpoint<T : Any, R : Any>(val path: String) {
+    /** 获取登录信息 */
+    object GetLoginInfo : ApiEndpoint<GetLoginInfoInput, GetLoginInfoOutput>("/get_login_info")
+
+    /** 获取协议端信息 */
+    object GetImplInfo : ApiEndpoint<GetImplInfoInput, GetImplInfoOutput>("/get_impl_info")
+
+    /** 获取用户个人信息 */
+    object GetUserProfile : ApiEndpoint<GetUserProfileInput, GetUserProfileOutput>("/get_user_profile")
+
+    /** 获取好友列表 */
+    object GetFriendList : ApiEndpoint<GetFriendListInput, GetFriendListOutput>("/get_friend_list")
+
+    /** 获取好友信息 */
+    object GetFriendInfo : ApiEndpoint<GetFriendInfoInput, GetFriendInfoOutput>("/get_friend_info")
+
+    /** 获取群列表 */
+    object GetGroupList : ApiEndpoint<GetGroupListInput, GetGroupListOutput>("/get_group_list")
+
+    /** 获取群信息 */
+    object GetGroupInfo : ApiEndpoint<GetGroupInfoInput, GetGroupInfoOutput>("/get_group_info")
+
+    /** 获取群成员列表 */
+    object GetGroupMemberList : ApiEndpoint<GetGroupMemberListInput, GetGroupMemberListOutput>("/get_group_member_list")
+
+    /** 获取群成员信息 */
+    object GetGroupMemberInfo : ApiEndpoint<GetGroupMemberInfoInput, GetGroupMemberInfoOutput>("/get_group_member_info")
+
+    /** 获取 Cookies */
+    object GetCookies : ApiEndpoint<GetCookiesInput, GetCookiesOutput>("/get_cookies")
+
+    /** 获取 CSRF Token */
+    object GetCsrfToken : ApiEndpoint<GetCsrfTokenInput, GetCsrfTokenOutput>("/get_csrf_token")
+
+    /** 发送私聊消息 */
+    object SendPrivateMessage : ApiEndpoint<SendPrivateMessageInput, SendPrivateMessageOutput>("/send_private_message")
+
+    /** 发送群聊消息 */
+    object SendGroupMessage : ApiEndpoint<SendGroupMessageInput, SendGroupMessageOutput>("/send_group_message")
+
+    /** 撤回私聊消息 */
+    object RecallPrivateMessage :
+        ApiEndpoint<RecallPrivateMessageInput, RecallPrivateMessageOutput>("/recall_private_message")
+
+    /** 撤回群聊消息 */
+    object RecallGroupMessage : ApiEndpoint<RecallGroupMessageInput, RecallGroupMessageOutput>("/recall_group_message")
+
+    /** 获取消息 */
+    object GetMessage : ApiEndpoint<GetMessageInput, GetMessageOutput>("/get_message")
+
+    /** 获取历史消息 */
+    object GetHistoryMessages : ApiEndpoint<GetHistoryMessagesInput, GetHistoryMessagesOutput>("/get_history_messages")
+
+    /** 获取临时资源链接 */
+    object GetResourceTempUrl : ApiEndpoint<GetResourceTempUrlInput, GetResourceTempUrlOutput>("/get_resource_temp_url")
+
+    /** 获取合并转发消息内容 */
+    object GetForwardedMessages :
+        ApiEndpoint<GetForwardedMessagesInput, GetForwardedMessagesOutput>("/get_forwarded_messages")
+
+    /** 标记消息为已读 */
+    object MarkMessageAsRead : ApiEndpoint<MarkMessageAsReadInput, MarkMessageAsReadOutput>("/mark_message_as_read")
+
+    /** 发送好友戳一戳 */
+    object SendFriendNudge : ApiEndpoint<SendFriendNudgeInput, SendFriendNudgeOutput>("/send_friend_nudge")
+
+    /** 发送名片点赞 */
+    object SendProfileLike : ApiEndpoint<SendProfileLikeInput, SendProfileLikeOutput>("/send_profile_like")
+
+    /** 获取好友请求列表 */
+    object GetFriendRequests : ApiEndpoint<GetFriendRequestsInput, GetFriendRequestsOutput>("/get_friend_requests")
+
+    /** 同意好友请求 */
+    object AcceptFriendRequest :
+        ApiEndpoint<AcceptFriendRequestInput, AcceptFriendRequestOutput>("/accept_friend_request")
+
+    /** 拒绝好友请求 */
+    object RejectFriendRequest :
+        ApiEndpoint<RejectFriendRequestInput, RejectFriendRequestOutput>("/reject_friend_request")
+
+    /** 设置群名称 */
+    object SetGroupName : ApiEndpoint<SetGroupNameInput, SetGroupNameOutput>("/set_group_name")
+
+    /** 设置群头像 */
+    object SetGroupAvatar : ApiEndpoint<SetGroupAvatarInput, SetGroupAvatarOutput>("/set_group_avatar")
+
+    /** 设置群名片 */
+    object SetGroupMemberCard : ApiEndpoint<SetGroupMemberCardInput, SetGroupMemberCardOutput>("/set_group_member_card")
+
+    /** 设置群成员专属头衔 */
+    object SetGroupMemberSpecialTitle :
+        ApiEndpoint<SetGroupMemberSpecialTitleInput, SetGroupMemberSpecialTitleOutput>("/set_group_member_special_title")
+
+    /** 设置群管理员 */
+    object SetGroupMemberAdmin :
+        ApiEndpoint<SetGroupMemberAdminInput, SetGroupMemberAdminOutput>("/set_group_member_admin")
+
+    /** 设置群成员禁言 */
+    object SetGroupMemberMute : ApiEndpoint<SetGroupMemberMuteInput, SetGroupMemberMuteOutput>("/set_group_member_mute")
+
+    /** 设置群全员禁言 */
+    object SetGroupWholeMute : ApiEndpoint<SetGroupWholeMuteInput, SetGroupWholeMuteOutput>("/set_group_whole_mute")
+
+    /** 踢出群成员 */
+    object KickGroupMember : ApiEndpoint<KickGroupMemberInput, KickGroupMemberOutput>("/kick_group_member")
+
+    /** 获取群公告列表 */
+    object GetGroupAnnouncementList :
+        ApiEndpoint<GetGroupAnnouncementListInput, GetGroupAnnouncementListOutput>("/get_group_announcement_list")
+
+    /** 发送群公告 */
+    object SendGroupAnnouncement :
+        ApiEndpoint<SendGroupAnnouncementInput, SendGroupAnnouncementOutput>("/send_group_announcement")
+
+    /** 删除群公告 */
+    object DeleteGroupAnnouncement :
+        ApiEndpoint<DeleteGroupAnnouncementInput, DeleteGroupAnnouncementOutput>("/delete_group_announcement")
+
+    /** 获取群精华消息列表 */
+    object GetGroupEssenceMessages :
+        ApiEndpoint<GetGroupEssenceMessagesInput, GetGroupEssenceMessagesOutput>("/get_group_essence_messages")
+
+    /** 设置群精华消息 */
+    object SetGroupEssenceMessage :
+        ApiEndpoint<SetGroupEssenceMessageInput, SetGroupEssenceMessageOutput>("/set_group_essence_message")
+
+    /** 退出群 */
+    object QuitGroup : ApiEndpoint<QuitGroupInput, QuitGroupOutput>("/quit_group")
+
+    /** 发送群消息表情回应 */
+    object SendGroupMessageReaction :
+        ApiEndpoint<SendGroupMessageReactionInput, SendGroupMessageReactionOutput>("/send_group_message_reaction")
+
+    /** 发送群戳一戳 */
+    object SendGroupNudge : ApiEndpoint<SendGroupNudgeInput, SendGroupNudgeOutput>("/send_group_nudge")
+
+    /** 获取群通知列表 */
+    object GetGroupNotifications :
+        ApiEndpoint<GetGroupNotificationsInput, GetGroupNotificationsOutput>("/get_group_notifications")
+
+    /** 同意入群/邀请他人入群请求 */
+    object AcceptGroupRequest : ApiEndpoint<AcceptGroupRequestInput, AcceptGroupRequestOutput>("/accept_group_request")
+
+    /** 拒绝入群/邀请他人入群请求 */
+    object RejectGroupRequest : ApiEndpoint<RejectGroupRequestInput, RejectGroupRequestOutput>("/reject_group_request")
+
+    /** 同意他人邀请自身入群 */
+    object AcceptGroupInvitation :
+        ApiEndpoint<AcceptGroupInvitationInput, AcceptGroupInvitationOutput>("/accept_group_invitation")
+
+    /** 拒绝他人邀请自身入群 */
+    object RejectGroupInvitation :
+        ApiEndpoint<RejectGroupInvitationInput, RejectGroupInvitationOutput>("/reject_group_invitation")
+
+    /** 上传私聊文件 */
+    object UploadPrivateFile : ApiEndpoint<UploadPrivateFileInput, UploadPrivateFileOutput>("/upload_private_file")
+
+    /** 上传群文件 */
+    object UploadGroupFile : ApiEndpoint<UploadGroupFileInput, UploadGroupFileOutput>("/upload_group_file")
+
+    /** 获取私聊文件下载链接 */
+    object GetPrivateFileDownloadUrl :
+        ApiEndpoint<GetPrivateFileDownloadUrlInput, GetPrivateFileDownloadUrlOutput>("/get_private_file_download_url")
+
+    /** 获取群文件下载链接 */
+    object GetGroupFileDownloadUrl :
+        ApiEndpoint<GetGroupFileDownloadUrlInput, GetGroupFileDownloadUrlOutput>("/get_group_file_download_url")
+
+    /** 获取群文件列表 */
+    object GetGroupFiles : ApiEndpoint<GetGroupFilesInput, GetGroupFilesOutput>("/get_group_files")
+
+    /** 移动群文件 */
+    object MoveGroupFile : ApiEndpoint<MoveGroupFileInput, MoveGroupFileOutput>("/move_group_file")
+
+    /** 重命名群文件 */
+    object RenameGroupFile : ApiEndpoint<RenameGroupFileInput, RenameGroupFileOutput>("/rename_group_file")
+
+    /** 删除群文件 */
+    object DeleteGroupFile : ApiEndpoint<DeleteGroupFileInput, DeleteGroupFileOutput>("/delete_group_file")
+
+    /** 创建群文件夹 */
+    object CreateGroupFolder : ApiEndpoint<CreateGroupFolderInput, CreateGroupFolderOutput>("/create_group_folder")
+
+    /** 重命名群文件夹 */
+    object RenameGroupFolder : ApiEndpoint<RenameGroupFolderInput, RenameGroupFolderOutput>("/rename_group_folder")
+
+    /** 删除群文件夹 */
+    object DeleteGroupFolder : ApiEndpoint<DeleteGroupFolderInput, DeleteGroupFolderOutput>("/delete_group_folder")
+}

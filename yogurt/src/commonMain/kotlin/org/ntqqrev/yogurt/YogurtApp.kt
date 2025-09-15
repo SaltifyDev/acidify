@@ -26,9 +26,9 @@ import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.UrlSignProvider
+import org.ntqqrev.milky.ApiGeneralResponse
+import org.ntqqrev.milky.milkyJsonModule
 import org.ntqqrev.yogurt.api.configureMilkyApi
-import org.ntqqrev.yogurt.protocol.ApiGeneralResponse
-import org.ntqqrev.yogurt.protocol.milkyJsonModule
 import org.ntqqrev.yogurt.util.YogurtCache
 import org.ntqqrev.yogurt.util.generateTerminalQRCode
 import org.ntqqrev.yogurt.util.logHandler

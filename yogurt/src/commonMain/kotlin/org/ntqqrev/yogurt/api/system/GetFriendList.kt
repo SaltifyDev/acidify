@@ -3,18 +3,16 @@ package org.ntqqrev.yogurt.api.system
 import io.ktor.server.plugins.di.*
 import io.ktor.server.routing.*
 import org.ntqqrev.milky.ApiEndpoint
-import org.ntqqrev.milky.GetFriendInfoOutput
-import org.ntqqrev.yogurt.api.MilkyApi
-import org.ntqqrev.yogurt.api.MilkyApiException
+import org.ntqqrev.milky.GetFriendListOutput
+import org.ntqqrev.yogurt.api.MilkyApiHandler
 import org.ntqqrev.yogurt.transform.toMilkyEntity
 import org.ntqqrev.yogurt.util.FriendCacheType
 import org.ntqqrev.yogurt.util.YogurtCache
 
-val GetFriendInfoApi = MilkyApi(ApiEndpoint.GetFriendInfo) {
+val GetFriendList = MilkyApiHandler(ApiEndpoint.GetFriendList) {
     val cache: YogurtCache<FriendCacheType> by application.dependencies
     val (f, fc) = cache.get(refresh = it.noCache)
-    GetFriendInfoOutput(
-        friend = f[it.userId]?.toMilkyEntity(fc)
-            ?: throw MilkyApiException(-404, "Friend not found")
+    GetFriendListOutput(
+        friends = f.values.map { it.toMilkyEntity(fc) }
     )
 }

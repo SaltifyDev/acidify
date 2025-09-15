@@ -7,30 +7,29 @@ import kotlinx.serialization.json.encodeToJsonElement
 import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
-import org.ntqqrev.yogurt.api.system.GetFriendInfoApi
-import org.ntqqrev.yogurt.api.system.GetFriendListApi
+import org.ntqqrev.yogurt.api.system.GetFriendInfo
+import org.ntqqrev.yogurt.api.system.GetFriendList
 import org.ntqqrev.yogurt.api.system.GetLoginInfo
 
-abstract class MilkyApi<T : Any, R : Any>(api: ApiEndpoint<T, R>) {
-    val endpoint: String = api.path
+abstract class MilkyApiHandler<T : Any, R : Any>(api: ApiEndpoint<T, R>) {
+    val path: String = api.path
     abstract suspend fun Route.call(payload: T): R
 }
 
-inline fun <reified T : Any, reified R : Any> MilkyApi(
+inline fun <reified T : Any, reified R : Any> MilkyApiHandler(
     api: ApiEndpoint<T, R>,
     crossinline handler: suspend Route.(T) -> R
-) =
-    object : MilkyApi<T, R>(api) {
-        override suspend fun Route.call(payload: T): R = handler(payload)
-    }
+) = object : MilkyApiHandler<T, R>(api) {
+    override suspend fun Route.call(payload: T): R = handler(payload)
+}
 
-private inline fun <reified T : Any, reified R : Any> Route.serve(api: MilkyApi<T, R>) {
-    post(api.endpoint) {
+private inline fun <reified T : Any, reified R : Any> Route.serve(handler: MilkyApiHandler<T, R>) {
+    post(handler.path) {
         try {
             val payload = call.receive<T>()
             call.respond(
                 try {
-                    val result = with(api) { call(payload) }
+                    val result = with(handler) { call(payload) }
                     ApiGeneralResponse(
                         status = "ok",
                         retcode = 0,
@@ -64,6 +63,6 @@ private inline fun <reified T : Any, reified R : Any> Route.serve(api: MilkyApi<
 
 fun Route.configureMilkyApi() {
     serve(GetLoginInfo)
-    serve(GetFriendListApi)
-    serve(GetFriendInfoApi)
+    serve(GetFriendList)
+    serve(GetFriendInfo)
 }

@@ -25,7 +25,7 @@ inline fun <reified T : Any, reified R : Any> MilkyApi(
     }
 
 private inline fun <reified T : Any, reified R : Any> Route.serve(api: MilkyApi<T, R>) {
-    post("/${api.endpoint}") {
+    post(api.endpoint) {
         try {
             val payload = call.receive<T>()
             call.respond(

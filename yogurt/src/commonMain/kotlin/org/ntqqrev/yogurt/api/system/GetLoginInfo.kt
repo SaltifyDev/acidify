@@ -5,9 +5,9 @@ import io.ktor.server.routing.*
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.GetLoginInfoOutput
-import org.ntqqrev.yogurt.api.MilkyApiHandler
+import org.ntqqrev.yogurt.api.invoke
 
-val GetLoginInfo = MilkyApiHandler(ApiEndpoint.GetLoginInfo) {
+val GetLoginInfo = ApiEndpoint.GetLoginInfo {
     val bot: Bot by application.dependencies
     GetLoginInfoOutput(
         uin = bot.uin,

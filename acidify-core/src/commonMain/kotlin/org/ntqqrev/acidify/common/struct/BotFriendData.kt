@@ -13,6 +13,7 @@ import org.ntqqrev.acidify.common.enum.UserInfoGender
  * @property age 好友的年龄
  * @property gender 好友的性别
  * @property categoryId 好友所在的分组 ID
+ * @property categoryName 好友所在的分组名称
  */
 data class BotFriendData(
     val uin: Long,
@@ -24,4 +25,5 @@ data class BotFriendData(
     val age: Int,
     val gender: UserInfoGender,
     val categoryId: Int,
+    val categoryName: String,
 )

@@ -2,7 +2,6 @@ package org.ntqqrev.acidify.internal.service.common
 
 import org.ntqqrev.acidify.common.enum.UserInfoGender
 import org.ntqqrev.acidify.common.enum.UserInfoKey
-import org.ntqqrev.acidify.common.struct.BotFriendCategoryData
 import org.ntqqrev.acidify.common.struct.BotFriendData
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.oidb.FetchFriendsCookie
@@ -16,7 +15,6 @@ internal object FetchFriends : OidbService<FetchFriends.Req, FetchFriends.Resp>(
     internal class Resp(
         val nextUin: Long?,
         val friendDataList: List<BotFriendData>,
-        val friendCategoryList: List<BotFriendCategoryData>
     )
 
     override fun buildOidb(client: LagrangeClient, payload: Req): ByteArray = IncPull {
@@ -50,6 +48,7 @@ internal object FetchFriends : OidbService<FetchFriends.Req, FetchFriends.Resp>(
 
     override fun parseOidb(client: LagrangeClient, payload: ByteArray): Resp {
         val resp = IncPullResp(payload)
+        val categories = resp.get { category }.associate { it.get { categoryId } to it.get { categoryName } }
         return Resp(
             nextUin = resp.get { cookie }?.get { nextUin },
             friendDataList = resp.get { friendList }.map { friend ->
@@ -69,15 +68,10 @@ internal object FetchFriends : OidbService<FetchFriends.Req, FetchFriends.Resp>(
                     gender = UserInfoGender.entries
                         .find { it.value == numMap[UserInfoKey.GENDER.number] }
                         ?: UserInfoGender.UNKNOWN,
-                    categoryId = friend.get { categoryId }
+                    categoryId = friend.get { categoryId },
+                    categoryName = categories[friend.get { categoryId }] ?: ""
                 )
             },
-            friendCategoryList = resp.get { category }.map { category ->
-                BotFriendCategoryData(
-                    id = category.get { categoryId },
-                    name = category.get { categoryName }
-                )
-            }
         )
     }
 }

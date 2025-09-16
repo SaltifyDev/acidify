@@ -15,7 +15,6 @@ import org.ntqqrev.acidify.common.log.LogHandler
 import org.ntqqrev.acidify.common.log.LogLevel
 import org.ntqqrev.acidify.common.log.LogMessage
 import org.ntqqrev.acidify.common.log.Logger
-import org.ntqqrev.acidify.common.struct.BotFriendCategoryData
 import org.ntqqrev.acidify.common.struct.BotFriendData
 import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
@@ -179,17 +178,15 @@ class Bot internal constructor(
     /**
      * 获取好友与好友分组信息。
      */
-    suspend fun fetchFriends(): Pair<List<BotFriendData>, List<BotFriendCategoryData>> {
+    suspend fun fetchFriends(): List<BotFriendData> {
         var nextUin: Long? = null
         val friendDataResult = mutableListOf<BotFriendData>()
-        val friendCategoryResult = mutableSetOf<BotFriendCategoryData>()
         do {
             val resp = client.callService(FetchFriends, FetchFriends.Req(nextUin))
             nextUin = resp.nextUin
             friendDataResult.addAll(resp.friendDataList)
-            friendCategoryResult.addAll(resp.friendCategoryList)
         } while (nextUin != null)
-        return Pair(friendDataResult, friendCategoryResult.toList())
+        return friendDataResult
     }
 
     companion object {

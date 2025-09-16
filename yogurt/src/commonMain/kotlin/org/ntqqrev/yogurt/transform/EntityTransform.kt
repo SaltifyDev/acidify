@@ -1,12 +1,11 @@
 package org.ntqqrev.yogurt.transform
 
 import org.ntqqrev.acidify.common.enum.UserInfoGender
-import org.ntqqrev.acidify.common.struct.BotFriendCategoryData
 import org.ntqqrev.acidify.common.struct.BotFriendData
 import org.ntqqrev.milky.FriendCategoryEntity
 import org.ntqqrev.milky.FriendEntity
 
-fun BotFriendData.toMilkyEntity(friendCacheMap: Map<Int, BotFriendCategoryData>) =
+fun BotFriendData.toMilkyEntity() =
     FriendEntity(
         userId = uin,
         nickname = nickname,
@@ -15,7 +14,7 @@ fun BotFriendData.toMilkyEntity(friendCacheMap: Map<Int, BotFriendCategoryData>)
         remark = remark,
         category = FriendCategoryEntity(
             categoryId = categoryId,
-            categoryName = friendCacheMap[categoryId]?.name.orEmpty()
+            categoryName = categoryName
         )
     )
 

@@ -5,20 +5,37 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.ntqqrev.acidify.common.struct.BotFriendCategoryData
-import org.ntqqrev.acidify.common.struct.BotFriendData
 
-typealias FriendCacheType = Pair<Map<Long, BotFriendData>, Map<Int, BotFriendCategoryData>>
-
-class YogurtCache<T>(private val scope: CoroutineScope, private val load: suspend () -> T) {
+class YogurtCache<K, V>(
+    val scope: CoroutineScope,
+    val fetchData: suspend () -> Map<K, V>
+) {
     private val updateMutex = Mutex()
-    private var currentTask: Deferred<T>? = null
-    private var currentValue: T? = null
+    private var currentTask: Deferred<Unit>? = null
 
-    suspend fun get(refresh: Boolean = false): T {
-        if (!refresh) {
-            currentValue?.let { return it }
+    private var currentCache = mutableMapOf<K, V>()
+
+    suspend operator fun get(key: K, cacheFirst: Boolean = true): V? {
+        if (key !in currentCache || !cacheFirst) {
+            update()
         }
+        return currentCache[key]
+    }
+
+    suspend fun getAll(cacheFirst: Boolean = true): Iterable<V> {
+        if (currentCache.isEmpty() || !cacheFirst) {
+            update()
+        }
+        return currentCache.values
+    }
+
+    suspend operator fun set(key: K, value: V) {
+        return updateMutex.withLock {
+            currentCache[key] = value
+        }
+    }
+
+    suspend fun update() {
         return updateMutex.withLock {
             currentTask?.let {
                 if (it.isActive) {
@@ -26,9 +43,8 @@ class YogurtCache<T>(private val scope: CoroutineScope, private val load: suspen
                 }
             }
             val newTask = scope.async {
-                val data = load()
-                currentValue = data
-                data
+                val data = fetchData()
+                currentCache = data.toMutableMap()
             }
             currentTask = newTask
             newTask

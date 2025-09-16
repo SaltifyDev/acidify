@@ -87,12 +87,8 @@ object YogurtApp {
                 }
 
                 provide {
-                    YogurtCache /* <FriendCacheType> */(scope) {
-                        val (friendList, friendCategoryList) = bot.fetchFriends()
-                        Pair(
-                            friendList.associateBy { it.uin },
-                            friendCategoryList.associateBy { it.id }
-                        )
+                    YogurtCache /* <Long, BotFriendData> */(scope) {
+                        bot.fetchFriends().associateBy { it.uin }
                     }
                 }
             }

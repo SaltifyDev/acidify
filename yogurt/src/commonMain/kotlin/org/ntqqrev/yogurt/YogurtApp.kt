@@ -84,6 +84,7 @@ object YogurtApp {
                     // Throws a JobCancellationException here.
                     // This is a bug tracked as KTOR-8785
                     // and will be fixed at next minor release (3.3.0).
+                    runBlocking { bot.offline() }
                 }
 
                 provide("FriendCache") {

@@ -10,7 +10,7 @@ import org.ntqqrev.yogurt.transform.toMilkyEntity
 import org.ntqqrev.yogurt.util.YogurtCache
 
 val GetFriendList = ApiEndpoint.GetFriendList {
-    val cache: YogurtCache<Long, BotFriendData> by application.dependencies
+    val cache: YogurtCache<Long, BotFriendData> = application.dependencies.resolve("FriendCache")
     val friends = cache.getAll(cacheFirst = !it.noCache)
     GetFriendListOutput(
         friends = friends.map(BotFriendData::toMilkyEntity)

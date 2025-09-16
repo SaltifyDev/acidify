@@ -11,7 +11,7 @@ import org.ntqqrev.yogurt.transform.toMilkyEntity
 import org.ntqqrev.yogurt.util.YogurtCache
 
 val GetFriendInfo = ApiEndpoint.GetFriendInfo {
-    val cache: YogurtCache<Long, BotFriendData> by application.dependencies
+    val cache: YogurtCache<Long, BotFriendData> = application.dependencies.resolve("FriendCache")
     val friend = cache[it.userId, !it.noCache]
         ?: throw MilkyApiException(-404, "Friend not found")
     GetFriendInfoOutput(

@@ -86,7 +86,7 @@ object YogurtApp {
                     // and will be fixed at next minor release (3.3.0).
                 }
 
-                provide {
+                provide("FriendCache") {
                     YogurtCache /* <Long, BotFriendData> */(scope) {
                         bot.fetchFriends().associateBy { it.uin }
                     }

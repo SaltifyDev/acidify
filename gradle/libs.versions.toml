@@ -10,7 +10,7 @@ kx-coroutines = "1.10.2"
 kx-io = "0.8.0"
 kx-atomicfu = "0.29.0"
 
-ktor = "3.2.3"
+ktor = "3.3.0"
 korlibs = "6.0.0"
 kermit = "2.0.8"
 mordant = "3.0.2"

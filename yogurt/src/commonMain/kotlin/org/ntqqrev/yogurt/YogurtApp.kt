@@ -36,7 +36,6 @@ import org.ntqqrev.yogurt.util.logHandler
 object YogurtApp {
     val config = YogurtConfig.loadFromFile()
     val signProvider = UrlSignProvider(config.signApiUrl)
-    val appInfo = signProvider.getAppInfo()!!
     val sessionStorePath = Path("session-store.json")
     val sessionStore: SessionStore = if (SystemFileSystem.exists(sessionStorePath)) {
         SystemFileSystem.source(sessionStorePath).buffered().use {
@@ -53,6 +52,7 @@ object YogurtApp {
     val qrCodePath = Path("qrcode.png")
 
     fun start() = runBlocking {
+        val appInfo = signProvider.getAppInfo()!!
         val bot = Bot.create(
             appInfo = appInfo,
             sessionStore = sessionStore,
@@ -87,6 +87,12 @@ object YogurtApp {
                 provide("FriendCache") {
                     YogurtCache /* <Long, BotFriendData> */(scope) {
                         bot.fetchFriends().associateBy { it.uin }
+                    }
+                }
+
+                provide("GroupCache") {
+                    YogurtCache /* <Long, BotGroupData> */(scope) {
+                        bot.fetchGroups().associateBy { it.uin }
                     }
                 }
             }

@@ -2,8 +2,10 @@ package org.ntqqrev.yogurt.transform
 
 import org.ntqqrev.acidify.common.enum.UserInfoGender
 import org.ntqqrev.acidify.common.struct.BotFriendData
+import org.ntqqrev.acidify.common.struct.BotGroupData
 import org.ntqqrev.milky.FriendCategoryEntity
 import org.ntqqrev.milky.FriendEntity
+import org.ntqqrev.milky.GroupEntity
 
 fun BotFriendData.toMilkyEntity() =
     FriendEntity(
@@ -16,6 +18,14 @@ fun BotFriendData.toMilkyEntity() =
             categoryId = categoryId,
             categoryName = categoryName
         )
+    )
+
+fun BotGroupData.toMilkyEntity() =
+    GroupEntity(
+        groupId = uin,
+        groupName = name,
+        memberCount = memberCount,
+        maxMemberCount = capacity
     )
 
 fun UserInfoGender.toMilkySex() = when (this) {

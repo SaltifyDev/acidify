@@ -7,9 +7,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
-import org.ntqqrev.yogurt.api.system.GetFriendInfo
-import org.ntqqrev.yogurt.api.system.GetFriendList
-import org.ntqqrev.yogurt.api.system.GetLoginInfo
+import org.ntqqrev.yogurt.api.system.*
 
 abstract class MilkyApiHandler<T : Any, R : Any>(api: ApiEndpoint<T, R>) {
     val path: String = api.path
@@ -64,4 +62,6 @@ fun Route.configureMilkyApi() {
     serve(GetLoginInfo)
     serve(GetFriendList)
     serve(GetFriendInfo)
+    serve(GetGroupList)
+    serve(GetGroupInfo)
 }

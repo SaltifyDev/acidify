@@ -16,6 +16,7 @@ import org.ntqqrev.acidify.common.log.LogLevel
 import org.ntqqrev.acidify.common.log.LogMessage
 import org.ntqqrev.acidify.common.log.Logger
 import org.ntqqrev.acidify.common.struct.BotFriendData
+import org.ntqqrev.acidify.common.struct.BotGroupData
 import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QRCodeStateQueryEvent
@@ -23,6 +24,7 @@ import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.common.FetchFriends
+import org.ntqqrev.acidify.internal.service.common.FetchGroups
 import org.ntqqrev.acidify.internal.service.system.*
 
 /**
@@ -187,6 +189,13 @@ class Bot internal constructor(
             friendDataResult.addAll(resp.friendDataList)
         } while (nextUin != null)
         return friendDataResult
+    }
+
+    /**
+     * 获取群信息。
+     */
+    suspend fun fetchGroups(): List<BotGroupData> {
+        return client.callService(FetchGroups)
     }
 
     companion object {

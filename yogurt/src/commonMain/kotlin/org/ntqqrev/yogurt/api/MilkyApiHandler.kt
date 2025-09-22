@@ -60,6 +60,7 @@ private inline fun <reified T : Any, reified R : Any> Route.serve(handler: Milky
 
 fun Route.configureMilkyApi() {
     serve(GetLoginInfo)
+    serve(GetImplInfo)
     serve(GetFriendList)
     serve(GetFriendInfo)
     serve(GetGroupList)

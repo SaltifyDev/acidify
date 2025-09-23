@@ -12,7 +12,6 @@ kx-atomicfu = "0.29.0"
 
 ktor = "3.3.0"
 korlibs = "6.0.0"
-kermit = "2.0.8"
 mordant = "3.0.2"
 logback = "1.5.18"
 
@@ -40,8 +39,6 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 korlibs-compression = { module = "com.soywiz:korlibs-compression", version.ref = "korlibs" }
-
-kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
 

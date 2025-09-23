@@ -1,6 +1,7 @@
 package org.ntqqrev.acidify
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -49,6 +50,8 @@ class Bot internal constructor(
         extraBufferCapacity = 100,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+    internal var heartbeatJob: Job? = null
+
 
     /**
      * [AcidifyEvent] 流，可用于监听各种事件
@@ -148,16 +151,27 @@ class Bot internal constructor(
         isLoggedIn = true
         logger.i { "用户 $uin 已上线" }
         // todo: post online logic
-        // - heartbeat
-        // - fetch friends/groups
         // - get face details
         // - get highway url
+
+        heartbeatJob = scope.launch {
+            while (isLoggedIn) {
+                try {
+                    client.callService(Heartbeat)
+                } catch (e: Exception) {
+                    logger.w(e) { "心跳包发送失败" }
+                }
+                delay(300_000L)
+            }
+        }
     }
 
     /**
      * 下线 Bot，释放资源。
      */
     suspend fun offline() {
+        heartbeatJob?.cancel()
+        heartbeatJob = null
         client.callService(BotOffline)
         logger.i { "用户 $uin 已下线" }
     }

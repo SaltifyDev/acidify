@@ -1,7 +1,4 @@
-package org.ntqqrev.acidify.util
-
-import org.ntqqrev.acidify.common.log.LogHandler
-import org.ntqqrev.acidify.common.log.LogLevel
+package org.ntqqrev.acidify.util.log
 
 object NopLogHandler : LogHandler {
     override fun handleLog(

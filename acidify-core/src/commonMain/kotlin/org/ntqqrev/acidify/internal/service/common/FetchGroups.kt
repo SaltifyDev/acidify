@@ -1,6 +1,6 @@
 package org.ntqqrev.acidify.internal.service.common
 
-import org.ntqqrev.acidify.common.struct.BotGroupData
+import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.oidb.FetchGroupsReq
 import org.ntqqrev.acidify.internal.packet.oidb.FetchGroupsResp

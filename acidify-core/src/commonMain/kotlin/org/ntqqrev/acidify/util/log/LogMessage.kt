@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.common.log
+package org.ntqqrev.acidify.util.log
 
 class LogMessage(
     val level: LogLevel,

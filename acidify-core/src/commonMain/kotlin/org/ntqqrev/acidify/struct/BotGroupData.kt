@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.common.struct
+package org.ntqqrev.acidify.struct
 
 /**
  * Bot 群数据

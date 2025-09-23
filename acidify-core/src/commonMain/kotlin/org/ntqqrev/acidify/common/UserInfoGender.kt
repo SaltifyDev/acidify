@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.common.enum
+package org.ntqqrev.acidify.common
 
 /**
  * 用户性别枚举

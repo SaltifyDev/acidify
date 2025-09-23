@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.common.log
+package org.ntqqrev.acidify.util.log
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch

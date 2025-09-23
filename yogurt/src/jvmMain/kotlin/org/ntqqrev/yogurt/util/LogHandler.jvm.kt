@@ -1,8 +1,8 @@
 package org.ntqqrev.yogurt.util
 
 import io.ktor.util.logging.*
-import org.ntqqrev.acidify.common.log.LogHandler
-import org.ntqqrev.acidify.common.log.LogLevel
+import org.ntqqrev.acidify.util.log.LogHandler
+import org.ntqqrev.acidify.util.log.LogLevel
 
 private fun Logger.toAcidifyLogHandler(): LogHandler =
     LogHandler { level, tag, message, throwable ->

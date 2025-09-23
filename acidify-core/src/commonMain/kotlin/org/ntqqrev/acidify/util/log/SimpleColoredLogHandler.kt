@@ -1,8 +1,6 @@
-package org.ntqqrev.acidify.util
+package org.ntqqrev.acidify.util.log
 
 import com.github.ajalt.mordant.rendering.TextColors.*
-import org.ntqqrev.acidify.common.log.LogHandler
-import org.ntqqrev.acidify.common.log.LogLevel
 
 object SimpleColoredLogHandler : LogHandler {
     private fun shortenPackageName(tag: String): String {

@@ -1,6 +1,6 @@
-package org.ntqqrev.acidify.common.struct
+package org.ntqqrev.acidify.struct
 
-import org.ntqqrev.acidify.common.enum.UserInfoGender
+import org.ntqqrev.acidify.common.UserInfoGender
 
 /**
  * Bot 好友数据

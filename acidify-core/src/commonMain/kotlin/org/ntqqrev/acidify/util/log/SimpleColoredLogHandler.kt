@@ -1,6 +1,17 @@
 package org.ntqqrev.acidify.util.log
 
 import com.github.ajalt.mordant.rendering.TextColors.*
+import com.github.ajalt.mordant.rendering.TextStyles.*
+import com.github.ajalt.mordant.widgets.Padding
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 object SimpleColoredLogHandler : LogHandler {
     private fun shortenPackageName(tag: String): String {
@@ -15,6 +26,15 @@ object SimpleColoredLogHandler : LogHandler {
         return b.toString()
     }
 
+    private val timeFormat = LocalDateTime.Format {
+        hour()
+        char(':')
+        minute()
+        char(':')
+        second()
+    }
+
+    @OptIn(ExperimentalTime::class)
     override fun handleLog(
         level: LogLevel,
         tag: String,
@@ -22,6 +42,10 @@ object SimpleColoredLogHandler : LogHandler {
         throwable: Throwable?
     ) {
         val b = StringBuilder()
+        val now: Instant = Clock.System.now()
+        val localNow: LocalDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
+        b.append(bold(green(timeFormat.format(localNow))))
+        b.append(" ")
         b.append(
             when (level) {
                 LogLevel.VERBOSE -> gray("TRACE")
@@ -36,7 +60,7 @@ object SimpleColoredLogHandler : LogHandler {
             when (level) {
                 LogLevel.VERBOSE -> gray
                 LogLevel.ERROR -> brightRed
-                else -> brightMagenta
+                else -> cyan
             }(shortenPackageName(tag))
         )
         b.append(" ")

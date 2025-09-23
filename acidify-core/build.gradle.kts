@@ -11,6 +11,7 @@ kotlin {
             implementation(libs.kotlinx.serialization)
             implementation(libs.kotlinx.coroutines)
             implementation(libs.kotlinx.io)
+            implementation(libs.kotlinx.datetime)
             implementation(libs.bundles.ktor.client)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.bundles.korlibs)

@@ -80,7 +80,7 @@ object YogurtApp {
             }
 
             dependencies {
-                provide { bot } cleanup {
+                provide("Bot") { bot } cleanup {
                     runBlocking { bot.offline() }
                 }
 

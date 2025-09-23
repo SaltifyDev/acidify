@@ -11,7 +11,7 @@ import org.ntqqrev.yogurt.transform.toMilkyEntity
 import org.ntqqrev.yogurt.util.YogurtCache
 
 val GetGroupInfo = ApiEndpoint.GetGroupInfo {
-    val groupCache = application.dependencies.resolve<YogurtCache<Long, BotGroupData>>("GroupCache")
+    val groupCache: YogurtCache<Long, BotGroupData> = application.dependencies.resolve("GroupCache")
     val group = groupCache[it.groupId, !it.noCache]
         ?: throw MilkyApiException(-404, "Group not found")
     GetGroupInfoOutput(

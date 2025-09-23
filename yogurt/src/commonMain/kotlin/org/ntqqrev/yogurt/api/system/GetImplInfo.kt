@@ -18,7 +18,7 @@ private fun String.toMilkyProtocolOs() = when (this) {
 }
 
 val GetImplInfo = ApiEndpoint.GetImplInfo {
-    val bot: Bot by application.dependencies
+    val bot: Bot = application.dependencies.resolve("Bot")
     GetImplInfoOutput(
         implName = implName,
         implVersion = implVersion,

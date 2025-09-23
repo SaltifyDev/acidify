@@ -8,7 +8,7 @@ import org.ntqqrev.milky.GetLoginInfoOutput
 import org.ntqqrev.yogurt.api.invoke
 
 val GetLoginInfo = ApiEndpoint.GetLoginInfo {
-    val bot: Bot by application.dependencies
+    val bot: Bot = application.dependencies.resolve("Bot")
     GetLoginInfoOutput(
         uin = bot.uin,
         nickname = "TODO" // todo: resolve nickname

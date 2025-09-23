@@ -70,10 +70,9 @@ class BotTest {
 
     @Test
     fun fetchFriendsTest() = runBlocking {
-        val (friends, friendCategories) = bot.fetchFriends()
+        val friends = bot.fetchFriends()
         assertTrue(friends.isNotEmpty())
         friends.forEach { println(it) }
-        friendCategories.forEach { println(it) }
     }
 
     @Test

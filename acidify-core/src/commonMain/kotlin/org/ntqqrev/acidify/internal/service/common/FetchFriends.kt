@@ -2,13 +2,13 @@ package org.ntqqrev.acidify.internal.service.common
 
 import org.ntqqrev.acidify.common.UserInfoGender
 import org.ntqqrev.acidify.common.UserInfoKey
-import org.ntqqrev.acidify.struct.BotFriendData
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.oidb.FetchFriendsCookie
 import org.ntqqrev.acidify.internal.packet.oidb.IncPull
 import org.ntqqrev.acidify.internal.packet.oidb.IncPullResp
 import org.ntqqrev.acidify.internal.service.OidbService
 import org.ntqqrev.acidify.pb.invoke
+import org.ntqqrev.acidify.struct.BotFriendData
 
 internal object FetchFriends : OidbService<FetchFriends.Req, FetchFriends.Resp>(0xfd4, 1) {
     internal class Req(val nextUin: Long?)

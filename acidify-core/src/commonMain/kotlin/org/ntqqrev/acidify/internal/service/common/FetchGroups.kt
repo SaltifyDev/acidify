@@ -1,11 +1,11 @@
 package org.ntqqrev.acidify.internal.service.common
 
-import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.oidb.FetchGroupsReq
 import org.ntqqrev.acidify.internal.packet.oidb.FetchGroupsResp
 import org.ntqqrev.acidify.internal.service.NoInputOidbService
 import org.ntqqrev.acidify.pb.invoke
+import org.ntqqrev.acidify.struct.BotGroupData
 
 internal object FetchGroups : NoInputOidbService<List<BotGroupData>>(0xfe5, 2) {
     override fun buildOidb(client: LagrangeClient, payload: Unit): ByteArray = FetchGroupsReq {

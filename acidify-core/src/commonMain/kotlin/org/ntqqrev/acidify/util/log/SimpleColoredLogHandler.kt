@@ -1,11 +1,8 @@
 package org.ntqqrev.acidify.util.log
 
 import com.github.ajalt.mordant.rendering.TextColors.*
-import com.github.ajalt.mordant.rendering.TextStyles.*
-import com.github.ajalt.mordant.widgets.Padding
-import kotlinx.datetime.LocalDate
+import com.github.ajalt.mordant.rendering.TextStyles.bold
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime

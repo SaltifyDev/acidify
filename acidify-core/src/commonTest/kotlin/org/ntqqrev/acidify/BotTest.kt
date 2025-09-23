@@ -12,8 +12,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.decodeFromSource
 import kotlinx.serialization.json.io.encodeToSink
 import org.ntqqrev.acidify.common.SessionStore
-import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
+import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.SimpleColoredLogHandler
 import kotlin.test.Test
 import kotlin.test.assertTrue

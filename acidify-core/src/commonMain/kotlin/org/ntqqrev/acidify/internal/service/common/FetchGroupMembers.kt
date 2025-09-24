@@ -13,6 +13,7 @@ internal object FetchGroupMembers : OidbService<FetchGroupMembers.Req, FetchGrou
         val groupUin: Long,
         val cookie: ByteArray? = null
     )
+
     internal class Resp(
         val cookie: ByteArray?,
         val memberDataList: List<BotGroupMemberData>,

@@ -26,9 +26,12 @@ class SessionStore(
     val guid: ByteArray,
     val deviceName: String,
 ) {
-    @Transient internal var keySig: ByteArray? = null
-    @Transient internal var exchangeKey: ByteArray? = null
-    @Transient internal var unusualCookies: String? = null
+    @Transient
+    internal var keySig: ByteArray? = null
+    @Transient
+    internal var exchangeKey: ByteArray? = null
+    @Transient
+    internal var unusualCookies: String? = null
 
     companion object {
         fun empty(): SessionStore {

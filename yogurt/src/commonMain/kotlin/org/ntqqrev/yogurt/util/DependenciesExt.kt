@@ -2,7 +2,7 @@ package org.ntqqrev.yogurt.util
 
 import co.touchlab.stately.collections.ConcurrentMutableMap
 import io.ktor.server.application.*
-import io.ktor.server.plugins.di.dependencies
+import io.ktor.server.plugins.di.*
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.acidify.struct.BotGroupMemberData

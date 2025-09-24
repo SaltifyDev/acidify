@@ -21,6 +21,7 @@ import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.common.FetchFriends
 import org.ntqqrev.acidify.internal.service.common.FetchGroupMembers
 import org.ntqqrev.acidify.internal.service.common.FetchGroups
+import org.ntqqrev.acidify.internal.service.common.FetchUserInfo
 import org.ntqqrev.acidify.internal.service.system.*
 import org.ntqqrev.acidify.struct.BotFriendData
 import org.ntqqrev.acidify.struct.BotGroupData
@@ -227,6 +228,16 @@ class Bot internal constructor(
         } while (cookie != null)
         return memberDataResult
     }
+
+    /**
+     * 通过 uin（QQ 号）获取用户信息。
+     */
+    suspend fun fetchUserInfoByUin(uin: Long) = client.callService(FetchUserInfo.ByUin, uin)
+
+    /**
+     * 通过 uid 获取用户信息。
+     */
+    suspend fun fetchUserInfoByUid(uid: String) = client.callService(FetchUserInfo.ByUid, uid)
 
     companion object {
         /**

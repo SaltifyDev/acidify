@@ -16,6 +16,7 @@ import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.SimpleColoredLogHandler
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class BotTest {
@@ -90,6 +91,17 @@ class BotTest {
         val members = bot.fetchGroupMembers(group.uin)
         assertTrue(members.isNotEmpty())
         members.forEach { println(it) }
+    }
+
+    @Test
+    fun fetchUserInfoTest() = runBlocking {
+        val friends = bot.fetchFriends()
+        assertTrue(friends.isNotEmpty())
+        val friend = friends.first()
+        val userInfoByUin = bot.fetchUserInfoByUin(friend.uin)
+        val userInfoByUid = bot.fetchUserInfoByUid(friend.uid)
+        assertEquals(userInfoByUin, userInfoByUid)
+        println(userInfoByUin)
     }
 
     @Test

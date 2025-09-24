@@ -1,6 +1,6 @@
 package org.ntqqrev.yogurt.api.system
 
-import io.ktor.server.plugins.di.*
+import io.ktor.server.plugins.di.dependencies
 import io.ktor.server.routing.*
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.milky.ApiEndpoint
@@ -18,7 +18,7 @@ private fun String.toMilkyProtocolOs() = when (this) {
 }
 
 val GetImplInfo = ApiEndpoint.GetImplInfo {
-    val bot: Bot = application.dependencies.resolve("Bot")
+    val bot = application.dependencies.resolve<Bot>()
     GetImplInfoOutput(
         implName = implName,
         implVersion = implVersion,

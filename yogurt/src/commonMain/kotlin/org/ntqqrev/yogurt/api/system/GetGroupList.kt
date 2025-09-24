@@ -1,6 +1,6 @@
 package org.ntqqrev.yogurt.api.system
 
-import io.ktor.server.plugins.di.*
+import io.ktor.server.plugins.di.dependencies
 import io.ktor.server.routing.*
 import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.milky.ApiEndpoint
@@ -10,7 +10,7 @@ import org.ntqqrev.yogurt.transform.toMilkyEntity
 import org.ntqqrev.yogurt.util.YogurtCache
 
 val GetGroupList = ApiEndpoint.GetGroupList {
-    val groupCache: YogurtCache<Long, BotGroupData> = application.dependencies.resolve("GroupCache")
+    val groupCache = application.dependencies.resolve<YogurtCache<Long, BotGroupData>>()
     val groups = groupCache.getAll(cacheFirst = !it.noCache)
     GetGroupListOutput(
         groups = groups.map(BotGroupData::toMilkyEntity)

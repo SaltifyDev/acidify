@@ -2,7 +2,6 @@
 
 package org.ntqqrev.yogurt
 
-import co.touchlab.stately.collections.ConcurrentMutableMap
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -26,12 +25,11 @@ import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
-import org.ntqqrev.acidify.struct.BotGroupMemberData
 import org.ntqqrev.acidify.util.UrlSignProvider
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
 import org.ntqqrev.yogurt.api.configureMilkyApi
-import org.ntqqrev.yogurt.util.YogurtCache
+import org.ntqqrev.yogurt.util.configureCacheDeps
 import org.ntqqrev.yogurt.util.generateTerminalQRCode
 import org.ntqqrev.yogurt.util.logHandler
 
@@ -72,6 +70,8 @@ object YogurtApp {
             }
         }
 
+        val logger = bot.createLogger(this@YogurtApp)
+
         embeddedServer(
             factory = CIO,
             port = config.httpConfig.port,
@@ -82,35 +82,12 @@ object YogurtApp {
             }
 
             dependencies {
-                provide("Bot") { bot } cleanup {
+                provide { bot } cleanup {
                     runBlocking { bot.offline() }
                 }
-
-                provide("FriendCache") {
-                    YogurtCache /* <Long, BotFriendData> */(scope) {
-                        bot.fetchFriends().associateBy { it.uin }
-                    }
-                }
-
-                provide("GroupCache") {
-                    YogurtCache /* <Long, BotGroupData> */(scope) {
-                        val groupMap = bot.fetchGroups().associateBy { it.uin }
-
-                        // clean up group member caches that are not in group list
-                        val groupMemberMap: ConcurrentMutableMap<Long, YogurtCache<Long, BotGroupMemberData>> =
-                            this@embeddedServer.dependencies.resolve("GroupMemberMap")
-                        groupMemberMap.apply {
-                            (keys - groupMap.keys).forEach { remove(it) }
-                        }
-
-                        groupMap
-                    }
-                }
-
-                provide("GroupMemberMap") {
-                    ConcurrentMutableMap<Long, YogurtCache<Long, BotGroupMemberData>>()
-                }
             }
+
+            configureCacheDeps()
 
             routing {
                 route("/api") {
@@ -148,8 +125,6 @@ object YogurtApp {
                 // todo: setup event APIs
             }
         }.start()
-
-        val logger = bot.createLogger(this@YogurtApp)
 
         scope.launch {
             bot.eventFlow.filterIsInstance<QRCodeGeneratedEvent>()

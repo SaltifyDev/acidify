@@ -141,6 +141,8 @@ object YogurtApp {
                 .take(1)
                 .collect {
                     logger.i { "请用手机 QQ 扫描二维码：\n" + generateTerminalQRCode(it.url) }
+                    logger.i { "或使用以下 URL 生成二维码并扫描：" }
+                    logger.i { it.url }
                     SystemFileSystem.sink(qrCodePath).buffered().use { sink ->
                         sink.write(it.png)
                     }

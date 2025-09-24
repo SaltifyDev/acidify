@@ -19,10 +19,12 @@ import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.common.FetchFriends
+import org.ntqqrev.acidify.internal.service.common.FetchGroupMembers
 import org.ntqqrev.acidify.internal.service.common.FetchGroups
 import org.ntqqrev.acidify.internal.service.system.*
 import org.ntqqrev.acidify.struct.BotFriendData
 import org.ntqqrev.acidify.struct.BotGroupData
+import org.ntqqrev.acidify.struct.BotGroupMemberData
 import org.ntqqrev.acidify.util.log.LogHandler
 import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.LogMessage
@@ -210,6 +212,20 @@ class Bot internal constructor(
      */
     suspend fun fetchGroups(): List<BotGroupData> {
         return client.callService(FetchGroups)
+    }
+
+    /**
+     * 获取指定群的成员信息。
+     */
+    suspend fun fetchGroupMembers(groupUin: Long): List<BotGroupMemberData> {
+        var cookie: ByteArray? = null
+        val memberDataResult = mutableListOf<BotGroupMemberData>()
+        do {
+            val resp = client.callService(FetchGroupMembers, FetchGroupMembers.Req(groupUin, cookie))
+            cookie = resp.cookie
+            memberDataResult.addAll(resp.memberDataList)
+        } while (cookie != null)
+        return memberDataResult
     }
 
     companion object {

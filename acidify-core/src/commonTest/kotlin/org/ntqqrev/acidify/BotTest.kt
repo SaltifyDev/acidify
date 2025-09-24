@@ -76,6 +76,23 @@ class BotTest {
     }
 
     @Test
+    fun fetchGroupsTest() = runBlocking {
+        val groups = bot.fetchGroups()
+        assertTrue(groups.isNotEmpty())
+        groups.forEach { println(it) }
+    }
+
+    @Test
+    fun fetchGroupMembersTest() = runBlocking {
+        val groups = bot.fetchGroups()
+        assertTrue(groups.isNotEmpty())
+        val group = groups.first()
+        val members = bot.fetchGroupMembers(group.uin)
+        assertTrue(members.isNotEmpty())
+        members.forEach { println(it) }
+    }
+
+    @Test
     fun packetReceivingTest() = runBlocking {
         delay(30_000L)
     }

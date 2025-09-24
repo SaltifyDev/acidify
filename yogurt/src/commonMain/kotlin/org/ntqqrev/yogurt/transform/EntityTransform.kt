@@ -5,8 +5,10 @@ import org.ntqqrev.acidify.common.UserInfoGender
 import org.ntqqrev.acidify.struct.BotFriendData
 import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.acidify.struct.BotGroupMemberData
+import org.ntqqrev.acidify.struct.BotUserInfo
 import org.ntqqrev.milky.FriendCategoryEntity
 import org.ntqqrev.milky.FriendEntity
+import org.ntqqrev.milky.GetUserProfileOutput
 import org.ntqqrev.milky.GroupEntity
 import org.ntqqrev.milky.GroupMemberEntity
 
@@ -44,6 +46,20 @@ fun BotGroupMemberData.toMilkyEntity(withGroupUin: Long) =
         joinTime = joinedAt,
         lastSentTime = lastSpokeAt,
         shutUpEndTime = mutedUntil
+    )
+
+fun BotUserInfo.toMilkyOutput() =
+    GetUserProfileOutput(
+        nickname = nickname,
+        qid = qid,
+        age = age,
+        sex = gender.toMilkySex(),
+        remark = remark,
+        bio = bio,
+        level = level,
+        country = country,
+        city = city,
+        school = school
     )
 
 fun UserInfoGender.toMilkySex() = when (this) {

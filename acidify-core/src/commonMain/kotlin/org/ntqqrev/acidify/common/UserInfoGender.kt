@@ -23,4 +23,10 @@ enum class UserInfoGender(val value: Int) {
      * 未知
      */
     UNKNOWN(255);
+
+    companion object {
+        fun from(value: Int): UserInfoGender {
+            return entries.firstOrNull { it.value == value } ?: UNKNOWN
+        }
+    }
 }

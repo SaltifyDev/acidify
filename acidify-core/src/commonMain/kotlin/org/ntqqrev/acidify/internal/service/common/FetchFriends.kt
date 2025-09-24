@@ -65,8 +65,7 @@ internal object FetchFriends : OidbService<FetchFriends.Req, FetchFriends.Resp>(
                     bio = strMap[UserInfoKey.BIO.number] ?: "",
                     qid = strMap[UserInfoKey.QID.number] ?: "",
                     age = numMap[UserInfoKey.AGE.number] ?: 0,
-                    gender = UserInfoGender.entries
-                        .find { it.value == numMap[UserInfoKey.GENDER.number] }
+                    gender = numMap[UserInfoKey.GENDER.number]?.let { UserInfoGender.from(it) }
                         ?: UserInfoGender.UNKNOWN,
                     categoryId = friend.get { categoryId },
                     categoryName = categories[friend.get { categoryId }] ?: ""

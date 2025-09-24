@@ -2,6 +2,7 @@
 
 package org.ntqqrev.yogurt
 
+import co.touchlab.stately.collections.ConcurrentMutableMap
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -25,6 +26,7 @@ import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
+import org.ntqqrev.acidify.struct.BotGroupMemberData
 import org.ntqqrev.acidify.util.UrlSignProvider
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
@@ -92,8 +94,21 @@ object YogurtApp {
 
                 provide("GroupCache") {
                     YogurtCache /* <Long, BotGroupData> */(scope) {
-                        bot.fetchGroups().associateBy { it.uin }
+                        val groupMap = bot.fetchGroups().associateBy { it.uin }
+
+                        // clean up group member caches that are not in group list
+                        val groupMemberMap: ConcurrentMutableMap<Long, YogurtCache<Long, BotGroupMemberData>> =
+                            this@embeddedServer.dependencies.resolve("GroupMemberMap")
+                        groupMemberMap.apply {
+                            (keys - groupMap.keys).forEach { remove(it) }
+                        }
+
+                        groupMap
                     }
+                }
+
+                provide("GroupMemberMap") {
+                    ConcurrentMutableMap<Long, YogurtCache<Long, BotGroupMemberData>>()
                 }
             }
 

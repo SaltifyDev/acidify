@@ -1,11 +1,14 @@
 package org.ntqqrev.yogurt.transform
 
+import org.ntqqrev.acidify.common.GroupMemberRole
 import org.ntqqrev.acidify.common.UserInfoGender
 import org.ntqqrev.acidify.struct.BotFriendData
 import org.ntqqrev.acidify.struct.BotGroupData
+import org.ntqqrev.acidify.struct.BotGroupMemberData
 import org.ntqqrev.milky.FriendCategoryEntity
 import org.ntqqrev.milky.FriendEntity
 import org.ntqqrev.milky.GroupEntity
+import org.ntqqrev.milky.GroupMemberEntity
 
 fun BotFriendData.toMilkyEntity() =
     FriendEntity(
@@ -28,8 +31,29 @@ fun BotGroupData.toMilkyEntity() =
         maxMemberCount = capacity
     )
 
+fun BotGroupMemberData.toMilkyEntity(withGroupUin: Long) =
+    GroupMemberEntity(
+        userId = uin,
+        nickname = nickname,
+        sex = "unknown",
+        groupId = withGroupUin,
+        card = card,
+        title = specialTitle,
+        level = level,
+        role = role.toMilkyRole(),
+        joinTime = joinedAt,
+        lastSentTime = lastSpokeAt,
+        shutUpEndTime = mutedUntil
+    )
+
 fun UserInfoGender.toMilkySex() = when (this) {
     UserInfoGender.MALE -> "male"
     UserInfoGender.FEMALE -> "female"
     else -> "unknown"
+}
+
+fun GroupMemberRole.toMilkyRole() = when (this) {
+    GroupMemberRole.OWNER -> "owner"
+    GroupMemberRole.ADMIN -> "admin"
+    GroupMemberRole.MEMBER -> "member"
 }

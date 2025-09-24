@@ -65,4 +65,6 @@ fun Route.configureMilkyApi() {
     serve(GetFriendInfo)
     serve(GetGroupList)
     serve(GetGroupInfo)
+    serve(GetGroupMemberList)
+    serve(GetGroupMemberInfo)
 }

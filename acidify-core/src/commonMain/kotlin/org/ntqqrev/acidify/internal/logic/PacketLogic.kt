@@ -57,13 +57,14 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
                 output = s.openWriteChannel(autoFlush = true)
                 logger.d { "已连接到 $host:$port" }
                 try {
-                    val job = client.scope.launch {
-                        handleReceiveLoop()
-                    }
                     if (isReconnect) {
-                        client.callService(BotOnline)
+                        client.scope.launch(CoroutineExceptionHandler { _, t ->
+                            logger.e(t) { "发送上线包时出现错误" }
+                        }) {
+                            client.callService(BotOnline)
+                        }
                     }
-                    job.join()
+                    handleReceiveLoop()
                 } catch (e: Exception) {
                     logger.e(e) { "接收数据包时出现错误，5s 后尝试重新连接" }
                     input.cancel()

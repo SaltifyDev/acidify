@@ -31,7 +31,9 @@ kotlin {
 
     targets.withType<KotlinNativeTarget> {
         binaries {
-            executable()
+            executable {
+                entryPoint = "org.ntqqrev.yogurt.main"
+            }
         }
     }
 }

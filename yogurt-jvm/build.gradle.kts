@@ -4,7 +4,7 @@ plugins {
 }
 
 application {
-    mainClass = "MainKt"
+    mainClass = "org.ntqqrev.yogurt.Main"
 }
 
 dependencies {

@@ -8,7 +8,6 @@ import io.ktor.utils.io.core.*
 import korlibs.io.compression.deflate.ZLib
 import korlibs.io.compression.uncompress
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
@@ -59,13 +58,6 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
 
         client.scope.launch {
             handleReceiveLoop()
-        }
-
-        client.scope.launch {
-            while (connected) {
-                // TODO: client.callService(SendHeartbeat)
-                delay(300_000) // 5 minutes
-            }
         }
     }
 

@@ -243,7 +243,7 @@ class Bot internal constructor(
         /**
          * 创建新的 Bot 实例
          */
-        suspend fun create(
+        fun create(
             appInfo: AppInfo,
             sessionStore: SessionStore,
             signProvider: SignProvider,
@@ -264,7 +264,7 @@ class Bot internal constructor(
                         )
                     }
             }
-            bot.client.packetLogic.connect()
+            bot.client.packetLogic.startConnectLoop()
             return bot
         }
     }

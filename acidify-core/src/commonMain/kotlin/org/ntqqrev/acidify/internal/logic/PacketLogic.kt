@@ -7,8 +7,7 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import korlibs.io.compression.deflate.ZLib
 import korlibs.io.compression.uncompress
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import org.ntqqrev.acidify.common.SignProvider
@@ -17,6 +16,7 @@ import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.SsoResponse
 import org.ntqqrev.acidify.internal.packet.system.SsoReservedFields
 import org.ntqqrev.acidify.internal.packet.system.SsoSecureInfo
+import org.ntqqrev.acidify.internal.service.system.BotOnline
 import org.ntqqrev.acidify.internal.util.*
 import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
@@ -33,7 +33,6 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private lateinit var output: ByteWriteChannel
     private val pending = ConcurrentMap<Int, CompletableDeferred<SsoResponse>>()
     private val headerLength = 4
-    var connected = false
     val signRequiredCommand = setOf(
         "MessageSvc.PbSendMsg",
         "wtlogin.trans_emp",
@@ -49,22 +48,31 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
 
     private val logger = client.createLogger(this)
 
-    suspend fun connect() {
-        val s = socket.connect(host, port)
-        input = s.openReadChannel()
-        output = s.openWriteChannel(autoFlush = true)
-        logger.d { "已连接到 $host:$port" }
-        connected = true
-
+    fun startConnectLoop() {
         client.scope.launch {
-            handleReceiveLoop()
+            var isReconnect = false
+            while (currentCoroutineContext().isActive) {
+                val s = socket.connect(host, port)
+                input = s.openReadChannel()
+                output = s.openWriteChannel(autoFlush = true)
+                logger.d { "已连接到 $host:$port" }
+                try {
+                    val job = client.scope.launch {
+                        handleReceiveLoop()
+                    }
+                    if (isReconnect) {
+                        client.callService(BotOnline)
+                    }
+                    job.join()
+                } catch (e: Exception) {
+                    logger.e(e) { "接收数据包时出现错误，5s 后尝试重新连接" }
+                    input.cancel()
+                    output.flushAndClose()
+                    delay(5000)
+                    isReconnect = true
+                }
+            }
         }
-    }
-
-    suspend fun disconnect() {
-        input.cancel()
-        output.flushAndClose()
-        connected = false
     }
 
     suspend fun sendPacket(cmd: String, payload: ByteArray): SsoResponse {
@@ -82,24 +90,19 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     }
 
     private suspend fun handleReceiveLoop() {
-        while (connected) {
-            try {
-                val header = input.readByteArray(headerLength)
-                val packetLength = header.readUInt32BE(0)
-                val packet = input.readByteArray(packetLength.toInt() - 4)
-                val service = parseService(packet)
-                val sso = parseSso(service)
-                logger.v { "[seq=${sso.sequence}] <- ${sso.command} (code=${sso.retCode})" }
-                pending.remove(sso.sequence).also {
-                    if (it != null) {
-                        it.complete(sso)
-                    } else {
-                        // TODO: client.eventContext.process(sso)
-                    }
+        while (true) {
+            val header = input.readByteArray(headerLength)
+            val packetLength = header.readUInt32BE(0)
+            val packet = input.readByteArray(packetLength.toInt() - 4)
+            val service = parseService(packet)
+            val sso = parseSso(service)
+            logger.v { "[seq=${sso.sequence}] <- ${sso.command} (code=${sso.retCode})" }
+            pending.remove(sso.sequence).also {
+                if (it != null) {
+                    it.complete(sso)
+                } else {
+                    // TODO: client.eventContext.process(sso)
                 }
-            } catch (e: Exception) {
-                logger.e(e) { "接收数据包时出现错误" }
-                disconnect()
             }
         }
     }

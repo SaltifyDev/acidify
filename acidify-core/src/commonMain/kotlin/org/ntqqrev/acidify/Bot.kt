@@ -239,6 +239,11 @@ class Bot internal constructor(
      */
     suspend fun fetchUserInfoByUid(uid: String) = client.callService(FetchUserInfo.ByUid, uid)
 
+    /**
+     * 获取 CSRF Token。
+     */
+    suspend fun getCsrfToken() = client.ticketLogic.getCsrfToken()
+
     companion object {
         /**
          * 创建新的 Bot 实例

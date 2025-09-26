@@ -103,6 +103,15 @@ class BotTest {
     }
 
     @Test
+    fun fetchCredentialsTest() = runBlocking {
+        val sKey = bot.client.ticketLogic.getSKey()
+        println("sKey: $sKey")
+        assertTrue(sKey.isNotEmpty())
+        val csrfToken = bot.getCsrfToken()
+        println("CSRF Token: $csrfToken")
+    }
+
+    @Test
     fun packetReceivingTest() = runBlocking {
         delay(30_000L)
     }

@@ -240,6 +240,16 @@ class Bot internal constructor(
     suspend fun fetchUserInfoByUid(uid: String) = client.callService(FetchUserInfo.ByUid, uid)
 
     /**
+     * 获取 s_key，用于组成 Cookie。
+     */
+    suspend fun getSKey() = client.ticketLogic.getSKey()
+
+    /**
+     * 获取给定域名的 p_skey，用于组成 Cookie。
+     */
+    suspend fun getPSKey(domain: String) = client.ticketLogic.getPSKey(domain)
+
+    /**
      * 获取 CSRF Token。
      */
     suspend fun getCsrfToken() = client.ticketLogic.getCsrfToken()

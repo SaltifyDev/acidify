@@ -104,11 +104,17 @@ class BotTest {
 
     @Test
     fun fetchCredentialsTest() = runBlocking {
-        val sKey = bot.client.ticketLogic.getSKey()
+        val sKey = bot.getSKey()
         println("sKey: $sKey")
         assertTrue(sKey.isNotEmpty())
+
         val csrfToken = bot.getCsrfToken()
         println("CSRF Token: $csrfToken")
+
+        val domain = "docs.qq.com"
+        val psKey = bot.getPSKey(domain)
+        println("PSKey for $domain: $psKey")
+        assertTrue(psKey.isNotEmpty())
     }
 
     @Test

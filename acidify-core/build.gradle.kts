@@ -15,6 +15,7 @@ kotlin {
             implementation(libs.bundles.ktor.client)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.bundles.korlibs)
+            implementation(libs.stately.concurrent.collections)
             implementation(libs.mordant)
         }
         commonTest.dependencies {

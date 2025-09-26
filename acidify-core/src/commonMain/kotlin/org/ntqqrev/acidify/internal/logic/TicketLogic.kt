@@ -2,11 +2,13 @@
 
 package org.ntqqrev.acidify.internal.logic
 
+import co.touchlab.stately.collections.ConcurrentMutableMap
 import io.ktor.client.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.request.*
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.system.FetchClientKey
+import org.ntqqrev.acidify.internal.service.system.FetchPSKey
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -31,6 +33,7 @@ internal class TicketLogic(client: LagrangeClient) : AbstractLogic(client) {
     }
 
     val currentSKey = KeyWithLifetime.dummy()
+    val psKeyCache = ConcurrentMutableMap<String, KeyWithLifetime>()
 
     private val httpClient = HttpClient {
         install(HttpCookies)
@@ -64,5 +67,18 @@ internal class TicketLogic(client: LagrangeClient) : AbstractLogic(client) {
             hash += (hash shl 5) + element.code
         }
         return hash and 0x7fffffff
+    }
+
+    suspend fun getPSKey(domain: String): String {
+        psKeyCache[domain]?.let {
+            if (it.isValid()) {
+                return it.value
+            }
+        }
+        val newKeys = client.callService(FetchPSKey, listOf(domain))
+        val newKey = newKeys[domain]
+            ?: throw RuntimeException("获取 PSKey 失败")
+        psKeyCache[domain] = KeyWithLifetime.create(newKey, 86400L)
+        return newKey
     }
 }

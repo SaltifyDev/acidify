@@ -1,8 +1,7 @@
 package org.ntqqrev.yogurt.api
 
-import io.ktor.server.application.log
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.plugins.di.dependencies
+import io.ktor.server.plugins.*
+import io.ktor.server.plugins.di.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -92,4 +91,6 @@ fun Route.configureMilkyApi() {
     serve(GetGroupInfo)
     serve(GetGroupMemberList)
     serve(GetGroupMemberInfo)
+    serve(GetCookies)
+    serve(GetCsrfToken)
 }

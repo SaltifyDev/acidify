@@ -44,7 +44,8 @@ internal class TicketLogic(client: LagrangeClient) : AbstractLogic(client) {
             return currentSKey.value
         }
         val clientKey = client.callService(FetchClientKey)
-        val jump = "https%3A%2F%2Fh5.qzone.qq.com%2Fqqnt%2Fqzoneinpcqq%2Ffriend%3Frefresh%3D0%26clientuin%3D0%26darkMode%3D0&keyindex=19&random=2599"
+        val jump =
+            "https%3A%2F%2Fh5.qzone.qq.com%2Fqqnt%2Fqzoneinpcqq%2Ffriend%3Frefresh%3D0%26clientuin%3D0%26darkMode%3D0&keyindex=19&random=2599"
         val urlString = "https://ssl.ptlogin2.qq.com/jump" +
                 "?ptlang=1033" +
                 "&clientuin=${client.sessionStore.uin}" +

@@ -28,8 +28,10 @@ class SessionStore(
 ) {
     @Transient
     internal var keySig: ByteArray? = null
+
     @Transient
     internal var exchangeKey: ByteArray? = null
+
     @Transient
     internal var unusualCookies: String? = null
 

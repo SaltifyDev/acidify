@@ -49,13 +49,10 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private val logger = client.createLogger(this)
 
     fun startConnectLoop() {
+        runBlocking { connect() }
         client.scope.launch {
             var isReconnect = false
             while (currentCoroutineContext().isActive) {
-                val s = socket.connect(host, port)
-                input = s.openReadChannel()
-                output = s.openWriteChannel(autoFlush = true)
-                logger.d { "已连接到 $host:$port" }
                 try {
                     if (isReconnect) {
                         client.scope.launch(CoroutineExceptionHandler { _, t ->
@@ -71,9 +68,17 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
                     output.flushAndClose()
                     delay(5000)
                     isReconnect = true
+                    connect()
                 }
             }
         }
+    }
+
+    private suspend fun connect() {
+        val s = socket.connect(host, port)
+        input = s.openReadChannel()
+        output = s.openWriteChannel(autoFlush = true)
+        logger.d { "已连接到 $host:$port" }
     }
 
     suspend fun sendPacket(cmd: String, payload: ByteArray): SsoResponse {

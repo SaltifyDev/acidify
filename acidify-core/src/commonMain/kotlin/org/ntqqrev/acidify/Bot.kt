@@ -254,6 +254,16 @@ class Bot internal constructor(
      */
     suspend fun getCsrfToken() = client.ticketLogic.getCsrfToken()
 
+    /**
+     * 获取指定域名的 Cookie 键值对。
+     */
+    suspend fun getCookies(domain: String) = mapOf<String, String>(
+        "p_uin" to "o$uin",
+        "p_skey" to getPSKey(domain),
+        "skey" to getSKey(),
+        "uin" to uin.toString(),
+    )
+
     companion object {
         /**
          * 创建新的 Bot 实例

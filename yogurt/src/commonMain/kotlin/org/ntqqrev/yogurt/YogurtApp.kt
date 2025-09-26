@@ -85,6 +85,7 @@ object YogurtApp {
                 provide { bot } cleanup {
                     runBlocking { bot.offline() }
                 }
+                provide { logger }
             }
 
             configureCacheDeps()

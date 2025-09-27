@@ -1,8 +1,6 @@
 <div align="center">
 
-<h1>Acidify</h1>
-
-PC NTQQ 协议的 Kotlin 实现，支持 JVM 和 Native 平台
+![acidify](https://socialify.git.ci/LagrangeDev/acidify/image?custom_description=&description=1&font=Inter&forks=1&issues=1&language=1&logo=https%3A%2F%2Fstatic.live.moe%2Flagrange.jpg&name=1&owner=1&pulls=1&stargazers=1&theme=Light)
 
 </div>
 

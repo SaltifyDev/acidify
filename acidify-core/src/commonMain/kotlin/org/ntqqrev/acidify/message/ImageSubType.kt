@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.struct.message
+package org.ntqqrev.acidify.message
 
 /**
  * 图片子类型枚举

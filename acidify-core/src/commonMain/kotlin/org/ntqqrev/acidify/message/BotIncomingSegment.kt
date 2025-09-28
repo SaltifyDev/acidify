@@ -1,16 +1,16 @@
-package org.ntqqrev.acidify.struct.message
+package org.ntqqrev.acidify.message
 
 /**
  * 接收消息段
  */
-sealed class IncomingSegment {
+sealed class BotIncomingSegment {
     /**
      * 文本消息段
      * @property text 文本内容
      */
     class Text internal constructor(
         val text: String,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 
     /**
      * 提及（At）消息段
@@ -20,7 +20,7 @@ sealed class IncomingSegment {
     class Mention internal constructor(
         val uin: Long? = null,
         val name: String,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 
     /**
      * 表情消息段
@@ -32,7 +32,7 @@ sealed class IncomingSegment {
         val faceId: Int,
         val summary: String,
         val isLarge: Boolean,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 
     /**
      * 回复消息段
@@ -40,7 +40,7 @@ sealed class IncomingSegment {
      */
     class Reply internal constructor(
         val sequence: Long,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 
     /**
      * 图片消息段
@@ -56,7 +56,7 @@ sealed class IncomingSegment {
         val height: Int,
         val subType: ImageSubType,
         val summary: String,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 
     /**
      * 语音消息段
@@ -66,7 +66,7 @@ sealed class IncomingSegment {
     class Record internal constructor(
         val fileId: String,
         val duration: Int,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 
     /**
      * 视频消息段
@@ -80,7 +80,7 @@ sealed class IncomingSegment {
         val duration: Int,
         val width: Int,
         val height: Int,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 
     /**
      * 文件消息段
@@ -94,7 +94,7 @@ sealed class IncomingSegment {
         val fileName: String,
         val fileSize: Long,
         val fileHash: String? = null,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 
     /**
      * 转发消息段
@@ -102,7 +102,7 @@ sealed class IncomingSegment {
      */
     class Forward internal constructor(
         val resId: String,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 
     /**
      * 小程序消息段
@@ -112,5 +112,5 @@ sealed class IncomingSegment {
     class LightApp internal constructor(
         val appName: String,
         val jsonPayload: String,
-    ) : IncomingSegment()
+    ) : BotIncomingSegment()
 }

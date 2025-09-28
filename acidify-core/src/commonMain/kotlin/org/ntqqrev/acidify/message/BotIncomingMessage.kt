@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.struct.message
+package org.ntqqrev.acidify.message
 
 /**
  * 接收消息
@@ -26,7 +26,7 @@ class BotIncomingMessage(
     val senderUid: String,
     val senderName: String,
 ) {
-    internal val segmentsMut = mutableListOf<IncomingSegment>()
-    val segments: List<IncomingSegment>
+    internal val segmentsMut = mutableListOf<BotIncomingSegment>()
+    val segments: List<BotIncomingSegment>
         get() = segmentsMut
 }

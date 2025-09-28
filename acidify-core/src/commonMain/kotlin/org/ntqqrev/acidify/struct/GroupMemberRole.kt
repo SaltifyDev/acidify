@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.common
+package org.ntqqrev.acidify.struct
 
 /**
  * 群成员角色（权限等级）枚举

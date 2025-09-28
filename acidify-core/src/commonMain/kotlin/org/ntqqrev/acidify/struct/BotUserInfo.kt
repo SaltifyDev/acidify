@@ -1,7 +1,5 @@
 package org.ntqqrev.acidify.struct
 
-import org.ntqqrev.acidify.common.UserInfoGender
-
 /**
  * 用户信息
  * @property uin 用户的 uin（QQ 号）

@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.common
+package org.ntqqrev.acidify.struct
 
 /**
  * 二维码状态

@@ -1,16 +1,7 @@
 package org.ntqqrev.yogurt.transform
 
-import org.ntqqrev.acidify.common.GroupMemberRole
-import org.ntqqrev.acidify.common.UserInfoGender
-import org.ntqqrev.acidify.struct.BotFriendData
-import org.ntqqrev.acidify.struct.BotGroupData
-import org.ntqqrev.acidify.struct.BotGroupMemberData
-import org.ntqqrev.acidify.struct.BotUserInfo
-import org.ntqqrev.milky.FriendCategoryEntity
-import org.ntqqrev.milky.FriendEntity
-import org.ntqqrev.milky.GetUserProfileOutput
-import org.ntqqrev.milky.GroupEntity
-import org.ntqqrev.milky.GroupMemberEntity
+import org.ntqqrev.acidify.struct.*
+import org.ntqqrev.milky.*
 
 fun BotFriendData.toMilkyEntity() =
     FriendEntity(

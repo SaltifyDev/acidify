@@ -1,6 +1,6 @@
 package org.ntqqrev.acidify.event
 
-import org.ntqqrev.acidify.common.QRCodeState
+import org.ntqqrev.acidify.struct.QRCodeState
 
 /**
  * 二维码状态查询事件

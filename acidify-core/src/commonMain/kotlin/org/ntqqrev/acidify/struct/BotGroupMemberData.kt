@@ -1,7 +1,5 @@
 package org.ntqqrev.acidify.struct
 
-import org.ntqqrev.acidify.common.GroupMemberRole
-
 /**
  * Bot 群成员数据
  * @property uin 群成员的 uin（QQ 号）

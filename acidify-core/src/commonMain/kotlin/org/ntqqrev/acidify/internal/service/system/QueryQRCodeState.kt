@@ -1,12 +1,12 @@
 package org.ntqqrev.acidify.internal.service.system
 
 import kotlinx.io.*
-import org.ntqqrev.acidify.common.QRCodeState
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.NoInputService
 import org.ntqqrev.acidify.internal.util.Prefix
 import org.ntqqrev.acidify.internal.util.reader
 import org.ntqqrev.acidify.internal.util.writeBytes
+import org.ntqqrev.acidify.struct.QRCodeState
 
 internal object QueryQRCodeState : NoInputService<QRCodeState>("wtlogin.trans_emp") {
     override fun build(client: LagrangeClient, payload: Unit): ByteArray {

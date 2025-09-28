@@ -1,12 +1,12 @@
 package org.ntqqrev.acidify.internal.service.common
 
-import org.ntqqrev.acidify.common.GroupMemberRole
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.oidb.FetchGroupMembersReq
 import org.ntqqrev.acidify.internal.packet.oidb.FetchGroupMembersResp
 import org.ntqqrev.acidify.internal.service.OidbService
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.struct.BotGroupMemberData
+import org.ntqqrev.acidify.struct.GroupMemberRole
 
 internal object FetchGroupMembers : OidbService<FetchGroupMembers.Req, FetchGroupMembers.Resp>(0xfe7, 3) {
     internal class Req(

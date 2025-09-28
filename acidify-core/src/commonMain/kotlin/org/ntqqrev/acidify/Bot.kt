@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.common.AppInfo
-import org.ntqqrev.acidify.common.QRCodeState
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.event.AcidifyEvent
@@ -26,6 +25,7 @@ import org.ntqqrev.acidify.internal.service.system.*
 import org.ntqqrev.acidify.struct.BotFriendData
 import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.acidify.struct.BotGroupMemberData
+import org.ntqqrev.acidify.struct.QRCodeState
 import org.ntqqrev.acidify.util.log.LogHandler
 import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.LogMessage

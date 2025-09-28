@@ -1,7 +1,5 @@
 package org.ntqqrev.acidify.struct
 
-import org.ntqqrev.acidify.common.UserInfoGender
-
 /**
  * Bot 好友数据
  * @property uin 好友的 uin（QQ 号）

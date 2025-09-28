@@ -13,6 +13,8 @@ class PbObject<S : PbSchema>(
     @JvmField val schema: S,
     @JvmField internal val tokens: MultiMap<Int, DataToken> = multiMapOf()
 ) {
+    internal val cachedResolvedValue = mutableMapOf<Int, Any?>()
+
     constructor(schema: S, byteArray: ByteArray) : this(
         schema,
         Buffer().apply {
@@ -20,9 +22,12 @@ class PbObject<S : PbSchema>(
         }.readTokens()
     )
 
+    @Suppress("unchecked_cast")
     operator fun <T> get(type: PbType<T>): T {
         val tokenList = tokens[type.fieldNumber] ?: return type.defaultValue
-        return type.decode(tokenList)
+        return cachedResolvedValue.getOrPut(type.fieldNumber) {
+            type.decode(tokenList)
+        } as T
     }
 
     inline fun <T> get(supplier: S.() -> PbType<T>): T {
@@ -32,6 +37,7 @@ class PbObject<S : PbSchema>(
 
     operator fun <T> set(type: PbType<T>, value: T) {
         tokens[type.fieldNumber] = type.encode(value)
+        cachedResolvedValue[type.fieldNumber] = value
     }
 
     inline fun <T> set(supplier: S.() -> Pair<PbType<T>, T>) {

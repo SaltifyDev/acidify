@@ -14,7 +14,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ClosedSendChannelException
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.take
 import kotlinx.io.buffered
@@ -142,7 +142,7 @@ object YogurtApp {
                         }
                         try {
                             incoming.receive()
-                        } catch (_: ClosedSendChannelException) {
+                        } catch (_: ClosedReceiveChannelException) {
                             logger.i { "${call.request.local.remoteAddress} 断开 WebSocket 连接" }
                         }
                     }

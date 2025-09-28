@@ -549,7 +549,7 @@ sealed class GroupNotification {
         @SerialName("operator_id") val operatorId: Long? = null,
         /** 入群请求附加信息 */
         @SerialName("comment") val comment: String,
-    )
+    ) : GroupNotification()
 
     /** 群管理员变更通知 */
     @Serializable
@@ -565,7 +565,7 @@ sealed class GroupNotification {
         @SerialName("is_set") val isSet: Boolean,
         /** 操作者（群主）QQ 号 */
         @SerialName("operator_id") val operatorId: Long,
-    )
+    ) : GroupNotification()
 
     /** 群成员被移除通知 */
     @Serializable
@@ -579,7 +579,7 @@ sealed class GroupNotification {
         @SerialName("target_user_id") val targetUserId: Long,
         /** 移除用户的管理员 QQ 号 */
         @SerialName("operator_id") val operatorId: Long,
-    )
+    ) : GroupNotification()
 
     /** 群成员退群通知 */
     @Serializable
@@ -591,7 +591,7 @@ sealed class GroupNotification {
         @SerialName("notification_seq") val notificationSeq: Long,
         /** 退群用户 QQ 号 */
         @SerialName("target_user_id") val targetUserId: Long,
-    )
+    ) : GroupNotification()
 
     /** 群成员邀请他人入群请求 */
     @Serializable
@@ -609,7 +609,7 @@ sealed class GroupNotification {
         @SerialName("state") val state: String,
         /** 处理请求的管理员 QQ 号 */
         @SerialName("operator_id") val operatorId: Long? = null,
-    )
+    ) : GroupNotification()
 }
 
 /** 接收消息 */
@@ -632,7 +632,7 @@ sealed class IncomingMessage {
         @SerialName("segments") val segments: List<IncomingSegment>,
         /** 好友信息 */
         @SerialName("friend") val friend: FriendEntity,
-    )
+    ) : IncomingMessage()
 
     /** 群消息 */
     @Serializable
@@ -652,7 +652,7 @@ sealed class IncomingMessage {
         @SerialName("group") val group: GroupEntity,
         /** 群成员信息 */
         @SerialName("group_member") val groupMember: GroupMemberEntity,
-    )
+    ) : IncomingMessage()
 
     /** 临时会话消息 */
     @Serializable
@@ -670,7 +670,7 @@ sealed class IncomingMessage {
         @SerialName("segments") val segments: List<IncomingSegment>,
         /** 临时会话发送者的所在的群信息 */
         @SerialName("group") val group: GroupEntity? = null,
-    )
+    ) : IncomingMessage()
 }
 
 /** 接收转发消息 */

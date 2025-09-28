@@ -12,6 +12,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.di.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sse.*
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
@@ -89,6 +90,8 @@ object YogurtApp {
                 contentConverter = KotlinxWebsocketSerializationConverter(milkyJsonModule)
             }
 
+            install(SSE)
+
             dependencies {
                 provide { bot } cleanup {
                     runBlocking { bot.offline() }
@@ -132,7 +135,21 @@ object YogurtApp {
                 }
 
                 route("/event") {
-                    // TODO: auth
+                    if (config.httpConfig.accessToken.isNotEmpty()) {
+                        val auth = createRouteScopedPlugin("Auth") {
+                            onCall { call ->
+                                if (
+                                    call.request.headers["Authorization"] != "Bearer ${config.httpConfig.accessToken}" &&
+                                    call.request.queryParameters["access_token"] != config.httpConfig.accessToken
+                                ) {
+                                    call.respond(HttpStatusCode.Unauthorized)
+                                    return@onCall
+                                }
+                            }
+                        }
+                        install(auth)
+                    }
+
                     webSocket {
                         logger.i { "${call.request.local.remoteAddress} 通过 WebSocket 连接" }
                         launch {
@@ -144,6 +161,20 @@ object YogurtApp {
                             incoming.receive()
                         } catch (_: ClosedReceiveChannelException) {
                             logger.i { "${call.request.local.remoteAddress} 断开 WebSocket 连接" }
+                        }
+                    }
+
+                    sse {
+                        logger.i { "${call.request.local.remoteAddress} 通过 SSE 连接" }
+                        launch {
+                            bot.eventFlow.collect { event ->
+                                transformAcidifyEvent(event)?.let {
+                                    send(
+                                        data = milkyJsonModule.encodeToString(it),
+                                        event = "milky_event"
+                                    )
+                                }
+                            }
                         }
                     }
                 }

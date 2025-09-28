@@ -10,7 +10,9 @@ sealed class BotIncomingSegment {
      */
     class Text internal constructor(
         val text: String,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = text
+    }
 
     /**
      * 提及（At）消息段
@@ -20,7 +22,9 @@ sealed class BotIncomingSegment {
     class Mention internal constructor(
         val uin: Long? = null,
         val name: String,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = name // already prefixed with '@'
+    }
 
     /**
      * 表情消息段
@@ -32,7 +36,9 @@ sealed class BotIncomingSegment {
         val faceId: Int,
         val summary: String,
         val isLarge: Boolean,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = summary
+    }
 
     /**
      * 回复消息段
@@ -40,7 +46,9 @@ sealed class BotIncomingSegment {
      */
     class Reply internal constructor(
         val sequence: Long,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = "[引用消息 #$sequence]"
+    }
 
     /**
      * 图片消息段
@@ -56,7 +64,9 @@ sealed class BotIncomingSegment {
         val height: Int,
         val subType: ImageSubType,
         val summary: String,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = summary
+    }
 
     /**
      * 语音消息段
@@ -66,7 +76,9 @@ sealed class BotIncomingSegment {
     class Record internal constructor(
         val fileId: String,
         val duration: Int,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = "[语音 ${duration}s]"
+    }
 
     /**
      * 视频消息段
@@ -80,7 +92,9 @@ sealed class BotIncomingSegment {
         val duration: Int,
         val width: Int,
         val height: Int,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = "[视频 ${width}x${height} ${duration}s]"
+    }
 
     /**
      * 文件消息段
@@ -94,7 +108,9 @@ sealed class BotIncomingSegment {
         val fileName: String,
         val fileSize: Long,
         val fileHash: String? = null,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = "[文件 $fileName]"
+    }
 
     /**
      * 转发消息段
@@ -102,7 +118,9 @@ sealed class BotIncomingSegment {
      */
     class Forward internal constructor(
         val resId: String,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = "[转发消息]"
+    }
 
     /**
      * 小程序消息段
@@ -112,5 +130,7 @@ sealed class BotIncomingSegment {
     class LightApp internal constructor(
         val appName: String,
         val jsonPayload: String,
-    ) : BotIncomingSegment()
+    ) : BotIncomingSegment() {
+        override fun toString(): String = "[卡片消息 $appName]"
+    }
 }

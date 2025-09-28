@@ -6,9 +6,9 @@ import org.ntqqrev.acidify.struct.BotFriendData
 import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.GetFriendInfoOutput
 import org.ntqqrev.yogurt.api.MilkyApiException
-import org.ntqqrev.yogurt.api.invoke
 import org.ntqqrev.yogurt.transform.toMilkyEntity
 import org.ntqqrev.yogurt.util.YogurtCache
+import org.ntqqrev.yogurt.util.invoke
 
 val GetFriendInfo = ApiEndpoint.GetFriendInfo {
     val friendCache = application.dependencies.resolve<YogurtCache<Long, BotFriendData>>()

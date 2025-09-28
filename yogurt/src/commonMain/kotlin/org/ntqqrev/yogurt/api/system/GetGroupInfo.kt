@@ -6,9 +6,9 @@ import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.GetGroupInfoOutput
 import org.ntqqrev.yogurt.api.MilkyApiException
-import org.ntqqrev.yogurt.api.invoke
 import org.ntqqrev.yogurt.transform.toMilkyEntity
 import org.ntqqrev.yogurt.util.YogurtCache
+import org.ntqqrev.yogurt.util.invoke
 
 val GetGroupInfo = ApiEndpoint.GetGroupInfo {
     val groupCache = application.dependencies.resolve<YogurtCache<Long, BotGroupData>>()

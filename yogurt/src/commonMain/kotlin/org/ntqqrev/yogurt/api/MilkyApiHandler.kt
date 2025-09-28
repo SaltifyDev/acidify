@@ -21,12 +21,6 @@ abstract class MilkyApiHandler<T : Any, R : Any>(api: ApiEndpoint<T, R>) {
     abstract suspend fun Route.call(payload: T): R
 }
 
-inline operator fun <reified T : Any, reified R : Any> ApiEndpoint<T, R>.invoke(
-    crossinline handler: suspend Route.(T) -> R
-) = object : MilkyApiHandler<T, R>(this) {
-    override suspend fun Route.call(payload: T): R = handler(payload)
-}
-
 private inline fun <reified T : Any, reified R : Any> Route.serve(handler: MilkyApiHandler<T, R>) {
     post(handler.path) {
         val logger = application.dependencies.resolve<Logger>()

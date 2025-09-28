@@ -4,8 +4,8 @@ import io.ktor.server.routing.*
 import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.GetGroupMemberInfoOutput
 import org.ntqqrev.yogurt.api.MilkyApiException
-import org.ntqqrev.yogurt.api.invoke
 import org.ntqqrev.yogurt.transform.toMilkyEntity
+import org.ntqqrev.yogurt.util.invoke
 import org.ntqqrev.yogurt.util.resolveGroupMemberCache
 
 val GetGroupMemberInfo = ApiEndpoint.GetGroupMemberInfo {

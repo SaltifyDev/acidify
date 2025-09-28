@@ -64,7 +64,7 @@ internal object IncPullResp : PbSchema() {
         val categoryId = PbInt32[1]
         val categoryName = PbString[2]
         val categoryMemberCount = PbInt32[3]
-        val catogorySortId = PbInt32[4]
+        val categorySortId = PbInt32[4]
     }
 }
 

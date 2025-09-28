@@ -61,7 +61,7 @@ class BotIncomingMessage(
                         scene = MessageScene.GROUP,
                         peerUin = routingHead.get { group }.get { groupCode },
                         peerUid = routingHead.get { toUid },
-                        sequence = contentHead.get { clientSequence },
+                        sequence = contentHead.get { sequence },
                         timestamp = contentHead.get { time },
                         senderUin = routingHead.get { fromUin },
                         senderUid = routingHead.get { fromUid },

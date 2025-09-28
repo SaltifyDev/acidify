@@ -20,7 +20,6 @@ import org.ntqqrev.acidify.pb.PbObject
  * @property timestamp 消息发送的 Unix 事件戳（秒）
  * @property senderUin 发送者的 uin（QQ 号）
  * @property senderUid 发送者的 uid
- * @property senderName 发送者的名称，视情况有可能是昵称 / 备注 / 群名片等
  * @property segments 消息内容
  */
 class BotIncomingMessage(
@@ -31,7 +30,6 @@ class BotIncomingMessage(
     val timestamp: Long,
     val senderUin: Long,
     val senderUid: String,
-    val senderName: String,
 ) {
     internal val segmentsMut = mutableListOf<BotIncomingSegment>()
     val segments: List<BotIncomingSegment>
@@ -56,7 +54,6 @@ class BotIncomingMessage(
                         timestamp = contentHead.get { time },
                         senderUin = routingHead.get { fromUin },
                         senderUid = routingHead.get { fromUid },
-                        senderName = routingHead.get { commonC2C }.get { name },
                     )
                 }
                 PushMsgType.GroupMessage -> {
@@ -68,7 +65,6 @@ class BotIncomingMessage(
                         timestamp = contentHead.get { time },
                         senderUin = routingHead.get { fromUin },
                         senderUid = routingHead.get { fromUid },
-                        senderName = routingHead.get { group }.get { groupCard },
                     )
                 }
                 else -> return null

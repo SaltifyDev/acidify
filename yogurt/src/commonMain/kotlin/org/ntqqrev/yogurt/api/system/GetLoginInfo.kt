@@ -11,6 +11,6 @@ val GetLoginInfo = ApiEndpoint.GetLoginInfo {
     val bot = application.dependencies.resolve<Bot>()
     GetLoginInfoOutput(
         uin = bot.uin,
-        nickname = "TODO" // todo: resolve nickname
+        nickname = bot.fetchUserInfoByUid(bot.uid).nickname
     )
 }

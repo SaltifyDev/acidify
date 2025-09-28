@@ -3,6 +3,7 @@
 package org.ntqqrev.yogurt
 
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
@@ -11,7 +12,9 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.di.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.take
 import kotlinx.io.buffered
@@ -29,6 +32,7 @@ import org.ntqqrev.acidify.util.UrlSignProvider
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
 import org.ntqqrev.yogurt.api.configureMilkyApi
+import org.ntqqrev.yogurt.transform.transformAcidifyEvent
 import org.ntqqrev.yogurt.util.configureCacheDeps
 import org.ntqqrev.yogurt.util.generateTerminalQRCode
 import org.ntqqrev.yogurt.util.logHandler
@@ -81,6 +85,10 @@ object YogurtApp {
                 json(milkyJsonModule)
             }
 
+            install(WebSockets) {
+                contentConverter = KotlinxWebsocketSerializationConverter(milkyJsonModule)
+            }
+
             dependencies {
                 provide { bot } cleanup {
                     runBlocking { bot.offline() }
@@ -123,7 +131,22 @@ object YogurtApp {
                     configureMilkyApi()
                 }
 
-                // todo: setup event APIs
+                route("/event") {
+                    // TODO: auth
+                    webSocket {
+                        logger.i { "${call.request.local.remoteAddress} 通过 WebSocket 连接" }
+                        launch {
+                            bot.eventFlow.collect { event ->
+                                transformAcidifyEvent(event)?.let { sendSerialized(it) }
+                            }
+                        }
+                        try {
+                            incoming.receive()
+                        } catch (_: ClosedSendChannelException) {
+                            logger.i { "${call.request.local.remoteAddress} 断开 WebSocket 连接" }
+                        }
+                    }
+                }
             }
         }.start()
 

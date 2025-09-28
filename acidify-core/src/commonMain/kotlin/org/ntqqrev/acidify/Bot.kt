@@ -3,10 +3,12 @@ package org.ntqqrev.acidify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SessionStore
@@ -15,6 +17,8 @@ import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QRCodeStateQueryEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
+import org.ntqqrev.acidify.event.internal.Signal
+import org.ntqqrev.acidify.event.internal.MsgPushSignal
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.service.common.FetchFriends
@@ -53,7 +57,11 @@ class Bot internal constructor(
         extraBufferCapacity = 100,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+    internal val signals = listOf<Signal>(
+        MsgPushSignal
+    ).associateBy { it.cmd }
     internal var heartbeatJob: Job? = null
+    internal var eventCollectJob: Job? = null
 
 
     /**
@@ -167,6 +175,21 @@ class Bot internal constructor(
                 delay(300_000L)
             }
         }
+
+        eventCollectJob = scope.launch {
+            while (currentCoroutineContext().isActive) {
+                val sso = client.pushChannel.receive()
+                val signal = signals[sso.command]
+                if (signal != null) {
+                    try {
+                        val parsed = signal.parse(this@Bot, sso.response)
+                        parsed.forEach { sharedEventFlow.emit(it) }
+                    } catch (e: Exception) {
+                        logger.e(e) { "处理信令 ${sso.command} 时出现错误" }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -175,6 +198,8 @@ class Bot internal constructor(
     suspend fun offline() {
         heartbeatJob?.cancel()
         heartbeatJob = null
+        eventCollectJob?.cancel()
+        eventCollectJob = null
         client.callService(BotOffline)
         logger.i { "用户 $uin 已下线" }
     }

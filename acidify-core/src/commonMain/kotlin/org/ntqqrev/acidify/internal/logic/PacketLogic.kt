@@ -107,7 +107,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
                 if (it != null) {
                     it.complete(sso)
                 } else {
-                    // TODO: client.eventContext.process(sso)
+                    client.pushChannel.send(sso)
                 }
             }
         }

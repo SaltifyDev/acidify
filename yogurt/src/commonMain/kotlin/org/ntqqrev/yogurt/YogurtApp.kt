@@ -103,6 +103,7 @@ object YogurtApp {
     fun start() = runBlocking {
         val embeddedServer = createServer()
         embeddedServer.start(wait = false)
+        embeddedServer.configureSigIntHandler()
 
         with(embeddedServer.application) {
             configureQrCodeDisplay()
@@ -115,7 +116,9 @@ object YogurtApp {
                 bot.tryLogin()
             }
 
-            delay(Long.MAX_VALUE)
+            launch {
+                delay(Long.MAX_VALUE)
+            }.join()
         }
     }
 }

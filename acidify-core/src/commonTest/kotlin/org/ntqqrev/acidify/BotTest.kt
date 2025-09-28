@@ -3,6 +3,7 @@
 package org.ntqqrev.acidify
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.buffered
@@ -12,6 +13,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.decodeFromSource
 import kotlinx.serialization.json.io.encodeToSink
 import org.ntqqrev.acidify.common.SessionStore
+import org.ntqqrev.acidify.event.MessageReceiveEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.SimpleColoredLogHandler
@@ -118,7 +120,15 @@ class BotTest {
     }
 
     @Test
-    fun packetReceivingTest() = runBlocking {
+    fun messageReceivingTest() = runBlocking {
+        val logger = bot.createLogger(this)
+        defaultScope.launch {
+            bot.sharedEventFlow.filterIsInstance<MessageReceiveEvent>().collect {
+                logger.i {
+                    "Received: ${it.message.scene} ${it.message.peerUin} ${it.message.senderUin} ${it.message.segments.joinToString("")}"
+                }
+            }
+        }
         delay(30_000L)
     }
 }

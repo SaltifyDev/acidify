@@ -12,7 +12,6 @@ import io.ktor.server.plugins.di.*
 import io.ktor.server.routing.*
 import io.ktor.server.sse.*
 import io.ktor.server.websocket.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.io.buffered
@@ -32,6 +31,7 @@ import org.ntqqrev.yogurt.api.configureMilkyApiLoginProtect
 import org.ntqqrev.yogurt.event.configureMilkyEventAuth
 import org.ntqqrev.yogurt.event.configureMilkyEventSse
 import org.ntqqrev.yogurt.event.configureMilkyEventWebSocket
+import org.ntqqrev.yogurt.event.configureMilkyEventWebhook
 import org.ntqqrev.yogurt.util.*
 
 object YogurtApp {
@@ -99,28 +99,20 @@ object YogurtApp {
                 configureMilkyEventSse()
             }
         }
-    }
 
-    fun start() = runBlocking {
-        val embeddedServer = createServer()
-        embeddedServer.start(wait = false)
-        embeddedServer.configureSigIntHandler()
-
-        with(embeddedServer.application) {
+        monitor.subscribe(ApplicationStarted) {
+            configureMilkyEventWebhook()
             configureQrCodeDisplay()
             configureSessionStoreAutoSave()
             configureEventLogging()
 
-            val bot = dependencies.resolve<Bot>()
-            if (bot.sessionStore.a2.isEmpty()) {
-                bot.qrCodeLogin()
-            } else {
-                bot.tryLogin()
-            }
-
             launch {
-                delay(Long.MAX_VALUE)
-            }.join()
+                if (bot.sessionStore.a2.isEmpty()) {
+                    bot.qrCodeLogin()
+                } else {
+                    bot.tryLogin()
+                }
+            }
         }
     }
 }

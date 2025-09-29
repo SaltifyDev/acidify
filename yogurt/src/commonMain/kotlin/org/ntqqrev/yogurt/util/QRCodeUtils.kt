@@ -10,6 +10,7 @@ import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.qrcode.ErrorCorrectionLevel
 import org.ntqqrev.acidify.qrcode.QRCodeProcessor
+import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.yogurt.YogurtApp.qrCodePath
 import org.ntqqrev.yogurt.YogurtApp.scope
 
@@ -48,7 +49,7 @@ fun generateTerminalQRCode(data: String): String {
 fun Application.configureQrCodeDisplay() {
     scope.launch {
         val bot = dependencies.resolve<Bot>()
-        val logger = dependencies.resolve<org.ntqqrev.acidify.util.log.Logger>()
+        val logger = dependencies.resolve<Logger>()
         bot.eventFlow.filterIsInstance<QRCodeGeneratedEvent>().collect {
             logger.i { "请用手机 QQ 扫描二维码：\n" + generateTerminalQRCode(it.url) }
             logger.i { "或使用以下 URL 生成二维码并扫描：" }

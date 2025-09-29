@@ -1,10 +1,13 @@
 package org.ntqqrev.acidify.message.internal
 
 import org.ntqqrev.acidify.internal.packet.highway.MsgInfo
+import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
+import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
 import org.ntqqrev.acidify.internal.util.readUInt32BE
 import org.ntqqrev.acidify.message.BotIncomingSegment
 import org.ntqqrev.acidify.message.ImageSubType
 import org.ntqqrev.acidify.message.MessageScene
+import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
 import kotlin.math.min
 
@@ -34,6 +37,61 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
                 uin = attr6.readUInt32BE(7).takeIf { it > 0 },
                 name = at.get { textMsg }
             )
+        }
+    }
+
+    object Face : IncomingSegmentFactory<BotIncomingSegment.Face> {
+        override fun tryParse(ctx: MessageParsingContext): BotIncomingSegment.Face? {
+            ctx.tryPeekType { face }?.let { face ->
+                ctx.consume()
+                val detail = ctx.bot.faceDetailMap[face.get { index }.toString()]
+                return BotIncomingSegment.Face(
+                    faceId = face.get { index },
+                    summary = "[${detail?.qDes?.removePrefix("/") ?: "表情"}]",
+                    isLarge = false,
+                )
+            }
+
+            ctx.tryPeekType { commonElem }?.let { common ->
+                val serviceType = common.get { serviceType }
+                if (serviceType == 33) {
+                    ctx.consume()
+                    val extra = PbObject(QSmallFaceExtra, common.get { pbElem })
+                    val faceId = extra.get { faceId }
+                    val detail = ctx.bot.faceDetailMap[faceId.toString()]
+                    return BotIncomingSegment.Face(
+                        faceId = faceId,
+                        summary = "[${
+                            (detail?.qDes ?: extra.get { text }.takeIf { it.isNotEmpty() })
+                                ?.removePrefix("/")
+                                ?: "表情"
+                        }]",
+                        isLarge = false,
+                    )
+                }
+
+                if (serviceType == 37) {
+                    ctx.consume()
+                    val extra = PbObject(QBigFaceExtra, common.get { pbElem })
+                    val faceId = extra.get { faceId }
+                    val detail = ctx.bot.faceDetailMap[faceId.toString()]
+                    if (ctx.hasNext()) {
+                        val text = ctx.tryPeekType { text }
+                        if (text?.get { textMsg } == detail?.qDes)
+                            ctx.skip()
+                    }
+                    return BotIncomingSegment.Face(
+                        faceId = faceId,
+                        summary = "[${
+                            (detail?.qDes ?: extra.get { preview }.takeIf { it.isNotEmpty() })
+                                ?.removePrefix("/")
+                                ?: "超级表情"
+                        }]",
+                        isLarge = true,
+                    )
+                }
+            }
+            return null
         }
     }
 

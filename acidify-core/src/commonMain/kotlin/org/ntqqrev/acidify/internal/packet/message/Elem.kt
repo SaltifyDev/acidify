@@ -7,6 +7,7 @@ import org.ntqqrev.acidify.pb.get
 
 internal object Elem : PbSchema() {
     val text = PbOptional[Text[1]]
+    val face = PbOptional[Face[2]]
     val notOnlineImage = PbOptional[NotOnlineImage[4]]
     val transElemInfo = PbOptional[TransElem[5]]
     val customFace = PbOptional[CustomFace[8]]

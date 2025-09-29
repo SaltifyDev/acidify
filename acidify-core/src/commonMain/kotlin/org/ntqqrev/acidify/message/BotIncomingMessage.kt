@@ -39,6 +39,7 @@ class BotIncomingMessage(
         internal val factories = listOf<IncomingSegmentFactory<*>>(
             IncomingSegmentFactory.Text,
             IncomingSegmentFactory.Mention,
+            IncomingSegmentFactory.Face,
             IncomingSegmentFactory.Reply,
             IncomingSegmentFactory.Image,
             IncomingSegmentFactory.Record,

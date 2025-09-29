@@ -37,6 +37,6 @@ suspend fun Application.resolveGroupMemberCache(groupUin: Long): GroupMemberCach
     val groupMemberMap = dependencies.resolve<GroupMemberMap>()
     groupCache[groupUin] ?: return null
     return groupMemberMap.getOrPut(groupUin) {
-        GroupMemberCache(bot.scope) { bot.fetchGroupMembers(groupUin).associateBy { it.uin } }
+        GroupMemberCache(this) { bot.fetchGroupMembers(groupUin).associateBy { it.uin } }
     }
 }

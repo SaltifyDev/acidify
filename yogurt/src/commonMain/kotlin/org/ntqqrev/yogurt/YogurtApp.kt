@@ -12,7 +12,9 @@ import io.ktor.server.plugins.di.*
 import io.ktor.server.routing.*
 import io.ktor.server.sse.*
 import io.ktor.server.websocket.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -107,6 +109,7 @@ object YogurtApp {
         with(embeddedServer.application) {
             configureQrCodeDisplay()
             configureSessionStoreAutoSave()
+            configureEventLogging()
 
             val bot = dependencies.resolve<Bot>()
             if (bot.sessionStore.a2.isEmpty()) {

@@ -101,7 +101,9 @@ object YogurtApp {
         }
 
         monitor.subscribe(ApplicationStarted) {
-            configureMilkyEventWebhook()
+            if (config.webhookConfig.url.isNotEmpty()) {
+                configureMilkyEventWebhook()
+            }
             configureQrCodeDisplay()
             configureSessionStoreAutoSave()
             configureEventLogging()

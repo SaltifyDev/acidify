@@ -34,7 +34,6 @@ import org.ntqqrev.yogurt.util.*
 
 object YogurtApp {
     val config = YogurtConfig.loadFromFile()
-    val scope = CoroutineScope(Dispatchers.IO)
     val qrCodePath = Path("qrcode.png")
 
     fun createServer() = embeddedServer(
@@ -59,7 +58,7 @@ object YogurtApp {
             appInfo = appInfo,
             sessionStore = sessionStore,
             signProvider = signProvider,
-            scope = scope,
+            scope = this@embeddedServer, // application is a CoroutineScope
             minLogLevel = config.logging.coreLogLevel,
             logHandler = logHandler
         )

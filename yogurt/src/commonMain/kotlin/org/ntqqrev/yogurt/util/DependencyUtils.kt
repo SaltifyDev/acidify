@@ -6,19 +6,18 @@ import io.ktor.server.plugins.di.*
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.acidify.struct.BotGroupMemberData
-import org.ntqqrev.yogurt.YogurtApp.scope
 
 fun Application.configureCacheDeps() {
     dependencies {
         provide {
-            YogurtCache /* <Long, BotFriendData> */(scope) {
+            YogurtCache /* <Long, BotFriendData> */(this) {
                 val bot = this@configureCacheDeps.dependencies.resolve<Bot>()
                 bot.fetchFriends().associateBy { it.uin }
             }
         }
 
         provide {
-            YogurtCache /* <Long, BotGroupData> */(scope) {
+            YogurtCache /* <Long, BotGroupData> */(this) {
                 val bot = this@configureCacheDeps.dependencies.resolve<Bot>()
                 val groupMap = bot.fetchGroups().associateBy { it.uin }
                 // clean up group member caches that are not in group list

@@ -12,7 +12,6 @@ import org.ntqqrev.acidify.qrcode.ErrorCorrectionLevel
 import org.ntqqrev.acidify.qrcode.QRCodeProcessor
 import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.yogurt.YogurtApp.qrCodePath
-import org.ntqqrev.yogurt.YogurtApp.scope
 
 object Palette {
     const val WHITE_WHITE = '\u2588'
@@ -47,7 +46,7 @@ fun generateTerminalQRCode(data: String): String {
 }
 
 fun Application.configureQrCodeDisplay() {
-    scope.launch {
+    launch {
         val bot = dependencies.resolve<Bot>()
         val logger = dependencies.resolve<Logger>()
         bot.eventFlow.filterIsInstance<QRCodeGeneratedEvent>().collect {

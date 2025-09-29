@@ -14,12 +14,11 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.encodeToSink
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
-import org.ntqqrev.yogurt.YogurtApp.scope
 
 val sessionStorePath = Path("session-store.json")
 
 fun Application.configureSessionStoreAutoSave() {
-    scope.launch {
+    launch {
         val bot = dependencies.resolve<Bot>()
         bot.eventFlow.filterIsInstance<SessionStoreUpdatedEvent>().collect {
             SystemFileSystem.sink(sessionStorePath).buffered().use { source ->

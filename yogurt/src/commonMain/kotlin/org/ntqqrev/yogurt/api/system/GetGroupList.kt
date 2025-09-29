@@ -6,11 +6,11 @@ import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.GetGroupListOutput
 import org.ntqqrev.yogurt.transform.toMilkyEntity
-import org.ntqqrev.yogurt.util.YogurtCache
+import org.ntqqrev.yogurt.util.GroupCache
 import org.ntqqrev.yogurt.util.invoke
 
 val GetGroupList = ApiEndpoint.GetGroupList {
-    val groupCache = application.dependencies.resolve<YogurtCache<Long, BotGroupData>>()
+    val groupCache = application.dependencies.resolve<GroupCache>()
     val groups = groupCache.getAll(cacheFirst = !it.noCache)
     GetGroupListOutput(
         groups = groups.map(BotGroupData::toMilkyEntity)

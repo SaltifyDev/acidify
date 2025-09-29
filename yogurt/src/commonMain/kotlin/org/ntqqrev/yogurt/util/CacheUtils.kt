@@ -1,10 +1,14 @@
 package org.ntqqrev.yogurt.util
 
+import co.touchlab.stately.collections.ConcurrentMutableMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.ntqqrev.acidify.struct.BotFriendData
+import org.ntqqrev.acidify.struct.BotGroupData
+import org.ntqqrev.acidify.struct.BotGroupMemberData
 
 class YogurtCache<K, V>(
     val scope: CoroutineScope,
@@ -51,3 +55,8 @@ class YogurtCache<K, V>(
         }.await()
     }
 }
+
+typealias FriendCache = YogurtCache<Long, BotFriendData>
+typealias GroupCache = YogurtCache<Long, BotGroupData>
+typealias GroupMemberCache = YogurtCache<Long, BotGroupMemberData>
+typealias GroupMemberMap = ConcurrentMutableMap<Long, GroupMemberCache>

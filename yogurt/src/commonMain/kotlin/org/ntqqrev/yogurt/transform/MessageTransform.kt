@@ -6,17 +6,16 @@ import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.message.BotIncomingMessage
 import org.ntqqrev.acidify.message.BotIncomingSegment
 import org.ntqqrev.acidify.message.MessageScene
-import org.ntqqrev.acidify.struct.BotFriendData
-import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.milky.IncomingMessage
 import org.ntqqrev.milky.IncomingSegment
-import org.ntqqrev.yogurt.util.YogurtCache
+import org.ntqqrev.yogurt.util.FriendCache
+import org.ntqqrev.yogurt.util.GroupCache
 import org.ntqqrev.yogurt.util.resolveGroupMemberCache
 
 suspend fun Application.transformMessage(msg: BotIncomingMessage): IncomingMessage? {
     return when (msg.scene) {
         MessageScene.FRIEND -> {
-            val friendCache = dependencies.resolve<YogurtCache<Long, BotFriendData>>()
+            val friendCache = dependencies.resolve<FriendCache>()
             val friend = friendCache[msg.peerUin] ?: return null
             IncomingMessage.Friend(
                 peerId = msg.peerUin,
@@ -29,7 +28,7 @@ suspend fun Application.transformMessage(msg: BotIncomingMessage): IncomingMessa
         }
 
         MessageScene.GROUP -> {
-            val groupCache = dependencies.resolve<YogurtCache<Long, BotGroupData>>()
+            val groupCache = dependencies.resolve<GroupCache>()
             val group = groupCache[msg.peerUin] ?: return null
             val memberCache = resolveGroupMemberCache(msg.peerUin) ?: return null
             val member = memberCache[msg.senderUin] ?: return null

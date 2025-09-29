@@ -1,28 +1,24 @@
 package org.ntqqrev.yogurt.util
 
-import co.touchlab.stately.collections.ConcurrentMutableMap
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 import org.ntqqrev.acidify.Bot
-import org.ntqqrev.acidify.struct.BotGroupData
-import org.ntqqrev.acidify.struct.BotGroupMemberData
 
 fun Application.configureCacheDeps() {
     dependencies {
         provide {
-            YogurtCache /* <Long, BotFriendData> */(this) {
+            FriendCache(this) {
                 val bot = this@configureCacheDeps.dependencies.resolve<Bot>()
                 bot.fetchFriends().associateBy { it.uin }
             }
         }
 
         provide {
-            YogurtCache /* <Long, BotGroupData> */(this) {
+            GroupCache(this) {
                 val bot = this@configureCacheDeps.dependencies.resolve<Bot>()
                 val groupMap = bot.fetchGroups().associateBy { it.uin }
                 // clean up group member caches that are not in group list
-                val groupMemberMap =
-                    this@configureCacheDeps.dependencies.resolve<ConcurrentMutableMap<Long, YogurtCache<Long, BotGroupMemberData>>>()
+                val groupMemberMap = this@configureCacheDeps.dependencies.resolve<GroupMemberMap>()
                 groupMemberMap.apply {
                     (keys - groupMap.keys).forEach { remove(it) }
                 }
@@ -31,18 +27,16 @@ fun Application.configureCacheDeps() {
             }
         }
 
-        provide {
-            ConcurrentMutableMap<Long, YogurtCache<Long, BotGroupMemberData>>()
-        }
+        provide { GroupMemberMap() }
     }
 }
 
-suspend fun Application.resolveGroupMemberCache(groupUin: Long): YogurtCache<Long, BotGroupMemberData>? {
+suspend fun Application.resolveGroupMemberCache(groupUin: Long): GroupMemberCache? {
     val bot = dependencies.resolve<Bot>()
-    val groupCache = dependencies.resolve<YogurtCache<Long, BotGroupData>>()
-    val groupMemberMap = dependencies.resolve<ConcurrentMutableMap<Long, YogurtCache<Long, BotGroupMemberData>>>()
+    val groupCache = dependencies.resolve<GroupCache>()
+    val groupMemberMap = dependencies.resolve<GroupMemberMap>()
     groupCache[groupUin] ?: return null
     return groupMemberMap.getOrPut(groupUin) {
-        YogurtCache(bot.scope) { bot.fetchGroupMembers(groupUin).associateBy { it.uin } }
+        GroupMemberCache(bot.scope) { bot.fetchGroupMembers(groupUin).associateBy { it.uin } }
     }
 }

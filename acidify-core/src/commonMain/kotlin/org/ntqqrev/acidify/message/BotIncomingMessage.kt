@@ -38,6 +38,8 @@ class BotIncomingMessage(
     companion object {
         internal val factories = listOf<IncomingSegmentFactory<*>>(
             IncomingSegmentFactory.Text,
+            IncomingSegmentFactory.Mention,
+            IncomingSegmentFactory.Reply,
         )
 
         internal fun Bot.parseMessage(raw: PbObject<CommonMessage>): BotIncomingMessage? {

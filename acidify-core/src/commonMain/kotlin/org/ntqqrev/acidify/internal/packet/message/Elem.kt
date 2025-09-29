@@ -12,6 +12,7 @@ internal object Elem : PbSchema() {
     val customFace = PbOptional[CustomFace[8]]
     val richMsg = PbOptional[RichMsg[12]]
     val videoFile = PbOptional[VideoFile[19]]
+    val generalFlags = PbOptional[GeneralFlags[37]]
     val srcMsg = PbOptional[SourceMsg[45]]
     val lightAppElem = PbOptional[LightAppElem[51]]
     val commonElem = PbOptional[CommonElem[53]]

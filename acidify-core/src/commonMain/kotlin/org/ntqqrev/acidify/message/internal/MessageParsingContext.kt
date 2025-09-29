@@ -14,6 +14,9 @@ internal class MessageParsingContext(
 ) {
     var currentIndex = 0
 
+    val remainingCount: Int
+        get() = elems.size - currentIndex
+
     fun hasNext(): Boolean = currentIndex < elems.size
 
     fun peek(): PbObject<Elem> = elems[currentIndex]

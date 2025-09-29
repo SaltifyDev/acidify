@@ -47,7 +47,7 @@ sealed class BotIncomingSegment {
     class Reply internal constructor(
         val sequence: Long,
     ) : BotIncomingSegment() {
-        override fun toString(): String = "[引用消息 #$sequence]"
+        override fun toString(): String = "[引用消息 #$sequence] "
     }
 
     /**

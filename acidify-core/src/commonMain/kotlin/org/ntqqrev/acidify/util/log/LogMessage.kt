@@ -3,7 +3,7 @@ package org.ntqqrev.acidify.util.log
 class LogMessage(
     val level: LogLevel,
     val tag: String,
-    val messageSupplier: () -> String,
+    val messageSupplier: suspend () -> String,
     val throwable: Throwable? = null,
 ) {
     init {

@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.Bot
 
-typealias MessageSupplier = () -> String
+typealias MessageSupplier = suspend () -> String
 
 class Logger(private val bot: Bot, val tag: String) {
     private fun MutableSharedFlow<LogMessage>.emitAsync(message: LogMessage) {

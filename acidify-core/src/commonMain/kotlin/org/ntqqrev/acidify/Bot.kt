@@ -21,11 +21,15 @@ import org.ntqqrev.acidify.event.internal.Signal
 import org.ntqqrev.acidify.event.internal.MsgPushSignal
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
+import org.ntqqrev.acidify.internal.packet.highway.FileId
+import org.ntqqrev.acidify.internal.packet.highway.IndexNode
 import org.ntqqrev.acidify.internal.service.common.FetchFriends
 import org.ntqqrev.acidify.internal.service.common.FetchGroupMembers
 import org.ntqqrev.acidify.internal.service.common.FetchGroups
 import org.ntqqrev.acidify.internal.service.common.FetchUserInfo
+import org.ntqqrev.acidify.internal.service.message.RichMediaDownload
 import org.ntqqrev.acidify.internal.service.system.*
+import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.struct.BotFriendData
 import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.acidify.struct.BotGroupMemberData
@@ -34,6 +38,7 @@ import org.ntqqrev.acidify.util.log.LogHandler
 import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.LogMessage
 import org.ntqqrev.acidify.util.log.Logger
+import kotlin.io.encoding.Base64
 
 /**
  * Acidify Bot 实例
@@ -285,6 +290,43 @@ class Bot internal constructor(
         "skey" to getSKey(),
         "uin" to uin.toString(),
     )
+
+    /**
+     * 获取给定资源 ID 的下载链接，支持图片、语音、视频。
+     */
+    suspend fun getDownloadUrl(resourceId: String): String {
+        if (resourceId.startsWith("http://") || resourceId.startsWith("https://"))
+            return resourceId // direct URL
+
+        val actualLength = if (resourceId.length % 4 == 0) {
+            resourceId.length
+        } else {
+            resourceId.length + (4 - resourceId.length % 4)
+        }
+        val normalizedBase64 = resourceId
+            .replace("-", "+")
+            .replace("_", "/")
+            .padEnd(actualLength, '=')
+        val fileIdDecoded = FileId(Base64.decode(normalizedBase64))
+        val appId = fileIdDecoded.get { appId }
+        val indexNode = IndexNode {
+            it[fileUuid] = resourceId
+            it[storeId] = fileIdDecoded.get { storeId }
+            it[ttl] = fileIdDecoded.get { ttl }
+        }
+        return client.callService(
+            when (appId) {
+                1402 -> RichMediaDownload.PrivateRecord
+                1403 -> RichMediaDownload.GroupRecord
+                1406 -> RichMediaDownload.PrivateImage
+                1407 -> RichMediaDownload.GroupImage
+                1413 -> RichMediaDownload.PrivateVideo
+                1415 -> RichMediaDownload.GroupVideo
+                else -> throw IllegalArgumentException("不支持的资源类型 $appId")
+            },
+            indexNode
+        )
+    }
 
     companion object {
         /**

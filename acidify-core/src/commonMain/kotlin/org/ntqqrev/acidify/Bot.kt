@@ -25,6 +25,7 @@ import org.ntqqrev.acidify.internal.service.common.FetchUserInfo
 import org.ntqqrev.acidify.internal.service.message.RichMediaDownload
 import org.ntqqrev.acidify.internal.service.system.*
 import org.ntqqrev.acidify.pb.invoke
+import org.ntqqrev.acidify.struct.BotFaceDetail
 import org.ntqqrev.acidify.struct.BotFriendData
 import org.ntqqrev.acidify.struct.BotGroupData
 import org.ntqqrev.acidify.struct.BotGroupMemberData
@@ -33,6 +34,7 @@ import org.ntqqrev.acidify.util.log.LogHandler
 import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.LogMessage
 import org.ntqqrev.acidify.util.log.Logger
+import kotlin.collections.associateBy
 import kotlin.io.encoding.Base64
 
 /**
@@ -57,6 +59,7 @@ class Bot internal constructor(
     internal val signals = listOf<Signal>(
         MsgPushSignal
     ).associateBy { it.cmd }
+    internal val faceDetailMap = mutableMapOf<String, BotFaceDetail>()
     internal var heartbeatJob: Job? = null
     internal var eventCollectJob: Job? = null
 
@@ -158,9 +161,7 @@ class Bot internal constructor(
         }
         isLoggedIn = true
         logger.i { "用户 $uin 已上线" }
-        // todo: post online logic
-        // - get face details
-        // - get highway url
+        // todo: get highway url
 
         heartbeatJob = launch {
             while (isLoggedIn) {
@@ -187,6 +188,10 @@ class Bot internal constructor(
                 }
             }
         }
+
+        faceDetailMap.putAll(
+            client.callService(FetchFaceDetails).associateBy { it.qSid }
+        ).also { logger.d { "加载了 ${faceDetailMap.size} 条表情信息" } }
     }
 
     /**
@@ -322,6 +327,11 @@ class Bot internal constructor(
             indexNode
         )
     }
+
+    /**
+     * 获取已加载的表情信息映射，键为表情的 [qSid][BotFaceDetail.qSid]，值为对应的 [BotFaceDetail] 实例。
+     */
+    fun getFaceDetails(): Map<String, BotFaceDetail> = faceDetailMap
 
     companion object {
         /**

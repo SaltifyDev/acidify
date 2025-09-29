@@ -18,9 +18,9 @@ internal class LagrangeClient(
     val appInfo: AppInfo,
     val sessionStore: SessionStore,
     val signProvider: SignProvider,
-    val scope: CoroutineScope,
-    val createLogger: (Any) -> Logger
-) {
+    val createLogger: (Any) -> Logger,
+    scope: CoroutineScope,
+) : CoroutineScope by scope {
     val loginLogic = LoginLogic(this)
     val packetLogic = PacketLogic(this)
     val ticketLogic = TicketLogic(this)

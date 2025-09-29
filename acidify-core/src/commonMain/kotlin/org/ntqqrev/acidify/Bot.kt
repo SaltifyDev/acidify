@@ -41,14 +41,11 @@ import org.ntqqrev.acidify.util.log.Logger
 class Bot internal constructor(
     val appInfo: AppInfo,
     val sessionStore: SessionStore,
-    val signProvider: SignProvider,
-    val scope: CoroutineScope
-) {
+    signProvider: SignProvider,
+    scope: CoroutineScope
+) : CoroutineScope by scope {
     private val logger = this.createLogger(this)
-    internal val client = LagrangeClient(
-        appInfo, sessionStore, signProvider, scope,
-        this::createLogger
-    )
+    internal val client = LagrangeClient(appInfo, sessionStore, signProvider, this::createLogger, scope)
     internal val sharedEventFlow = MutableSharedFlow<AcidifyEvent>(
         extraBufferCapacity = 100,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
@@ -165,7 +162,7 @@ class Bot internal constructor(
         // - get face details
         // - get highway url
 
-        heartbeatJob = scope.launch {
+        heartbeatJob = launch {
             while (isLoggedIn) {
                 try {
                     client.callService(Heartbeat)
@@ -176,7 +173,7 @@ class Bot internal constructor(
             }
         }
 
-        eventCollectJob = scope.launch {
+        eventCollectJob = launch {
             while (currentCoroutineContext().isActive) {
                 val sso = client.pushChannel.receive()
                 val signal = signals[sso.command]
@@ -302,7 +299,7 @@ class Bot internal constructor(
             logHandler: LogHandler,
         ): Bot {
             val bot = Bot(appInfo, sessionStore, signProvider, scope)
-            scope.launch {
+            bot.launch {
                 bot.sharedLogFlow
                     .filter { it.level >= minLogLevel }
                     .collect {

@@ -39,7 +39,7 @@ class BotTest {
     )
 
     init {
-        defaultScope.launch {
+        bot.launch {
             bot.eventFlow.collect {
                 when (it) {
                     is SessionStoreUpdatedEvent -> {
@@ -122,7 +122,7 @@ class BotTest {
     @Test
     fun messageReceivingTest() = runBlocking {
         val logger = bot.createLogger(this)
-        defaultScope.launch {
+        bot.launch {
             bot.sharedEventFlow.filterIsInstance<MessageReceiveEvent>().collect {
                 logger.i {
                     "Received: ${it.message.scene} ${it.message.peerUin} ${it.message.senderUin} ${it.message.segments.joinToString("")}"

@@ -8,7 +8,7 @@ typealias MessageSupplier = suspend () -> String
 
 class Logger(private val bot: Bot, val tag: String) {
     private fun MutableSharedFlow<LogMessage>.emitAsync(message: LogMessage) {
-        bot.scope.launch {
+        bot.launch {
             emit(message)
         }
     }

@@ -27,7 +27,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private val host = "msfwifi.3g.qq.com"
     private val port = 8080
 
-    private val selectorManager = SelectorManager(client.scope.coroutineContext)
+    private val selectorManager = SelectorManager(client.coroutineContext)
     private val socket = aSocket(selectorManager).tcp()
     private lateinit var input: ByteReadChannel
     private lateinit var output: ByteWriteChannel
@@ -50,12 +50,12 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
 
     fun startConnectLoop() {
         runBlocking { connect() }
-        client.scope.launch {
+        client.launch {
             var isReconnect = false
             while (currentCoroutineContext().isActive) {
                 try {
                     if (isReconnect) {
-                        client.scope.launch(CoroutineExceptionHandler { _, t ->
+                        client.launch(CoroutineExceptionHandler { _, t ->
                             logger.e(t) { "发送上线包时出现错误" }
                         }) {
                             client.callService(BotOnline)

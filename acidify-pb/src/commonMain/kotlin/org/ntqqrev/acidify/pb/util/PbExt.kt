@@ -51,6 +51,7 @@ internal fun MultiMap<Int, DataToken>.encodeToBuffer(): Buffer {
                     token.dataBlock.size.encodeVarintToSink(buffer)
                     buffer.write(token.dataBlock)
                 }
+                else -> throw IllegalArgumentException("Unsupported token type: $token")
             }
         }
     }

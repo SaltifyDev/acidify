@@ -2,12 +2,10 @@ package org.ntqqrev.acidify.pb
 
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
-import org.ntqqrev.acidify.pb.dataview.DataToken
-import org.ntqqrev.acidify.pb.dataview.LengthDelimited
-import org.ntqqrev.acidify.pb.dataview.Varint
+import org.ntqqrev.acidify.pb.dataview.*
+import org.ntqqrev.acidify.pb.util.encodeToBuffer
 import org.ntqqrev.acidify.pb.util.encodeVarintToSink
 import org.ntqqrev.acidify.pb.util.readVarint32
-import org.ntqqrev.acidify.pb.util.encodeToBuffer
 import org.ntqqrev.acidify.pb.util.readVarint64
 
 abstract class PbType<T>(val fieldNumber: Int) {
@@ -60,6 +58,7 @@ class PbRepeatedInt32(
                         result.add(intValue)
                     }
                 }
+                else -> throw IllegalArgumentException("Unexpected wire type: ${it.wireType}")
             }
         }
         return result
@@ -116,6 +115,7 @@ class PbRepeatedInt64(
                         result.add(longValue)
                     }
                 }
+                else -> throw IllegalArgumentException("Unexpected wire type: ${it.wireType}")
             }
         }
         return result
@@ -246,6 +246,40 @@ class PbRepeatedMessage<S : PbSchema>(fieldNumber: Int, val schema: S) : PbType<
 
 object PbRepeated {
     operator fun <S : PbSchema> get(pbMsg: PbMessage<S>) = PbRepeatedMessage(pbMsg.fieldNumber, pbMsg.schema)
+}
+
+class PbFixed32(fieldNumber: Int) : PbType<Int>(fieldNumber) {
+    override fun encode(value: Int): MutableList<DataToken> {
+        return mutableListOf(Fixed32(value))
+    }
+
+    override fun decode(tokens: List<DataToken>): Int {
+        val token = tokens.firstOrNull() as? Fixed32 ?: return defaultValue
+        return token.value
+    }
+
+    override val defaultValue: Int = 0
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbFixed32(fieldNumber)
+    }
+}
+
+class PbFixed64(fieldNumber: Int) : PbType<Long>(fieldNumber) {
+    override fun encode(value: Long): MutableList<DataToken> {
+        return mutableListOf(Fixed64(value))
+    }
+
+    override fun decode(tokens: List<DataToken>): Long {
+        val token = tokens.firstOrNull() as? Fixed64 ?: return defaultValue
+        return token.value
+    }
+
+    override val defaultValue: Long = 0L
+
+    companion object {
+        operator fun get(fieldNumber: Int) = PbFixed64(fieldNumber)
+    }
 }
 
 class PbOptional<T>(private val wrapped: PbType<T>) : PbType<T?>(wrapped.fieldNumber) {

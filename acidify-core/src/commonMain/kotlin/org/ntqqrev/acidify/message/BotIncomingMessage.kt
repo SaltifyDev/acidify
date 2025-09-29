@@ -44,6 +44,7 @@ class BotIncomingMessage(
             IncomingSegmentFactory.Image,
             IncomingSegmentFactory.Record,
             IncomingSegmentFactory.Video,
+            IncomingSegmentFactory.Forward,
         )
 
         internal fun Bot.parseMessage(raw: PbObject<CommonMessage>): BotIncomingMessage? {

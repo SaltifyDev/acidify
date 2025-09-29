@@ -1,5 +1,13 @@
 package org.ntqqrev.acidify.message.internal
 
+import korlibs.io.compression.deflate.ZLib
+import korlibs.io.compression.uncompress
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import nl.adaptivity.xmlutil.ExperimentalXmlUtilApi
+import nl.adaptivity.xmlutil.serialization.UnknownChildHandler
+import nl.adaptivity.xmlutil.serialization.XML
 import org.ntqqrev.acidify.internal.packet.highway.MsgInfo
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
@@ -174,6 +182,35 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
                 duration = videoInfo.get { time },
                 width = videoInfo.get { width },
                 height = videoInfo.get { height },
+            )
+        }
+    }
+
+    object Forward : IncomingSegmentFactory<BotIncomingSegment.Forward> {
+        @Serializable
+        data class ForwardBody(
+            @SerialName("m_resid") val resId: String,
+        )
+
+        @OptIn(ExperimentalXmlUtilApi::class)
+        val xmlModule = XML {
+            defaultPolicy {
+                unknownChildHandler = UnknownChildHandler {
+                    input, inputKind, descriptor, name, candidates -> emptyList()
+                }
+            }
+        }
+
+        override fun tryParse(ctx: MessageParsingContext): BotIncomingSegment.Forward? {
+            val forward = ctx.tryPeekType { richMsg } ?: return null
+            ctx.consume()
+            val bytesTemplate1 = forward.get { bytesTemplate1 }
+            val xml = ZLib.uncompress(
+                bytesTemplate1.sliceArray(1 until bytesTemplate1.size)
+            ).decodeToString()
+            val resId = xmlModule.decodeFromString<ForwardBody>(xml).resId
+            return BotIncomingSegment.Forward(
+                resId = resId
             )
         }
     }

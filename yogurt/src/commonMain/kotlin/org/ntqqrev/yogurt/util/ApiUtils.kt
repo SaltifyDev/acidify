@@ -1,6 +1,6 @@
 package org.ntqqrev.yogurt.util
 
-import io.ktor.server.routing.Route
+import io.ktor.server.routing.*
 import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.yogurt.api.MilkyApiHandler
 

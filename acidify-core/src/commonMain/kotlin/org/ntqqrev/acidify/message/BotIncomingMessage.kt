@@ -61,6 +61,7 @@ class BotIncomingMessage(
                         senderUid = routingHead.get { fromUid },
                     )
                 }
+
                 PushMsgType.GroupMessage -> {
                     BotIncomingMessage(
                         scene = MessageScene.GROUP,
@@ -72,6 +73,7 @@ class BotIncomingMessage(
                         senderUid = routingHead.get { fromUid },
                     )
                 }
+
                 else -> return null
             }
             val elems = raw.get { messageBody }.get { richText }.get { elems }

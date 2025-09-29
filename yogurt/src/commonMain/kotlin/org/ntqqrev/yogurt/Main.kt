@@ -6,7 +6,8 @@ import org.ntqqrev.yogurt.util.addSigIntHandler
 import kotlin.jvm.JvmName
 
 fun main() {
-    println("""
+    println(
+        """
         | .--------------------------------------.
         | |   __  __                       __    |
         | |   \ \/ /___  ____ ___  _______/ /_   |
@@ -15,7 +16,8 @@ fun main() {
         | |   /_/\____/\__, /\__,_/_/   \__/     |
         | |           /____/   Acidify + Milky   |
         | '--------------------------------------'
-    """.trimMargin())
+    """.trimMargin()
+    )
     YogurtApp.createServer()
         .addSigIntHandler()
         .start(wait = true)

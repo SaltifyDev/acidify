@@ -1,15 +1,10 @@
 package org.ntqqrev.acidify
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
@@ -17,8 +12,8 @@ import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QRCodeStateQueryEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
-import org.ntqqrev.acidify.event.internal.Signal
 import org.ntqqrev.acidify.event.internal.MsgPushSignal
+import org.ntqqrev.acidify.event.internal.Signal
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.highway.FileId

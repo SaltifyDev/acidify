@@ -21,7 +21,7 @@ internal class MessageParsingContext(
 
     fun peek(): PbObject<Elem> = elems[currentIndex]
 
-    fun <T : PbSchema> tryPeekType(type: PbOptional<PbObject<T>>) : PbObject<T>? = peek()[type]
+    fun <T : PbSchema> tryPeekType(type: PbOptional<PbObject<T>>): PbObject<T>? = peek()[type]
 
     inline fun <T : PbSchema> tryPeekType(typeProvider: Elem.() -> PbOptional<PbObject<T>>) =
         tryPeekType(Elem.typeProvider())

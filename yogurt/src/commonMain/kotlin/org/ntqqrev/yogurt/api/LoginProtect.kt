@@ -1,10 +1,9 @@
 package org.ntqqrev.yogurt.api
 
-import io.ktor.server.application.createRouteScopedPlugin
-import io.ktor.server.plugins.di.dependencies
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.application
+import io.ktor.server.application.*
+import io.ktor.server.plugins.di.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.milky.ApiGeneralResponse
 

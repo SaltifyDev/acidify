@@ -84,7 +84,7 @@ suspend fun Application.transformSegment(segment: BotIncomingSegment): IncomingS
         is BotIncomingSegment.Image -> IncomingSegment.Image(
             data = IncomingSegment.Image.Data(
                 resourceId = segment.fileId,
-                tempUrl = "", // TODO
+                tempUrl = bot.getDownloadUrl(segment.fileId),
                 width = segment.width,
                 height = segment.height,
                 summary = segment.summary,
@@ -95,7 +95,7 @@ suspend fun Application.transformSegment(segment: BotIncomingSegment): IncomingS
         is BotIncomingSegment.Record -> IncomingSegment.Record(
             data = IncomingSegment.Record.Data(
                 resourceId = segment.fileId,
-                tempUrl = "", // TODO
+                tempUrl = bot.getDownloadUrl(segment.fileId),
                 duration = segment.duration
             )
         )
@@ -103,7 +103,7 @@ suspend fun Application.transformSegment(segment: BotIncomingSegment): IncomingS
         is BotIncomingSegment.Video -> IncomingSegment.Video(
             data = IncomingSegment.Video.Data(
                 resourceId = segment.fileId,
-                tempUrl = "", // TODO
+                tempUrl = bot.getDownloadUrl(segment.fileId),
                 duration = segment.duration,
                 width = segment.width,
                 height = segment.height

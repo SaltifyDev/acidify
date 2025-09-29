@@ -5,6 +5,7 @@ import io.ktor.server.plugins.di.*
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.message.BotIncomingMessage
 import org.ntqqrev.acidify.message.BotIncomingSegment
+import org.ntqqrev.acidify.message.ImageSubType
 import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.milky.IncomingMessage
 import org.ntqqrev.milky.IncomingSegment
@@ -80,6 +81,35 @@ suspend fun Application.transformSegment(segment: BotIncomingSegment): IncomingS
             )
         )
 
+        is BotIncomingSegment.Image -> IncomingSegment.Image(
+            data = IncomingSegment.Image.Data(
+                resourceId = segment.fileId,
+                tempUrl = "", // TODO
+                width = segment.width,
+                height = segment.height,
+                summary = segment.summary,
+                subType = segment.subType.toMilkyString()
+            )
+        )
+
+        is BotIncomingSegment.Record -> IncomingSegment.Record(
+            data = IncomingSegment.Record.Data(
+                resourceId = segment.fileId,
+                tempUrl = "", // TODO
+                duration = segment.duration
+            )
+        )
+
+        is BotIncomingSegment.Video -> IncomingSegment.Video(
+            data = IncomingSegment.Video.Data(
+                resourceId = segment.fileId,
+                tempUrl = "", // TODO
+                duration = segment.duration,
+                width = segment.width,
+                height = segment.height
+            )
+        )
+
         is BotIncomingSegment.File -> IncomingSegment.File(
             data = IncomingSegment.File.Data(
                 fileId = segment.fileId,
@@ -101,7 +131,10 @@ suspend fun Application.transformSegment(segment: BotIncomingSegment): IncomingS
                 jsonPayload = segment.jsonPayload
             )
         )
-
-        else -> TODO()
     }
+}
+
+fun ImageSubType.toMilkyString() = when (this) {
+    ImageSubType.NORMAL -> "normal"
+    ImageSubType.STICKER -> "sticker"
 }

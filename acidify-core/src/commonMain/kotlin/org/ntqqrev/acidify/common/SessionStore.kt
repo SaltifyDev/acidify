@@ -2,7 +2,6 @@ package org.ntqqrev.acidify.common
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import org.ntqqrev.acidify.internal.util.toHex
 import kotlin.jvm.JvmField
 import kotlin.random.Random
 
@@ -48,7 +47,7 @@ class SessionStore(
                 noPicSig = ByteArray(0),
                 qrSig = ByteArray(0),
                 guid = Random.nextBytes(16),
-                deviceName = "Lagrange-${Random.nextBytes(3).toHex()}"
+                deviceName = "Lagrange-${Random.nextBytes(3).toHexString()}"
             )
         }
     }

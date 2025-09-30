@@ -12,8 +12,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SignProvider
-import org.ntqqrev.acidify.internal.util.fromHex
-import org.ntqqrev.acidify.internal.util.toHex
 
 /**
  * 通过 HTTP 接口进行签名的 [SignProvider] 实现
@@ -35,9 +33,13 @@ class UrlSignProvider(val url: String, val httpProxy: String? = null) : SignProv
     override suspend fun sign(cmd: String, seq: Int, src: ByteArray): SignProvider.Result {
         val value = client.post(url) {
             contentType(ContentType.Application.Json)
-            setBody(UrlSignRequest(cmd, seq, src.toHex()))
+            setBody(UrlSignRequest(cmd, seq, src.toHexString()))
         }.body<UrlSignResponse>().value
-        return SignProvider.Result(value.sign.fromHex(), value.token.fromHex(), value.extra.fromHex())
+        return SignProvider.Result(
+            sign = value.sign.hexToByteArray(),
+            token = value.token.hexToByteArray(),
+            extra = value.extra.hexToByteArray(),
+        )
     }
 
     /**

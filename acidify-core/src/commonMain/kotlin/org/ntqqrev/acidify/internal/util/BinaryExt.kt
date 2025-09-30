@@ -7,12 +7,6 @@ import org.ntqqrev.acidify.crypto.hash.MD5
 
 internal fun ByteArray.md5(): ByteArray = MD5.hash(this)
 
-internal fun ByteArray.toHex(): String {
-    return joinToString("") {
-        it.toInt().and(0xff).toString(16).padStart(2, '0')
-    }
-}
-
 internal fun ByteArray.writeUInt32BE(value: Long, offset: Int) {
     this[offset] = (value ushr 24).toByte()
     this[offset + 1] = (value ushr 16).toByte()
@@ -28,15 +22,6 @@ internal fun ByteArray.readUInt32BE(offset: Int): Long {
 }
 
 internal fun ByteArray.reader() = BinaryReader(this)
-
-internal fun String.fromHex(): ByteArray {
-    val hex = this
-    val result = ByteArray(hex.length / 2)
-    for (i in hex.indices step 2) {
-        result[i / 2] = hex.substring(i, i + 2).toInt(16).toByte()
-    }
-    return result
-}
 
 internal fun Sink.writeString(value: String, prefix: Prefix = Prefix.NONE) {
     this.writeLength(value.length.toUInt(), prefix)

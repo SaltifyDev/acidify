@@ -146,7 +146,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
             writeBytes(client.sessionStore.a2, Prefix.UINT_32 or Prefix.INCLUDE_PREFIX)
             writeString(command, Prefix.UINT_32 or Prefix.INCLUDE_PREFIX)
             writeBytes(ByteArray(0), Prefix.UINT_32 or Prefix.INCLUDE_PREFIX) // unknown
-            writeString(client.sessionStore.guid.toHex(), Prefix.UINT_32 or Prefix.INCLUDE_PREFIX)
+            writeString(client.sessionStore.guid.toHexString(), Prefix.UINT_32 or Prefix.INCLUDE_PREFIX)
             writeBytes(ByteArray(0), Prefix.UINT_32 or Prefix.INCLUDE_PREFIX) // unknown
             writeString(client.appInfo.currentVersion, Prefix.UINT_16 or Prefix.INCLUDE_PREFIX)
             writeBytes(ssoReserved, Prefix.UINT_32 or Prefix.INCLUDE_PREFIX)

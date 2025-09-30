@@ -103,3 +103,11 @@ internal fun Int.encodeToLittleEndian(): IntArray {
     result[3] = (this ushr 24) and 0xFF
     return result
 }
+
+internal fun Int.toIpString(): String {
+    val byte1 = (this ushr 24) and 0xFF
+    val byte2 = (this ushr 16) and 0xFF
+    val byte3 = (this ushr 8) and 0xFF
+    val byte4 = this and 0xFF
+    return "$byte1.$byte2.$byte3.$byte4"
+}

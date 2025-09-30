@@ -3,9 +3,11 @@ package org.ntqqrev.acidify.message
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.internal.packet.message.CommonMessage
 import org.ntqqrev.acidify.internal.packet.message.PushMsgType
+import org.ntqqrev.acidify.internal.packet.message.extra.PrivateFileExtra
 import org.ntqqrev.acidify.message.internal.IncomingSegmentFactory
 import org.ntqqrev.acidify.message.internal.MessageParsingContext
 import org.ntqqrev.acidify.pb.PbObject
+import org.ntqqrev.acidify.pb.invoke
 
 /**
  * 接收消息
@@ -51,8 +53,11 @@ class BotIncomingMessage(
         internal fun Bot.parseMessage(raw: PbObject<CommonMessage>): BotIncomingMessage? {
             val routingHead = raw.get { routingHead }
             val contentHead = raw.get { contentHead }
-            val draftMsg = when (PushMsgType.from(contentHead.get { type })) {
-                PushMsgType.FriendMessage, PushMsgType.FriendRecordMessage -> {
+            val pushMsgType = PushMsgType.from(contentHead.get { type })
+            val draftMsg = when (pushMsgType) {
+                PushMsgType.FriendMessage,
+                PushMsgType.FriendRecordMessage,
+                PushMsgType.FriendFileMessage -> {
                     val isSelfSend = routingHead.get { fromUin } == this.uin
                     BotIncomingMessage(
                         scene = MessageScene.FRIEND,
@@ -79,21 +84,34 @@ class BotIncomingMessage(
 
                 else -> return null
             }
-            val elems = raw.get { messageBody }.get { richText }.get { elems }
-            val ctx = MessageParsingContext(draftMsg, elems, this)
-            while (ctx.hasNext()) {
-                var matched = false
-                for (factory in factories) {
-                    val segment = factory.tryParse(ctx) ?: continue
-                    draftMsg.segmentsMut += segment
-                    matched = true
-                    break
+
+            if (pushMsgType != PushMsgType.FriendFileMessage) {
+                val elems = raw.get { messageBody }.get { richText }.get { elems }
+                val ctx = MessageParsingContext(draftMsg, elems, this)
+                while (ctx.hasNext()) {
+                    var matched = false
+                    for (factory in factories) {
+                        val segment = factory.tryParse(ctx) ?: continue
+                        draftMsg.segmentsMut += segment
+                        matched = true
+                        break
+                    }
+                    if (!matched) {
+                        ctx.skip()
+                    }
                 }
-                if (!matched) {
-                    ctx.skip()
-                }
+                return draftMsg.takeIf { it.segments.isNotEmpty() }
+            } else {
+                val notOnlineFile = PrivateFileExtra(raw.get { messageBody }.get { msgContent })
+                    .get { notOnlineFile }
+                draftMsg.segmentsMut += BotIncomingSegment.File(
+                    fileId = notOnlineFile.get { fileUuid },
+                    fileName = notOnlineFile.get { fileName },
+                    fileSize = notOnlineFile.get { fileSize },
+                    fileHash = notOnlineFile.get { fileIdCrcMedia }
+                )
+                return draftMsg
             }
-            return draftMsg.takeIf { it.segments.isNotEmpty() }
         }
     }
 }

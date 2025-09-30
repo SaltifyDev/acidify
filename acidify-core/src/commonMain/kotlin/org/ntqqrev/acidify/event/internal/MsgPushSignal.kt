@@ -12,7 +12,10 @@ internal object MsgPushSignal : Signal("trpc.msg.olpush.OlPushService.MsgPush") 
     override fun parse(bot: Bot, payload: ByteArray): List<AcidifyEvent> {
         val commonMsg = PushMsg(payload).get { message }
         return when (PushMsgType.from(commonMsg.get { contentHead }.get { type })) {
-            PushMsgType.FriendMessage, PushMsgType.FriendRecordMessage, PushMsgType.GroupMessage -> {
+            PushMsgType.FriendMessage,
+            PushMsgType.FriendRecordMessage,
+            PushMsgType.FriendFileMessage,
+            PushMsgType.GroupMessage -> {
                 val msg = bot.parseMessage(commonMsg) ?: return listOf()
                 // todo: resolve group invite card
                 listOf(MessageReceiveEvent(msg))

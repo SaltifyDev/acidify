@@ -67,9 +67,6 @@ ktor-server = [
     "ktor-server-sse",
     "ktor-server-websockets"
 ]
-korlibs = [
-    "korlibs-compression"
-]
 xmlutil = [
     "xmlutil-core",
     "xmlutil-serialization"

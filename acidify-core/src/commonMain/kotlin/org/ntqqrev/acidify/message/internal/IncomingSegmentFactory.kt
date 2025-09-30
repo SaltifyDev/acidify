@@ -10,7 +10,6 @@ import nl.adaptivity.xmlutil.ExperimentalXmlUtilApi
 import nl.adaptivity.xmlutil.serialization.UnknownChildHandler
 import nl.adaptivity.xmlutil.serialization.XML
 import org.ntqqrev.acidify.internal.packet.highway.MsgInfo
-import org.ntqqrev.acidify.internal.packet.message.elem.MarketFace.summary
 import org.ntqqrev.acidify.internal.packet.message.extra.GroupFileExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra

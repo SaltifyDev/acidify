@@ -25,16 +25,11 @@ import org.ntqqrev.acidify.internal.service.common.FetchUserInfo
 import org.ntqqrev.acidify.internal.service.message.RichMediaDownload
 import org.ntqqrev.acidify.internal.service.system.*
 import org.ntqqrev.acidify.pb.invoke
-import org.ntqqrev.acidify.struct.BotFaceDetail
-import org.ntqqrev.acidify.struct.BotFriendData
-import org.ntqqrev.acidify.struct.BotGroupData
-import org.ntqqrev.acidify.struct.BotGroupMemberData
-import org.ntqqrev.acidify.struct.QRCodeState
+import org.ntqqrev.acidify.struct.*
 import org.ntqqrev.acidify.util.log.LogHandler
 import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.LogMessage
 import org.ntqqrev.acidify.util.log.Logger
-import kotlin.collections.associateBy
 import kotlin.io.encoding.Base64
 
 /**

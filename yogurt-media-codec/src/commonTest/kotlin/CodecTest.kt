@@ -2,7 +2,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
-import org.ntqqrev.yogurt.codec.audioToPcm24000
+import org.ntqqrev.yogurt.codec.audioToMonoPcm
 import org.ntqqrev.yogurt.codec.getImageInfo
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -38,7 +38,7 @@ class CodecTest {
         val file = SystemFileSystem.source(Path("src/commonTest/resources/audio/test.mp3"))
             .buffered()
             .readByteArray()
-        val pcm = audioToPcm24000(file)
+        val pcm = audioToMonoPcm(file).data
         println("PCM size: ${pcm.size}")
         SystemFileSystem.sink(Path("test-output/test-pcm-24000.pcm")).buffered().use {
             it.write(pcm)

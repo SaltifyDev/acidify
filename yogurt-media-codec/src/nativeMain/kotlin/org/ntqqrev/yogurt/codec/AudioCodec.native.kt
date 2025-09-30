@@ -7,14 +7,14 @@ import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlin.experimental.ExperimentalNativeApi
 
-actual fun audioToPcm24000(input: ByteArray): ByteArray =
-    processAudio(input, CodecLibrary.audioToPcm)
+actual fun audioToMonoPcm(input: ByteArray): PcmWithSampleRate =
+    PcmWithSampleRate(processAudio(input, CodecLibrary.audioToPcm), 24000)
 
-actual fun silkDecode(input: ByteArray): ByteArray =
+actual fun silkDecodeToPcm24000(input: ByteArray): ByteArray =
     processAudio(input, CodecLibrary.silkDecode)
 
-actual fun silkEncode(input: ByteArray): ByteArray =
-    processAudio(input, CodecLibrary.silkEncode)
+actual fun silkEncode(input: PcmWithSampleRate): ByteArray =
+    processAudio(input.data, CodecLibrary.silkEncode)
 
 private fun processAudio(input: ByteArray, func: CPointer<AudioCodecFunction>): ByteArray = memScoped {
     val inputData = allocArray<ByteVar>(input.size)

@@ -38,10 +38,11 @@ class CodecTest {
         val file = SystemFileSystem.source(Path("src/commonTest/resources/audio/test.mp3"))
             .buffered()
             .readByteArray()
-        val pcm = audioToMonoPcm(file).data
-        println("PCM size: ${pcm.size}")
-        SystemFileSystem.sink(Path("test-output/test-pcm-24000.pcm")).buffered().use {
-            it.write(pcm)
+        val pcm = audioToMonoPcm(file)
+        println("PCM sample rate: ${pcm.sampleRate}")
+        println("PCM size: ${pcm.data.size}")
+        SystemFileSystem.sink(Path("test-output/test-pcm-${pcm.sampleRate}.pcm")).buffered().use {
+            it.write(pcm.data)
         }
     }
 }

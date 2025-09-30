@@ -14,10 +14,6 @@ jobs:
             task: linkReleaseExecutableMingwX64
             platform: windows-x64
             ext: .exe
-          - target: macosX64
-            task: linkReleaseExecutableMacosX64
-            platform: macos-x64
-            ext: .kexe
           - target: macosArm64
             task: linkReleaseExecutableMacosArm64
             platform: macos-arm64

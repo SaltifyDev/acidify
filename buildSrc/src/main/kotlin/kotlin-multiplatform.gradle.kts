@@ -7,7 +7,6 @@ plugins {
 kotlin {
     jvm()
     mingwX64() // Windows target
-    macosX64()
     macosArm64()
     linuxX64()
     linuxArm64()

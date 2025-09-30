@@ -2,39 +2,30 @@ package org.ntqqrev.acidify.pb.util
 
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
-import org.ntqqrev.acidify.pb.dataview.DataToken
-import org.ntqqrev.acidify.pb.dataview.LengthDelimited
-import org.ntqqrev.acidify.pb.dataview.Varint
-import org.ntqqrev.acidify.pb.dataview.WireType
+import org.ntqqrev.acidify.pb.dataview.*
 
 internal fun Buffer.readTokens(): MultiMap<Int, DataToken> {
     val result = multiMapOf<Int, DataToken>()
     while (!this.exhausted()) {
         val (fieldNumber, wireType) = readTag()
-        val token = when (wireType) {
-            WireType.VARINT -> Varint(readVarint64())
+        result.put(
+            fieldNumber,
+            when (wireType) {
+                WireType.VARINT -> Varint(readVarint64())
 
-            WireType.LENGTH_DELIMITED -> {
-                val length = readVarint32()
-                val byteArray = readByteArray(length)
-                LengthDelimited(byteArray)
+                WireType.LENGTH_DELIMITED -> {
+                    val length = readVarint32()
+                    val byteArray = readByteArray(length)
+                    LengthDelimited(byteArray)
+                }
+
+                WireType.FIXED32 -> Fixed32(readInt())
+
+                WireType.FIXED64 -> Fixed64(readLong())
+
+                else -> throw IllegalArgumentException("Unsupported wire type: $wireType")
             }
-
-            WireType.FIXED32 -> {
-                skip(4)
-                null
-            }
-
-            WireType.FIXED64 -> {
-                skip(8)
-                null
-            }
-
-            else -> throw IllegalArgumentException("Unsupported wire type: $wireType")
-        }
-        if (token != null) {
-            result.put(fieldNumber, token)
-        }
+        )
     }
     return result
 }
@@ -51,7 +42,8 @@ internal fun MultiMap<Int, DataToken>.encodeToBuffer(): Buffer {
                     token.dataBlock.size.encodeVarintToSink(buffer)
                     buffer.write(token.dataBlock)
                 }
-                else -> throw IllegalArgumentException("Unsupported token type: $token")
+                is Fixed32 -> buffer.writeInt(token.value)
+                is Fixed64 -> buffer.writeLong(token.value)
             }
         }
     }

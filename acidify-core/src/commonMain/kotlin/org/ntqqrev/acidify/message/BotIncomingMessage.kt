@@ -49,6 +49,7 @@ class BotIncomingMessage(
             IncomingSegmentFactory.File,
             IncomingSegmentFactory.Forward,
             IncomingSegmentFactory.MarketFace,
+            IncomingSegmentFactory.LightApp,
         )
 
         internal fun Bot.parseMessage(raw: PbObject<CommonMessage>): BotIncomingMessage? {

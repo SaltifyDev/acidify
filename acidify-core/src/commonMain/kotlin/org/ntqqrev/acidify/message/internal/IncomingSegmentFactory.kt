@@ -5,10 +5,12 @@ import korlibs.io.compression.uncompress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import nl.adaptivity.xmlutil.ExperimentalXmlUtilApi
 import nl.adaptivity.xmlutil.serialization.UnknownChildHandler
 import nl.adaptivity.xmlutil.serialization.XML
 import org.ntqqrev.acidify.internal.packet.highway.MsgInfo
+import org.ntqqrev.acidify.internal.packet.message.elem.MarketFace.summary
 import org.ntqqrev.acidify.internal.packet.message.extra.GroupFileExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
@@ -249,6 +251,30 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
             return BotIncomingSegment.MarketFace(
                 url = "https://gxh.vip.qq.com/club/item/parcel/item/${faceIdHex.take(2)}/$faceIdHex/raw300.gif",
                 summary = market.get { summary }
+            )
+        }
+    }
+
+    object LightApp : IncomingSegmentFactory<BotIncomingSegment.LightApp> {
+        @Serializable
+        class AppPayload(
+            @SerialName("app") val appName: String,
+        )
+
+        val jsonModule = Json { ignoreUnknownKeys = true }
+
+        override fun tryParse(ctx: MessageParsingContext): BotIncomingSegment.LightApp? {
+            val elem = ctx.tryPeekType { lightAppElem } ?: return null
+            ctx.consume()
+            if (ctx.tryPeekType { text }?.get { textMsg } == "当前QQ版本不支持此应用，请升级") {
+                ctx.skip()
+            }
+            val compressed = elem.get { bytesData }
+            val json = ZLib.uncompress(compressed.sliceArray(1 until compressed.size)).decodeToString()
+            val appName = jsonModule.decodeFromString<AppPayload>(json).appName
+            return BotIncomingSegment.LightApp(
+                appName = appName,
+                jsonPayload = json,
             )
         }
     }

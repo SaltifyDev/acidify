@@ -9,7 +9,7 @@ import org.ntqqrev.yogurt.util.invoke
 
 val GetCookies = ApiEndpoint.GetCookies {
     val bot = application.dependencies.resolve<Bot>()
-    return@GetCookies GetCookiesOutput(
+    GetCookiesOutput(
         cookies = bot.getCookies(it.domain).entries
             .joinToString("; ") { "${it.key}=${it.value}" }
     )

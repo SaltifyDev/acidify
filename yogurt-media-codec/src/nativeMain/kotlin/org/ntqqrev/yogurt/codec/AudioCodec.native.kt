@@ -24,7 +24,7 @@ private fun processAudio(input: ByteArray, func: CPointer<AudioCodecFunction>): 
     val inputDataRef = StableRef.create(inputData)
     val userData = Buffer()
     val userDataRef = StableRef.create(userData)
-    func.invoke(
+    val result = func.invoke(
         inputDataRef.get(),
         input.size,
         staticCFunction { userData, p, len ->
@@ -34,6 +34,7 @@ private fun processAudio(input: ByteArray, func: CPointer<AudioCodecFunction>): 
         },
         userDataRef.asCPointer()
     )
+    require(result == 0) { "audio processing failed with code $result" }
     inputDataRef.dispose()
     userDataRef.dispose()
     return userData.readByteArray()

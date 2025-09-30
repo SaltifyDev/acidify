@@ -123,6 +123,18 @@ sealed class BotIncomingSegment {
     }
 
     /**
+     * 市场表情消息段
+     * @property url 表情的图像 URL
+     * @property summary 表情的文本描述
+     */
+    class MarketFace internal constructor(
+        val url: String,
+        val summary: String,
+    ) : BotIncomingSegment() {
+        override fun toString(): String = summary
+    }
+
+    /**
      * 小程序消息段
      * @property appName 小程序 App Name
      * @property jsonPayload 小程序的 JSON 负载

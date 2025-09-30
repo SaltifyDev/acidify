@@ -10,6 +10,7 @@ internal object Elem : PbSchema() {
     val face = PbOptional[Face[2]]
     val notOnlineImage = PbOptional[NotOnlineImage[4]]
     val transElemInfo = PbOptional[TransElem[5]]
+    val marketFace = PbOptional[MarketFace[6]]
     val customFace = PbOptional[CustomFace[8]]
     val richMsg = PbOptional[RichMsg[12]]
     val videoFile = PbOptional[VideoFile[19]]

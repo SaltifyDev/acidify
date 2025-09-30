@@ -21,6 +21,7 @@ import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
 import kotlin.math.min
+import org.ntqqrev.acidify.internal.util.toHex
 
 internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
     fun tryParse(ctx: MessageParsingContext): T?
@@ -234,6 +235,21 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
             val resId = xmlModule.decodeFromString<ForwardBody>(xml).resId
             return BotIncomingSegment.Forward(
                 resId = resId
+            )
+        }
+    }
+
+    object MarketFace : IncomingSegmentFactory<BotIncomingSegment.MarketFace> {
+        override fun tryParse(ctx: MessageParsingContext): BotIncomingSegment.MarketFace? {
+            val market = ctx.tryPeekType { marketFace } ?: return null
+            ctx.consume()
+            if (ctx.tryPeekType { text }?.get { textMsg } == market.get { summary }) {
+                ctx.skip()
+            }
+            val faceIdHex = market.get { faceId }.toHex()
+            return BotIncomingSegment.MarketFace(
+                url = "https://gxh.vip.qq.com/club/item/parcel/item/${faceIdHex.take(2)}/$faceIdHex/raw300.gif",
+                summary = market.get { summary }
             )
         }
     }

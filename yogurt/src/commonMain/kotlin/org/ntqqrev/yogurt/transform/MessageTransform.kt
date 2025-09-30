@@ -125,6 +125,12 @@ suspend fun Application.transformSegment(segment: BotIncomingSegment): IncomingS
             )
         )
 
+        is BotIncomingSegment.MarketFace -> IncomingSegment.MarketFace(
+            data = IncomingSegment.MarketFace.Data(
+                url = segment.url,
+            )
+        )
+
         is BotIncomingSegment.LightApp -> IncomingSegment.LightApp(
             data = IncomingSegment.LightApp.Data(
                 appName = segment.appName,

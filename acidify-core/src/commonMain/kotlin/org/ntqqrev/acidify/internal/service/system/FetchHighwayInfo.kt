@@ -1,9 +1,8 @@
 package org.ntqqrev.acidify.internal.service.system
 
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.highway.C501ReqBody
-import org.ntqqrev.acidify.internal.packet.highway.C501RspBody
-import org.ntqqrev.acidify.internal.packet.highway.SubCmd0x501ReqBody
+import org.ntqqrev.acidify.internal.packet.highway.FetchHighwayInfoReq
+import org.ntqqrev.acidify.internal.packet.highway.FetchHighwayInfoResp
 import org.ntqqrev.acidify.internal.service.NoInputService
 import org.ntqqrev.acidify.internal.util.toIpString
 import org.ntqqrev.acidify.pb.invoke
@@ -14,8 +13,8 @@ internal object FetchHighwayInfo : NoInputService<FetchHighwayInfo.Resp>("HttpCo
         val servers: Map<Int, List<Pair<String, Int>>>
     )
 
-    override fun build(client: LagrangeClient, payload: Unit): ByteArray = C501ReqBody {
-        it[reqBody] = SubCmd0x501ReqBody {
+    override fun build(client: LagrangeClient, payload: Unit): ByteArray = FetchHighwayInfoReq {
+        it[reqBody] = FetchHighwayInfoReq.Body {
             it[uin] = client.sessionStore.uin
             it[idcId] = 0
             it[appid] = 16
@@ -32,7 +31,7 @@ internal object FetchHighwayInfo : NoInputService<FetchHighwayInfo.Resp>("HttpCo
     }.toByteArray()
 
     override fun parse(client: LagrangeClient, payload: ByteArray): Resp {
-        val rsp = C501RspBody(payload).get { rspBody }
+        val rsp = FetchHighwayInfoResp(payload).get { rspBody }
         val sigSession = rsp.get { sigSession }
         val servers = mutableMapOf<Int, List<Pair<String, Int>>>()
 

@@ -22,5 +22,6 @@ include(":acidify-pb")
 include(":acidify-qrcode")
 include(":yogurt")
 include(":yogurt-jvm")
+include(":yogurt-media-codec")
 
 rootProject.name = "acidify"

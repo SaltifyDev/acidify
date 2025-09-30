@@ -44,6 +44,7 @@ class BotIncomingMessage(
             IncomingSegmentFactory.Image,
             IncomingSegmentFactory.Record,
             IncomingSegmentFactory.Video,
+            IncomingSegmentFactory.File,
             IncomingSegmentFactory.Forward,
         )
 

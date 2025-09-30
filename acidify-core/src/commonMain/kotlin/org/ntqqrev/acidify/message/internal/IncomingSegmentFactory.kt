@@ -9,8 +9,11 @@ import nl.adaptivity.xmlutil.ExperimentalXmlUtilApi
 import nl.adaptivity.xmlutil.serialization.UnknownChildHandler
 import nl.adaptivity.xmlutil.serialization.XML
 import org.ntqqrev.acidify.internal.packet.highway.MsgInfo
+import org.ntqqrev.acidify.internal.packet.message.extra.GroupFileExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
+import org.ntqqrev.acidify.internal.util.BinaryReader
+import org.ntqqrev.acidify.internal.util.Prefix
 import org.ntqqrev.acidify.internal.util.readUInt32BE
 import org.ntqqrev.acidify.message.BotIncomingSegment
 import org.ntqqrev.acidify.message.ImageSubType
@@ -182,6 +185,26 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
                 duration = videoInfo.get { time },
                 width = videoInfo.get { width },
                 height = videoInfo.get { height },
+            )
+        }
+    }
+
+    object File : IncomingSegmentFactory<BotIncomingSegment.File> {
+        override fun tryParse(ctx: MessageParsingContext): BotIncomingSegment.File? {
+            if (ctx.message.scene != MessageScene.GROUP) return null
+            val trans = ctx.tryPeekType { transElemInfo } ?: return null
+            if (trans.get { elemType } != 24) return null
+            ctx.consume()
+            val payload = trans.get { elemValue }
+            val reader = BinaryReader(payload)
+            reader.readByte() // skip 1 byte (same as Skip(1))
+            val data = reader.readPrefixedBytes(Prefix.UINT_16)
+            val extra = PbObject(GroupFileExtra, data)
+            val info = extra.get { inner }.get { info }
+            return BotIncomingSegment.File(
+                fileId = info.get { fileId },
+                fileName = info.get { fileName },
+                fileSize = info.get { fileSize },
             )
         }
     }

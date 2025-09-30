@@ -12,6 +12,7 @@
 - `acidify-qrcode` - 二维码矩阵生成
 - `yogurt` - 基于 Acidify 的 [Milky](https://milky.ntqqrev.org/) 实现
 - `yogurt-jvm` - Yogurt 的 JVM 平台实现 (Workaround for Ktor plugin's incompatibility issue)
+- `yogurt-media-codec` - Yogurt 的多媒体编解码支持
 
 ## 支持平台
 

@@ -14,12 +14,13 @@ import org.ntqqrev.acidify.internal.util.toIpString
 import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
+import org.ntqqrev.acidify.util.createHttpClient
 
 internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
     private var highwayHost: String = ""
     private var highwayPort: Int = 0
     private var sigSession: ByteArray = ByteArray(0)
-    private val httpClient = HttpClient()
+    private val httpClient = createHttpClient { }
 
     companion object {
         const val MAX_BLOCK_SIZE = 1024 * 1024 // 1MB

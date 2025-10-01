@@ -1,6 +1,5 @@
 package org.ntqqrev.acidify.util
 
-import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -19,7 +18,7 @@ import org.ntqqrev.acidify.common.SignProvider
  * @param httpProxy 可选的 HTTP 代理地址，例如 `http://127.0.0.1:7890`
  */
 class UrlSignProvider(val url: String, val httpProxy: String? = null) : SignProvider {
-    private val client = HttpClient {
+    private val client = createHttpClient {
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })
         }

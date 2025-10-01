@@ -1,6 +1,5 @@
 package org.ntqqrev.acidify.internal.logic
 
-import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -12,13 +11,14 @@ import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadReq
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadResp
 import org.ntqqrev.acidify.internal.util.sha1
 import org.ntqqrev.acidify.pb.invoke
+import org.ntqqrev.acidify.util.createHttpClient
 
 /**
  * FlashTransfer 上传逻辑
  * 用于通过闪传方式上传文件
  */
 internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client) {
-    private val httpClient = HttpClient()
+    private val httpClient = createHttpClient { }
     private val logger = client.createLogger(this)
     private val url = "https://multimedia.qfile.qq.com/sliceupload"
 

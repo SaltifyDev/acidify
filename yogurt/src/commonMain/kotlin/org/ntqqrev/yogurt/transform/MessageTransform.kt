@@ -1,17 +1,18 @@
 package org.ntqqrev.yogurt.transform
 
+import io.ktor.client.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 import org.ntqqrev.acidify.Bot
-import org.ntqqrev.acidify.message.BotIncomingMessage
-import org.ntqqrev.acidify.message.BotIncomingSegment
-import org.ntqqrev.acidify.message.ImageSubType
-import org.ntqqrev.acidify.message.MessageScene
+import org.ntqqrev.acidify.message.*
 import org.ntqqrev.milky.IncomingMessage
 import org.ntqqrev.milky.IncomingSegment
+import org.ntqqrev.milky.OutgoingSegment
+import org.ntqqrev.yogurt.codec.*
 import org.ntqqrev.yogurt.util.FriendCache
 import org.ntqqrev.yogurt.util.GroupCache
 import org.ntqqrev.yogurt.util.resolveGroupMemberCache
+import org.ntqqrev.yogurt.util.resolveUri
 
 suspend fun Application.transformMessage(msg: BotIncomingMessage): IncomingMessage? {
     return when (msg.scene) {
@@ -140,9 +141,103 @@ suspend fun Application.transformSegment(segment: BotIncomingSegment): IncomingS
     }
 }
 
+suspend fun BotOutgoingMessageBuilder.applySegment(
+    segment: OutgoingSegment,
+    httpClient: HttpClient
+) {
+    when (segment) {
+        is OutgoingSegment.Text -> {
+            text(segment.data.text)
+        }
+
+        is OutgoingSegment.Mention -> {
+            mention(segment.data.userId)
+        }
+
+        is OutgoingSegment.MentionAll -> {
+            mention(null)
+        }
+
+        is OutgoingSegment.Face -> {
+            face(segment.data.faceId.toInt())
+        }
+
+        is OutgoingSegment.Reply -> {
+            reply(segment.data.messageSeq)
+        }
+
+        is OutgoingSegment.Image -> {
+            val imageData = resolveUri(segment.data.uri, httpClient)
+            val imageInfo = getImageInfo(imageData)
+            image(
+                raw = imageData,
+                format = imageInfo.format,
+                width = imageInfo.width,
+                height = imageInfo.height,
+                subType = segment.data.subType.toImageSubType(),
+                summary = segment.data.summary ?: "[图片]"
+            )
+        }
+
+        is OutgoingSegment.Record -> {
+            val audioData = resolveUri(segment.data.uri, httpClient)
+            // try to convert to pcm, if fails, assume it's already pcm
+            val pcmData = try {
+                audioToPcm(audioData)
+            } catch (_: Exception) {
+                audioData
+            }
+            val silkData = silkEncode(pcmData)
+            val duration = calculatePcmDuration(pcmData)
+            record(
+                rawSilk = silkData,
+                duration = duration.inWholeSeconds
+            )
+        }
+
+        is OutgoingSegment.Video -> {
+            val videoData = resolveUri(segment.data.uri, httpClient)
+            val videoInfo = getVideoInfo(videoData)
+            val thumbData = if (segment.data.thumbUri != null) {
+                resolveUri(segment.data.thumbUri, httpClient)
+            } else {
+                getVideoFirstFrameJpg(videoData)
+            }
+            val thumbInfo = getImageInfo(thumbData)
+
+            video(
+                raw = videoData,
+                width = videoInfo.width,
+                height = videoInfo.height,
+                duration = videoInfo.duration.inWholeSeconds,
+                thumb = thumbData,
+                thumbFormat = thumbInfo.format
+            )
+        }
+
+        is OutgoingSegment.Forward -> {
+            forward {
+                segment.data.messages.forEach { forwardedMsg ->
+                    node(forwardedMsg.userId, forwardedMsg.senderName) {
+                        forwardedMsg.segments.forEach { seg ->
+                            this@node.applySegment(seg, httpClient)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 fun ImageSubType.toMilkyString() = when (this) {
     ImageSubType.NORMAL -> "normal"
     ImageSubType.STICKER -> "sticker"
+}
+
+fun String.toImageSubType() = when (this) {
+    "normal" -> ImageSubType.NORMAL
+    "sticker" -> ImageSubType.STICKER
+    else -> ImageSubType.NORMAL
 }
 
 fun String.toMessageScene() = when (this) {

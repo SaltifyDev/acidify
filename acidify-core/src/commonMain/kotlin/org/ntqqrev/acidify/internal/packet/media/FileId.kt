@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.internal.packet.highway
+package org.ntqqrev.acidify.internal.packet.media
 
 import org.ntqqrev.acidify.pb.PbInt32
 import org.ntqqrev.acidify.pb.PbSchema

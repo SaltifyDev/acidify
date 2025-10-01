@@ -1,15 +1,14 @@
 package org.ntqqrev.acidify.internal.logic
 
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.flash.FlashTransferSha1StateV
-import org.ntqqrev.acidify.internal.packet.flash.FlashTransferUploadBody
-import org.ntqqrev.acidify.internal.packet.flash.FlashTransferUploadReq
-import org.ntqqrev.acidify.internal.packet.flash.FlashTransferUploadResp
+import org.ntqqrev.acidify.internal.packet.media.FlashTransferSha1StateV
+import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadBody
+import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadReq
+import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadResp
 import org.ntqqrev.acidify.internal.util.sha1
 import org.ntqqrev.acidify.pb.invoke
 

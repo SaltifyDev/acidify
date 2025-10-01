@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.internal.packet.flash
+package org.ntqqrev.acidify.internal.packet.media
 
 import org.ntqqrev.acidify.pb.*
 

@@ -1,7 +1,7 @@
 package org.ntqqrev.acidify.internal.service.message
 
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.highway.*
+import org.ntqqrev.acidify.internal.packet.media.*
 import org.ntqqrev.acidify.internal.service.OidbService
 import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.pb.PbObject

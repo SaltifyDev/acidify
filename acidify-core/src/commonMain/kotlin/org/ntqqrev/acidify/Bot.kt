@@ -18,8 +18,8 @@ import org.ntqqrev.acidify.event.internal.Signal
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.exception.MessageSendException
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.highway.FileId
-import org.ntqqrev.acidify.internal.packet.highway.IndexNode
+import org.ntqqrev.acidify.internal.packet.media.FileId
+import org.ntqqrev.acidify.internal.packet.media.IndexNode
 import org.ntqqrev.acidify.internal.service.common.*
 import org.ntqqrev.acidify.internal.service.message.*
 import org.ntqqrev.acidify.internal.service.system.*

@@ -10,7 +10,7 @@ internal object SourceMsg : PbSchema() {
     val elems = PbRepeatedBytes[5]
     val type = PbInt32[6]
     val richMsg = PbBytes[7]
-    val pbReserve = PbReserve[8]
+    val pbReserve = PbBytes[8]
     val srcMsg = PbBytes[9]
     val toUin = PbInt64[10]
     val troopName = PbBytes[11]

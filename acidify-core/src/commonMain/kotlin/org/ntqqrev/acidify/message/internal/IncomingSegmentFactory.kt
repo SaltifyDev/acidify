@@ -10,6 +10,7 @@ import nl.adaptivity.xmlutil.ExperimentalXmlUtilApi
 import nl.adaptivity.xmlutil.serialization.UnknownChildHandler
 import nl.adaptivity.xmlutil.serialization.XML
 import org.ntqqrev.acidify.internal.packet.highway.MsgInfo
+import org.ntqqrev.acidify.internal.packet.message.elem.SourceMsg
 import org.ntqqrev.acidify.internal.packet.message.extra.GroupFileExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
@@ -128,7 +129,7 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
             return BotIncomingSegment.Reply(
                 sequence = when (ctx.message.scene) {
                     MessageScene.GROUP -> reply.get { origSeqs }.firstOrNull() ?: 0L
-                    else -> reply.get { pbReserve }.get { friendSequence }
+                    else -> SourceMsg.PbReserve(reply.get { pbReserve }).get { friendSequence }
                 }
             )
         }

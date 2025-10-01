@@ -13,6 +13,7 @@ kotlin {
             implementation(libs.kotlinx.io)
             implementation(libs.kotlinx.datetime)
             implementation(libs.bundles.ktor.client)
+            implementation(libs.ktor.network)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.korlibs.compression)
             implementation(libs.bundles.xmlutil)

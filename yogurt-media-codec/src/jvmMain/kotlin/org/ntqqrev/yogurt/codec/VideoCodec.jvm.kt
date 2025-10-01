@@ -6,7 +6,7 @@ import com.sun.jna.ptr.PointerByReference
 import kotlin.time.Duration.Companion.seconds
 
 actual fun getVideoInfo(videoData: ByteArray): VideoInfo {
-    val lib = CodecLibrary.INSTANCE
+    val lib = lib
     val inputMem = Memory(videoData.size.toLong())
     inputMem.write(0, videoData, 0, videoData.size)
     val infoStruct = VideoInfoStruct()
@@ -21,7 +21,7 @@ actual fun getVideoInfo(videoData: ByteArray): VideoInfo {
 }
 
 actual fun getVideoFirstFrameJpg(videoData: ByteArray): ByteArray {
-    val lib = CodecLibrary.INSTANCE
+    val lib = lib
     val inputMem = Memory(videoData.size.toLong())
     inputMem.write(0, videoData, 0, videoData.size)
     val outputPtr = PointerByReference()

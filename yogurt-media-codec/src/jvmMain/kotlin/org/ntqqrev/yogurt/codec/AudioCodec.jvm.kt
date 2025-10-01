@@ -4,11 +4,11 @@ import com.sun.jna.Memory
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 
-actual fun audioToPcm(input: ByteArray) = processAudio(input, CodecLibrary.INSTANCE::audio_to_pcm)
+actual fun audioToPcm(input: ByteArray) = processAudio(input, lib::audio_to_pcm)
 
-actual fun silkDecode(input: ByteArray) = processAudio(input, CodecLibrary.INSTANCE::silk_decode)
+actual fun silkDecode(input: ByteArray) = processAudio(input, lib::silk_decode)
 
-actual fun silkEncode(input: ByteArray) = processAudio(input, CodecLibrary.INSTANCE::silk_encode)
+actual fun silkEncode(input: ByteArray) = processAudio(input, lib::silk_encode)
 
 private fun processAudio(input: ByteArray, func: AudioCodecFunction): ByteArray {
     val inputMem = Memory(input.size.toLong())

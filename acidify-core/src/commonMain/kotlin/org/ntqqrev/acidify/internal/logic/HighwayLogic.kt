@@ -1,6 +1,7 @@
 package org.ntqqrev.acidify.internal.logic
 
 import io.ktor.client.*
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -18,6 +19,7 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
     private var highwayHost: String = ""
     private var highwayPort: Int = 0
     private var sigSession: ByteArray = ByteArray(0)
+    private val httpClient = HttpClient()
 
     companion object {
         const val MAX_BLOCK_SIZE = 1024 * 1024 // 1MB
@@ -137,7 +139,9 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
                     cmd = cmd,
                     data = data,
                     md5 = md5,
-                    extendInfo = extendInfo
+                    extendInfo = extendInfo,
+                    httpClient = httpClient,
+                    timeout = timeout,
                 )
                 session.upload()
             }
@@ -155,9 +159,9 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         private val data: ByteArray,
         private val md5: ByteArray,
         private val extendInfo: ByteArray,
+        private val httpClient: HttpClient,
+        private val timeout: Long,
     ) {
-        private val httpClient = HttpClient()
-
         suspend fun upload() {
             var offset = 0
             while (offset < data.size) {
@@ -269,6 +273,11 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
                     append(HttpHeaders.ContentLength, frame.size.toString())
                 }
                 setBody(frame)
+                this@post.timeout {
+                    requestTimeoutMillis = timeout
+                    connectTimeoutMillis = timeout / 2
+                    socketTimeoutMillis = timeout
+                }
             }
             return response.readRawBytes()
         }

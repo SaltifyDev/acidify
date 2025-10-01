@@ -90,6 +90,6 @@ interface BotOutgoingMessageBuilder {
          * @param senderName 该消息的发送者昵称
          * @param block 构建该消息的内容
          */
-        fun node(senderUin: String, senderName: String, block: suspend BotOutgoingMessageBuilder.() -> Unit)
+        fun node(senderUin: Long, senderName: String, block: suspend BotOutgoingMessageBuilder.() -> Unit)
     }
 }

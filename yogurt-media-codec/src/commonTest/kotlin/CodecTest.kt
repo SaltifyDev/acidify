@@ -3,6 +3,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import org.ntqqrev.yogurt.codec.audioToPcm
+import org.ntqqrev.yogurt.codec.calculatePcmDuration
 import org.ntqqrev.yogurt.codec.getVideoFirstFrameJpg
 import org.ntqqrev.yogurt.codec.getImageInfo
 import org.ntqqrev.yogurt.codec.getVideoInfo
@@ -42,6 +43,7 @@ class CodecTest {
             .readByteArray()
         val pcm = audioToPcm(file)
         println("PCM size: ${pcm.size}")
+        println("duration: ${calculatePcmDuration(pcm)}")
         SystemFileSystem.sink(Path("test-output/test-pcm-24000.pcm")).buffered().use {
             it.write(pcm)
         }

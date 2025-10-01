@@ -5,7 +5,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.crypto.hash.MD5
-import org.ntqqrev.acidify.crypto.hash.SHA1
 import org.ntqqrev.acidify.internal.packet.message.Elem
 import org.ntqqrev.acidify.internal.packet.message.elem.CommonElem
 import org.ntqqrev.acidify.internal.packet.message.elem.Face
@@ -119,7 +118,7 @@ internal class MessageBuildingContext(
     ) = addAsync {
         val imageMd5 = MD5.hashHex(raw)
         val imageSha1Bytes = raw.sha1()
-        val imageSha1 = SHA1.toHex(imageSha1Bytes)
+        val imageSha1 = imageSha1Bytes.toHexString()
 
         val uploadResp = when (scene) {
             MessageScene.FRIEND -> {
@@ -185,7 +184,7 @@ internal class MessageBuildingContext(
     override fun record(rawSilk: ByteArray, duration: Long) = addAsync {
         val recordMd5 = MD5.hashHex(rawSilk)
         val recordSha1Bytes = rawSilk.sha1()
-        val recordSha1 = SHA1.toHex(recordSha1Bytes)
+        val recordSha1 = recordSha1Bytes.toHexString()
 
         val uploadResp = when (scene) {
             MessageScene.FRIEND -> {

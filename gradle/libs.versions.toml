@@ -13,6 +13,7 @@ kx-atomicfu = "0.29.0"
 
 ktor = "3.3.0"
 korlibs = "6.0.0"
+kotlincrypto = "0.8.0"
 xmlutil = "0.91.2"
 stately = "2.1.0"
 mordant = "3.0.2"
@@ -45,6 +46,8 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 korlibs-compression = { module = "com.soywiz:korlibs-compression", version.ref = "korlibs" }
+
+kotlincrypto-hash-sha1 = { module = "org.kotlincrypto.hash:sha1", version.ref = "kotlincrypto" }
 
 xmlutil-core = { module = "io.github.pdvrieze.xmlutil:core", version.ref = "xmlutil" }
 xmlutil-serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "xmlutil" }

@@ -4,6 +4,7 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import org.ntqqrev.acidify.crypto.hash.SHA1Stream
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferSha1StateV
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadBody
@@ -37,11 +38,15 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
         val chunkCount = (bodyStream.size + CHUNK_SIZE - 1) / CHUNK_SIZE
 
         val sha1StateList = mutableListOf<ByteArray>()
+        val sha1Stream = SHA1Stream()
         for (i in 0 until chunkCount) {
             if (i != chunkCount - 1) {
                 val accLength = (i + 1) * CHUNK_SIZE
                 val accBuffer = bodyStream.copyOfRange(0, accLength)
-                val digest = accBuffer.sha1()
+                val digest = ByteArray(20)
+                sha1Stream.update(accBuffer)
+                sha1Stream.hash(digest, false)
+                sha1Stream.reset()
                 sha1StateList.add(digest)
             } else {
                 val digest = bodyStream.sha1()

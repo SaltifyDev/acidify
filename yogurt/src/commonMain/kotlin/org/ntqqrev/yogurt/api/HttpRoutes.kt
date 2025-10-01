@@ -11,9 +11,7 @@ import org.ntqqrev.acidify.exception.ServiceException
 import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
-import org.ntqqrev.yogurt.api.message.GetHistoryMessages
-import org.ntqqrev.yogurt.api.message.GetMessage
-import org.ntqqrev.yogurt.api.message.GetResourceTempUrl
+import org.ntqqrev.yogurt.api.message.*
 import org.ntqqrev.yogurt.api.system.*
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
@@ -107,6 +105,8 @@ fun Route.configureMilkyApiHttpRoutes() {
     serve(GetCookies)
     serve(GetCsrfToken)
 
+    serve(SendPrivateMessage)
+    serve(SendGroupMessage)
     serve(GetMessage)
     serve(GetHistoryMessages)
     serve(GetResourceTempUrl)

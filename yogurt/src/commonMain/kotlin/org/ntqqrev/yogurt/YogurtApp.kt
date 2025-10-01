@@ -2,6 +2,7 @@
 
 package org.ntqqrev.yogurt
 
+import io.ktor.client.HttpClient
 import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -80,6 +81,7 @@ object YogurtApp {
                 runBlocking { bot.offline() }
             }
             provide { logger }
+            provide { HttpClient() }
         }
         configureCacheDeps()
 

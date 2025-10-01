@@ -7,7 +7,7 @@ fun BotFriendData.toMilkyEntity() =
     FriendEntity(
         userId = uin,
         nickname = nickname,
-        sex = gender.toMilkySex(),
+        sex = gender.toMilkyString(),
         qid = qid,
         remark = remark,
         category = FriendCategoryEntity(
@@ -33,7 +33,7 @@ fun BotGroupMemberData.toMilkyEntity(withGroupUin: Long) =
         card = card,
         title = specialTitle,
         level = level,
-        role = role.toMilkyRole(),
+        role = role.toMilkyString(),
         joinTime = joinedAt,
         lastSentTime = lastSpokeAt,
         shutUpEndTime = mutedUntil
@@ -44,7 +44,7 @@ fun BotUserInfo.toMilkyOutput() =
         nickname = nickname,
         qid = qid,
         age = age,
-        sex = gender.toMilkySex(),
+        sex = gender.toMilkyString(),
         remark = remark,
         bio = bio,
         level = level,
@@ -53,13 +53,13 @@ fun BotUserInfo.toMilkyOutput() =
         school = school
     )
 
-fun UserInfoGender.toMilkySex() = when (this) {
+fun UserInfoGender.toMilkyString() = when (this) {
     UserInfoGender.MALE -> "male"
     UserInfoGender.FEMALE -> "female"
     else -> "unknown"
 }
 
-fun GroupMemberRole.toMilkyRole() = when (this) {
+fun GroupMemberRole.toMilkyString() = when (this) {
     GroupMemberRole.OWNER -> "owner"
     GroupMemberRole.ADMIN -> "admin"
     GroupMemberRole.MEMBER -> "member"

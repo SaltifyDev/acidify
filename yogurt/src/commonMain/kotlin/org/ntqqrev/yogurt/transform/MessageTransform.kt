@@ -141,21 +141,39 @@ suspend fun Application.transformSegment(segment: BotIncomingSegment): IncomingS
     }
 }
 
-suspend fun BotOutgoingMessageBuilder.applySegment(
-    segment: OutgoingSegment,
-    httpClient: HttpClient
-) {
+class YogurtMessageBuildingContext(
+    val application: Application,
+    val builder: BotOutgoingMessageBuilder,
+    val scene: MessageScene,
+    val peerUin: Long,
+    val httpClient: HttpClient
+) : BotOutgoingMessageBuilder by builder {
+    fun switchTo(newBuilder: BotOutgoingMessageBuilder): YogurtMessageBuildingContext {
+        return YogurtMessageBuildingContext(application, newBuilder, scene, peerUin, httpClient)
+    }
+}
+
+suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) {
     when (segment) {
         is OutgoingSegment.Text -> {
             text(segment.data.text)
         }
 
         is OutgoingSegment.Mention -> {
-            mention(segment.data.userId)
+            if (scene == MessageScene.FRIEND) {
+                // 私聊不支持 at，转换为文本
+                text("@${segment.data.userId} ")
+                return
+            }
+            val groupMemberCache = application.resolveGroupMemberCache(peerUin)
+            mention(
+                segment.data.userId,
+                groupMemberCache?.get(segment.data.userId)?.nickname ?: segment.data.userId.toString()
+            )
         }
 
         is OutgoingSegment.MentionAll -> {
-            mention(null)
+            mention(null, "全体成员")
         }
 
         is OutgoingSegment.Face -> {
@@ -219,8 +237,9 @@ suspend fun BotOutgoingMessageBuilder.applySegment(
             forward {
                 segment.data.messages.forEach { forwardedMsg ->
                     node(forwardedMsg.userId, forwardedMsg.senderName) {
+                        val nodeContext = switchTo(this@node)
                         forwardedMsg.segments.forEach { seg ->
-                            this@node.applySegment(seg, httpClient)
+                            nodeContext.applySegment(seg)
                         }
                     }
                 }

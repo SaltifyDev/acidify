@@ -13,8 +13,9 @@ interface BotOutgoingMessageBuilder {
     /**
      * 添加提及（At）消息段
      * @param uin 被提及的用户的 uin（QQ 号），为 `null` 表示提及了所有人（`@全体成员`）
+     * @param name 被提及的用户的外显名称（仅在电脑端可见）
      */
-    fun mention(uin: Long?)
+    fun mention(uin: Long?, name: String)
 
     /**
      * 添加表情消息段

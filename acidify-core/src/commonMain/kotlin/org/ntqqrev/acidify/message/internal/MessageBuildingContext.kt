@@ -42,10 +42,10 @@ internal class MessageBuildingContext(
         }
     }
 
-    override fun mention(uin: Long?) = addAsync {
+    override fun mention(uin: Long?, name: String) = addAsync {
         Elem {
             it[text] = Text {
-                it[textMsg] = "@"
+                it[textMsg] = "@$name"
                 it[pbReserve] = TextResvAttr {
                     it[atType] = if (uin == null) 1 else 2  // 1 for @all, 2 for @specific
                     if (uin != null) {

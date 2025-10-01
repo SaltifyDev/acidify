@@ -6,8 +6,8 @@ import org.ntqqrev.acidify.pb.PbSchema
 import org.ntqqrev.acidify.pb.PbString
 
 internal object TextResvAttr : PbSchema() {
-    val atType = PbInt32[1] // 1 for @all, 2 for @specific
-    val atMemberUin = PbInt64[2]
-    val atMemberTinyid = PbInt64[3]
-    val atMemberUid = PbString[4]
+    val atType = PbInt32[3] // 1 for @all, 2 for @specific
+    val atMemberUin = PbInt64[4]
+    val atMemberTinyid = PbInt64[5]
+    val atMemberUid = PbString[9]
 }

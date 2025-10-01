@@ -8,7 +8,7 @@ import kotlinx.cinterop.reinterpret
 import platform.windows.GetProcAddress
 import platform.windows.LoadLibraryA
 
-const val dllPath = "LagrangeCodec.x64.dll"
+const val dllPath = "lagrangecodec.dll"
 
 actual fun loadCodecLibrary(): COpaquePointer {
     val handle = LoadLibraryA(dllPath)

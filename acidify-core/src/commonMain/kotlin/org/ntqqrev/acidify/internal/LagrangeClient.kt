@@ -7,10 +7,7 @@ import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.exception.ServiceException
-import org.ntqqrev.acidify.internal.logic.HighwayLogic
-import org.ntqqrev.acidify.internal.logic.LoginLogic
-import org.ntqqrev.acidify.internal.logic.PacketLogic
-import org.ntqqrev.acidify.internal.logic.TicketLogic
+import org.ntqqrev.acidify.internal.logic.*
 import org.ntqqrev.acidify.internal.packet.SsoResponse
 import org.ntqqrev.acidify.internal.service.Service
 import org.ntqqrev.acidify.util.log.Logger
@@ -26,6 +23,7 @@ internal class LagrangeClient(
     val packetLogic = PacketLogic(this)
     val ticketLogic = TicketLogic(this)
     val highwayLogic = HighwayLogic(this)
+    val flashTransferLogic = FlashTransferLogic(this)
 
     val pushChannel = Channel<SsoResponse>(capacity = 15, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 

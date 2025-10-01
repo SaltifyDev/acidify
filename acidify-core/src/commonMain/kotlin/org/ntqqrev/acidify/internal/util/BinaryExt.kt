@@ -4,8 +4,11 @@ import io.ktor.utils.io.core.*
 import kotlinx.io.*
 import kotlinx.io.Buffer
 import org.ntqqrev.acidify.crypto.hash.MD5
+import org.ntqqrev.acidify.crypto.hash.SHA1
 
 internal fun ByteArray.md5(): ByteArray = MD5.hash(this)
+
+internal fun ByteArray.sha1(): ByteArray = SHA1.hash(this)
 
 internal fun ByteArray.writeUInt32BE(value: Long, offset: Int) {
     this[offset] = (value ushr 24).toByte()

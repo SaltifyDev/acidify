@@ -59,6 +59,33 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         )
     }
 
+    suspend fun uploadVideo(
+        video: ByteArray,
+        videoMd5: ByteArray,
+        videoSha1: ByteArray,
+        thumbnail: ByteArray,
+        thumbnailMd5: ByteArray,
+        thumbnailSha1: ByteArray,
+        uploadResp: PbObject<UploadResp>,
+        messageScene: MessageScene,
+    ) {
+        val videoCmd = if (messageScene == MessageScene.FRIEND) 1001 else 1005
+        upload(
+            cmd = videoCmd,
+            data = video,
+            md5 = videoMd5,
+            extendInfo = buildExtendInfo(uploadResp, videoSha1, bodyIndex = 0)
+        )
+
+        val thumbnailCmd = if (messageScene == MessageScene.FRIEND) 1002 else 1006
+        upload(
+            cmd = thumbnailCmd,
+            data = thumbnail,
+            md5 = thumbnailMd5,
+            extendInfo = buildExtendInfo(uploadResp, thumbnailSha1, bodyIndex = 1)
+        )
+    }
+
     suspend fun uploadGroupFile(
         file: ByteArray,
         fileName: String,
@@ -66,9 +93,9 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         uploadResp: PbObject<UploadResp>,
     ): Unit = TODO("build FileUploadExt")
 
-    private fun buildExtendInfo(uploadResp: PbObject<UploadResp>, sha1: ByteArray): ByteArray {
+    private fun buildExtendInfo(uploadResp: PbObject<UploadResp>, sha1: ByteArray, bodyIndex: Int = 0): ByteArray {
         val msgInfoBodyList = uploadResp.get { msgInfo }.get { msgInfoBody }
-        val index = msgInfoBodyList.firstOrNull()?.get { index }
+        val index = msgInfoBodyList.getOrNull(bodyIndex)?.get { index }
         val fileUuidValue = index?.get { fileUuid } ?: ""
 
         return NTV2RichMediaHighwayExt {

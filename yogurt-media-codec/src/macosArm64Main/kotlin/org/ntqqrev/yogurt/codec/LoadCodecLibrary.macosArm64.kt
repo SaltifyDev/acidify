@@ -8,7 +8,7 @@ import platform.posix.RTLD_LAZY
 import platform.posix.dlopen
 import platform.posix.dlsym
 
-const val dylibPath = "./liblagrangecodec.dylib"
+const val dylibPath = "./lib/macos-arm64/liblagrangecodec.dylib"
 
 actual fun loadCodecLibrary(): COpaquePointer {
     val handle = dlopen(dylibPath, RTLD_LAZY)

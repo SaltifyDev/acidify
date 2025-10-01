@@ -8,7 +8,7 @@ import platform.posix.RTLD_LAZY
 import platform.posix.dlopen
 import platform.posix.dlsym
 
-const val soPath = "./liblagrangecodec.so"
+const val soPath = "./lib/linux-x64/liblagrangecodec.so"
 
 actual fun loadCodecLibrary(): COpaquePointer {
     val handle = dlopen(soPath, RTLD_LAZY)

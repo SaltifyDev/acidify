@@ -1,5 +1,6 @@
 package org.ntqqrev.acidify
 
+import co.touchlab.stately.collections.ConcurrentMutableMap
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,6 +16,7 @@ import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
 import org.ntqqrev.acidify.event.internal.MsgPushSignal
 import org.ntqqrev.acidify.event.internal.Signal
 import org.ntqqrev.acidify.exception.BotOnlineException
+import org.ntqqrev.acidify.exception.MessageSendException
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.highway.FileId
 import org.ntqqrev.acidify.internal.packet.highway.IndexNode
@@ -23,7 +25,13 @@ import org.ntqqrev.acidify.internal.service.common.FetchGroupMembers
 import org.ntqqrev.acidify.internal.service.common.FetchGroups
 import org.ntqqrev.acidify.internal.service.common.FetchUserInfo
 import org.ntqqrev.acidify.internal.service.message.RichMediaDownload
+import org.ntqqrev.acidify.internal.service.message.SendFriendMessage
+import org.ntqqrev.acidify.internal.service.message.SendGroupMessage
 import org.ntqqrev.acidify.internal.service.system.*
+import org.ntqqrev.acidify.message.BotOutgoingMessageBuilder
+import org.ntqqrev.acidify.message.BotOutgoingMessageResult
+import org.ntqqrev.acidify.message.MessageScene
+import org.ntqqrev.acidify.message.internal.MessageBuildingContext
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.struct.*
 import org.ntqqrev.acidify.util.log.LogHandler
@@ -55,9 +63,10 @@ class Bot internal constructor(
         MsgPushSignal
     ).associateBy { it.cmd }
     internal val faceDetailMap = mutableMapOf<String, BotFaceDetail>()
+    internal val uin2uidMap = ConcurrentMutableMap<Long, String>()
+    internal val uid2uinMap = ConcurrentMutableMap<String, Long>()
     internal var heartbeatJob: Job? = null
     internal var eventCollectJob: Job? = null
-
 
     /**
      * [AcidifyEvent] 流，可用于监听各种事件
@@ -236,7 +245,14 @@ class Bot internal constructor(
             nextUin = resp.nextUin
             friendDataResult.addAll(resp.friendDataList)
         } while (nextUin != null)
-        return friendDataResult
+        return friendDataResult.also {
+            launch {
+                it.forEach { data ->
+                    uin2uidMap[data.uin] = data.uid
+                    uid2uinMap[data.uid] = data.uin
+                }
+            }
+        }
     }
 
     /**
@@ -257,7 +273,14 @@ class Bot internal constructor(
             cookie = resp.cookie
             memberDataResult.addAll(resp.memberDataList)
         } while (cookie != null)
-        return memberDataResult
+        return memberDataResult.also {
+            launch {
+                it.forEach { data ->
+                    uin2uidMap[data.uin] = data.uid
+                    uid2uinMap[data.uid] = data.uin
+                }
+            }
+        }
     }
 
     /**
@@ -269,6 +292,35 @@ class Bot internal constructor(
      * 通过 uid 获取用户信息。
      */
     suspend fun fetchUserInfoByUid(uid: String) = client.callService(FetchUserInfo.ByUid, uid)
+
+    /**
+     * 解析 uid 到 uin（QQ 号）。
+     * 如果之前未解析过该 uid，会发起网络请求获取用户信息。
+     */
+    suspend fun getUinByUid(uid: String): Long {
+        return uid2uinMap.getOrPut(uid) {
+            fetchUserInfoByUid(uid).uin.also { uin2uidMap[it] = uid }
+        }
+    }
+
+    /**
+     * 解析 uin（QQ 号）到 uid，该过程可能失败，此时抛出 [NoSuchElementException]。
+     * 若 [mayComeFromGroupUin] 非空且在缓存中未找到对应 uid，会尝试从该群的成员列表中查找；
+     * 否则，会尝试从好友列表中查找。
+     */
+    suspend fun getUidByUin(uin: Long, mayComeFromGroupUin: Long? = null): String {
+        return uin2uidMap[uin] ?: if (mayComeFromGroupUin != null) {
+            fetchGroupMembers(mayComeFromGroupUin).firstOrNull { it.uin == uin }?.uid?.also {
+                uin2uidMap[uin] = it
+                uid2uinMap[it] = uin
+            }
+        } else {
+            fetchFriends().firstOrNull { it.uin == uin }?.uid?.also {
+                uin2uidMap[uin] = it
+                uid2uinMap[it] = uin
+            }
+        } ?: throw NoSuchElementException("无法解析 uin $uin 对应的 uid")
+    }
 
     /**
      * 获取 s_key，用于组成 Cookie。
@@ -294,6 +346,55 @@ class Bot internal constructor(
         "skey" to getSKey(),
         "uin" to uin.toString(),
     )
+
+    /**
+     * 发送好友消息
+     * @param friendUin 好友 QQ 号
+     * @param build 消息构建器
+     */
+    suspend fun sendFriendMessage(
+        friendUin: Long,
+        build: suspend BotOutgoingMessageBuilder.() -> Unit
+    ): BotOutgoingMessageResult {
+        val friendUid = getUidByUin(friendUin)
+        val context = MessageBuildingContext(
+            bot = this,
+            scene = MessageScene.FRIEND,
+            peerUin = friendUin,
+            peerUid = friendUid
+        )
+        build(context)
+        val elems = context.build()
+        val resp = client.callService(SendFriendMessage, SendFriendMessage.Req(friendUin, friendUid, elems))
+        if (resp.result != 0) {
+            throw MessageSendException(resp.result, resp.errMsg)
+        }
+        return BotOutgoingMessageResult(resp.sequence, resp.sendTime)
+    }
+
+    /**
+     * 发送群消息
+     * @param groupUin 群号
+     * @param build 消息构建器
+     */
+    suspend fun sendGroupMessage(
+        groupUin: Long,
+        build: suspend BotOutgoingMessageBuilder.() -> Unit
+    ): BotOutgoingMessageResult {
+        val context = MessageBuildingContext(
+            bot = this,
+            scene = MessageScene.GROUP,
+            peerUin = groupUin,
+            peerUid = groupUin.toString(),
+        )
+        build(context)
+        val elems = context.build()
+        val resp = client.callService(SendGroupMessage, SendGroupMessage.Req(groupUin, elems))
+        if (resp.result != 0) {
+            throw MessageSendException(resp.result, resp.errMsg)
+        }
+        return BotOutgoingMessageResult(resp.sequence, resp.sendTime)
+    }
 
     /**
      * 获取给定资源 ID 的下载链接，支持图片、语音、视频。

@@ -120,6 +120,19 @@ class BotTest {
     }
 
     @Test
+    fun sendMessageTest() = runBlocking {
+        val friendResult = bot.sendFriendMessage(0) { // replace 0 with a valid friend UIN
+            text("Hello world from Acidify!")
+        }
+        println("Friend send result: seq=${friendResult.sequence}")
+
+        val groupResult = bot.sendGroupMessage(0) { // replace 0 with a valid group UIN
+            text("Hello world from Acidify!")
+        }
+        println("Group send result: seq=${groupResult.sequence}")
+    }
+
+    @Test
     fun messageReceivingTest() = runBlocking {
         val logger = bot.createLogger(this)
         bot.launch {

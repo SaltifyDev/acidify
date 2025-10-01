@@ -36,17 +36,14 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
     suspend fun uploadFile(uKey: String, appId: Int, bodyStream: ByteArray): Boolean {
         val chunkCount = (bodyStream.size + CHUNK_SIZE - 1) / CHUNK_SIZE
 
-        // 预计算所有块的 SHA1 状态
         val sha1StateList = mutableListOf<ByteArray>()
         for (i in 0 until chunkCount) {
             if (i != chunkCount - 1) {
-                // 不是最后一块，计算累积 SHA1
                 val accLength = (i + 1) * CHUNK_SIZE
                 val accBuffer = bodyStream.copyOfRange(0, accLength)
                 val digest = accBuffer.sha1()
                 sha1StateList.add(digest)
             } else {
-                // 最后一块，计算整个文件的 SHA1
                 val digest = bodyStream.sha1()
                 sha1StateList.add(digest)
             }
@@ -121,7 +118,7 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
             }
 
             // 解析响应
-            val responseBytes = response.readBytes()
+            val responseBytes = response.readRawBytes()
             val resp = FlashTransferUploadResp(responseBytes)
             val status = resp.get { this.status }
 

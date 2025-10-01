@@ -144,3 +144,10 @@ fun ImageSubType.toMilkyString() = when (this) {
     ImageSubType.NORMAL -> "normal"
     ImageSubType.STICKER -> "sticker"
 }
+
+fun String.toMessageScene() = when (this) {
+    "friend" -> MessageScene.FRIEND
+    "group" -> MessageScene.GROUP
+    "temp" -> MessageScene.TEMP
+    else -> throw IllegalArgumentException("Unknown message scene: $this")
+}

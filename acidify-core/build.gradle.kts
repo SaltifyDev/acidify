@@ -24,6 +24,10 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
+        jvmMain.dependencies {
+            implementation("net.covers1624:curl4j:3.0-SNAPSHOT:libcurl")
+            implementation("net.covers1624:Quack:0.4.10.117")
+        }
         nativeMain.dependencies {
             implementation(libs.ktor.client.curl)
         }

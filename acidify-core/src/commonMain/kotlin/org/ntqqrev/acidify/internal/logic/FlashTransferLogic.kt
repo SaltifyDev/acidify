@@ -1,24 +1,16 @@
 package org.ntqqrev.acidify.internal.logic
 
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 import org.ntqqrev.acidify.crypto.hash.SHA1Stream
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferSha1StateV
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadBody
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadReq
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadResp
+import org.ntqqrev.acidify.internal.util.postWithBlock
 import org.ntqqrev.acidify.internal.util.sha1
 import org.ntqqrev.acidify.pb.invoke
-import org.ntqqrev.acidify.util.createHttpClient
 
-/**
- * FlashTransfer 上传逻辑
- * 用于通过闪传方式上传文件
- */
 internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client) {
-    private val httpClient = createHttpClient { }
     private val logger = client.createLogger(this)
     private val url = "https://multimedia.qfile.qq.com/sliceupload"
 
@@ -27,13 +19,6 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
         private const val TAG = "FlashTransferLogic"
     }
 
-    /**
-     * 上传文件
-     * @param uKey 上传密钥
-     * @param appId 应用 ID
-     * @param bodyStream 文件数据
-     * @return 上传是否成功
-     */
     suspend fun uploadFile(uKey: String, appId: Int, bodyStream: ByteArray): Boolean {
         val chunkCount = (bodyStream.size + CHUNK_SIZE - 1) / CHUNK_SIZE
 
@@ -77,9 +62,6 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
         return true
     }
 
-    /**
-     * 上传单个数据块
-     */
     private suspend fun uploadChunk(
         uKey: String,
         appId: Int,
@@ -112,18 +94,7 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
 
         try {
             // 发送 HTTP POST 请求
-            val response = httpClient.post(url) {
-                headers {
-                    append(HttpHeaders.Accept, "*/*")
-                    append(HttpHeaders.Expect, "100-continue")
-                    append(HttpHeaders.Connection, "Keep-Alive")
-                    append(HttpHeaders.AcceptEncoding, "gzip")
-                }
-                setBody(payload)
-            }
-
-            // 解析响应
-            val responseBytes = response.readRawBytes()
+            val responseBytes = postWithBlock(url, payload)
             val resp = FlashTransferUploadResp(responseBytes)
             val status = resp.get { this.status }
 
@@ -138,13 +109,6 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
             logger.e(e) { "FlashTransfer 上传块 $start 异常: ${e.message}" }
             return false
         }
-    }
-
-    /**
-     * 关闭 HTTP 客户端
-     */
-    fun close() {
-        httpClient.close()
     }
 }
 

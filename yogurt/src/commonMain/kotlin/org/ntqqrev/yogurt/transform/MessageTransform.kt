@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.message.*
+import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.milky.IncomingMessage
 import org.ntqqrev.milky.IncomingSegment
 import org.ntqqrev.milky.OutgoingSegment
@@ -154,6 +155,7 @@ class YogurtMessageBuildingContext(
 }
 
 suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) {
+    val logger = application.dependencies.resolve<Logger>()
     when (segment) {
         is OutgoingSegment.Text -> {
             text(segment.data.text)
@@ -202,11 +204,14 @@ suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) 
             // try to convert to pcm, if fails, assume it's already pcm
             val pcmData = try {
                 audioToPcm(audioData)
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                logger.w(e) { "语音 ${segment.data.uri} 转 PCM 失败，尝试直接编码" }
                 audioData
             }
             val silkData = silkEncode(pcmData)
+            logger.d { "语音 ${segment.data.uri} 编码完成" }
             val duration = calculatePcmDuration(pcmData)
+            logger.d { "语音时长 ${duration.inWholeSeconds} 秒" }
             record(
                 rawSilk = silkData,
                 duration = duration.inWholeSeconds

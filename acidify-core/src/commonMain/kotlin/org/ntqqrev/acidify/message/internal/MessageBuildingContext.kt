@@ -4,6 +4,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import org.ntqqrev.acidify.Bot
+import org.ntqqrev.acidify.crypto.hash.MD5
+import org.ntqqrev.acidify.crypto.hash.SHA1
 import org.ntqqrev.acidify.internal.packet.message.Elem
 import org.ntqqrev.acidify.internal.packet.message.elem.CommonElem
 import org.ntqqrev.acidify.internal.packet.message.elem.Face
@@ -11,6 +13,8 @@ import org.ntqqrev.acidify.internal.packet.message.elem.Text
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.TextResvAttr
+import org.ntqqrev.acidify.internal.service.message.RichMediaUpload
+import org.ntqqrev.acidify.internal.util.sha1
 import org.ntqqrev.acidify.message.BotOutgoingMessageBuilder
 import org.ntqqrev.acidify.message.ImageFormat
 import org.ntqqrev.acidify.message.ImageSubType
@@ -112,12 +116,126 @@ internal class MessageBuildingContext(
         height: Int,
         subType: ImageSubType,
         summary: String
-    ) {
-        TODO("Not yet implemented")
+    ) = addAsync {
+        val imageMd5 = MD5.hashHex(raw)
+        val imageSha1Bytes = raw.sha1()
+        val imageSha1 = SHA1.toHex(imageSha1Bytes)
+
+        val uploadResp = when (scene) {
+            MessageScene.FRIEND -> {
+                bot.client.callService(
+                    RichMediaUpload.PrivateImage,
+                    RichMediaUpload.ImageUploadRequest(
+                        imageData = raw,
+                        imageMd5 = imageMd5,
+                        imageSha1 = imageSha1,
+                        imageExt = ".${format.ext}",
+                        width = width,
+                        height = height,
+                        picFormat = format.underlying,
+                        subType = subType.underlying,
+                        textSummary = summary
+                    )
+                )
+            }
+
+            MessageScene.GROUP -> {
+                bot.client.callService(
+                    RichMediaUpload.GroupImage,
+                    RichMediaUpload.ImageUploadRequest(
+                        imageData = raw,
+                        imageMd5 = imageMd5,
+                        imageSha1 = imageSha1,
+                        imageExt = ".${format.ext}",
+                        width = width,
+                        height = height,
+                        picFormat = format.underlying,
+                        subType = subType.underlying,
+                        textSummary = summary,
+                        groupUin = peerUin
+                    )
+                )
+            }
+
+            else -> throw IllegalArgumentException("不支持的消息场景: $scene")
+        }
+
+        bot.client.flashTransferLogic.uploadFile(
+            uKey = uploadResp.respObj.get { uKey },
+            appId = if (scene == MessageScene.FRIEND) 1406 else 1407,
+            bodyStream = raw
+        )
+
+        val msgInfo = uploadResp.respObj.get { msgInfo }
+        val businessType = when (scene) {
+            MessageScene.FRIEND -> 10
+            MessageScene.GROUP -> 20
+            else -> throw IllegalArgumentException("不支持的消息场景: $scene")
+        }
+
+        Elem {
+            it[commonElem] = CommonElem {
+                it[serviceType] = 48
+                it[pbElem] = msgInfo.toByteArray()
+                it[this.businessType] = businessType
+            }
+        }
     }
 
-    override fun record(rawSilk: ByteArray, duration: Long) {
-        TODO("Not yet implemented")
+    override fun record(rawSilk: ByteArray, duration: Long) = addAsync {
+        val recordMd5 = MD5.hashHex(rawSilk)
+        val recordSha1Bytes = rawSilk.sha1()
+        val recordSha1 = SHA1.toHex(recordSha1Bytes)
+
+        val uploadResp = when (scene) {
+            MessageScene.FRIEND -> {
+                bot.client.callService(
+                    RichMediaUpload.PrivateRecord,
+                    RichMediaUpload.RecordUploadRequest(
+                        audioData = rawSilk,
+                        audioMd5 = recordMd5,
+                        audioSha1 = recordSha1,
+                        audioDuration = duration.toInt()
+                    )
+                )
+            }
+
+            MessageScene.GROUP -> {
+                bot.client.callService(
+                    RichMediaUpload.GroupRecord,
+                    RichMediaUpload.RecordUploadRequest(
+                        audioData = rawSilk,
+                        audioMd5 = recordMd5,
+                        audioSha1 = recordSha1,
+                        audioDuration = duration.toInt(),
+                        groupUin = peerUin
+                    )
+                )
+            }
+
+            else -> throw IllegalArgumentException("不支持的消息场景: $scene")
+        }
+
+        bot.client.flashTransferLogic.uploadFile(
+            uKey = uploadResp.respObj.get { uKey },
+            appId = if (scene == MessageScene.FRIEND) 1402 else 1403,
+            bodyStream = rawSilk
+        )
+
+        val msgInfo = uploadResp.respObj.get { msgInfo }
+        val businessType = when (scene) {
+            MessageScene.FRIEND -> 12
+            MessageScene.GROUP -> 22
+            else -> throw IllegalArgumentException("不支持的消息场景: $scene")
+        }
+
+        Elem {
+            it[commonElem] = CommonElem {
+                it[serviceType] = 48
+                it[pbElem] = msgInfo.toByteArray()
+                it[this.businessType] = businessType
+            }
+        }
     }
 
     override fun video(

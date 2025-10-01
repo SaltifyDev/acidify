@@ -9,8 +9,7 @@ kotlin {
             implementation(libs.kotlinx.io)
         }
         jvmMain.dependencies {
-            implementation("io.github.kasukusakura:silk-codec:0.0.5")
-            implementation("com.googlecode.soundlibs:mp3spi:1.9.5.4")
+            implementation("net.java.dev.jna:jna:5.18.0")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

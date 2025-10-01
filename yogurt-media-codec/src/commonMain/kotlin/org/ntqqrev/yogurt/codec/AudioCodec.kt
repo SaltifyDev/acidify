@@ -1,9 +1,7 @@
 package org.ntqqrev.yogurt.codec
 
-class PcmWithSampleRate(val data: ByteArray, val sampleRate: Int)
+expect fun audioToPcm(input: ByteArray): ByteArray
 
-expect fun audioToMonoPcm(input: ByteArray): PcmWithSampleRate
+expect fun silkDecode(input: ByteArray): ByteArray
 
-expect fun silkDecodeToPcm24000(input: ByteArray): ByteArray
-
-expect fun silkEncode(input: PcmWithSampleRate): ByteArray
+expect fun silkEncode(input: ByteArray): ByteArray

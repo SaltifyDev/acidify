@@ -2,7 +2,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
-import org.ntqqrev.yogurt.codec.audioToMonoPcm
+import org.ntqqrev.yogurt.codec.audioToPcm
 import org.ntqqrev.yogurt.codec.getVideoFirstFrameJpg
 import org.ntqqrev.yogurt.codec.getImageInfo
 import org.ntqqrev.yogurt.codec.getVideoInfo
@@ -40,11 +40,10 @@ class CodecTest {
         val file = SystemFileSystem.source(Path("src/commonTest/resources/audio/test.mp3"))
             .buffered()
             .readByteArray()
-        val pcm = audioToMonoPcm(file)
-        println("PCM sample rate: ${pcm.sampleRate}")
-        println("PCM size: ${pcm.data.size}")
-        SystemFileSystem.sink(Path("test-output/test-pcm-${pcm.sampleRate}.pcm")).buffered().use {
-            it.write(pcm.data)
+        val pcm = audioToPcm(file)
+        println("PCM size: ${pcm.size}")
+        SystemFileSystem.sink(Path("test-output/test-pcm-24000.pcm")).buffered().use {
+            it.write(pcm)
         }
     }
 

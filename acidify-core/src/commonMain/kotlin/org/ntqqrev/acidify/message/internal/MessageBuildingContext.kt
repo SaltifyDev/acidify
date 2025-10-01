@@ -5,7 +5,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.internal.packet.message.Elem
+import org.ntqqrev.acidify.internal.packet.message.elem.CommonElem
+import org.ntqqrev.acidify.internal.packet.message.elem.Face
 import org.ntqqrev.acidify.internal.packet.message.elem.Text
+import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
+import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
+import org.ntqqrev.acidify.internal.packet.message.extra.TextResvAttr
 import org.ntqqrev.acidify.message.BotOutgoingMessageBuilder
 import org.ntqqrev.acidify.message.ImageFormat
 import org.ntqqrev.acidify.message.ImageSubType
@@ -37,12 +42,63 @@ internal class MessageBuildingContext(
         }
     }
 
-    override fun mention(uin: Long?) {
-        TODO("Not yet implemented")
+    override fun mention(uin: Long?) = addAsync {
+        Elem {
+            it[text] = Text {
+                it[textMsg] = "@"
+                it[pbReserve] = TextResvAttr {
+                    it[atType] = if (uin == null) 1 else 2  // 1 for @all, 2 for @specific
+                    if (uin != null) {
+                        it[atMemberUin] = uin
+                        it[atMemberUid] = bot.getUidByUin(uin)
+                    }
+                }.toByteArray()
+            }
+        }
     }
 
-    override fun face(faceId: Int, isLarge: Boolean) {
-        TODO("Not yet implemented")
+    override fun face(faceId: Int, isLarge: Boolean) = addAsync {
+        val faceDetail = bot.faceDetailMap[faceId.toString()]
+            ?: throw NoSuchElementException("要发送的表情 ID 不存在: $faceId")
+
+        if (isLarge) {
+            Elem {
+                it[commonElem] = CommonElem {
+                    it[serviceType] = 37
+                    it[pbElem] = QBigFaceExtra {
+                        it[aniStickerPackId] = faceDetail.aniStickerPackId.toString()
+                        it[aniStickerId] = faceDetail.aniStickerId.toString()
+                        it[this.faceId] = faceId
+                        it[field4] = 1
+                        it[aniStickerType] = faceDetail.aniStickerType
+                        it[field6] = ""
+                        it[preview] = faceDetail.qDes
+                        it[field9] = 1
+                    }.toByteArray()
+                    it[businessType] = faceDetail.aniStickerType
+                }
+            }
+        }
+
+        if (faceId >= 260) {
+            Elem {
+                it[commonElem] = CommonElem {
+                    it[serviceType] = 33
+                    it[pbElem] = QSmallFaceExtra {
+                        it[this.faceId] = faceId
+                        it[text] = faceDetail.qDes
+                        it[compatText] = faceDetail.qDes
+                    }.toByteArray()
+                    it[businessType] = faceDetail.aniStickerType
+                }
+            }
+        }
+
+        Elem {
+            it[face] = Face {
+                it[index] = faceId
+            }
+        }
     }
 
     override fun reply(sequence: Long) {

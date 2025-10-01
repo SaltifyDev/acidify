@@ -83,6 +83,8 @@ internal object ExtBizInfo : PbSchema() {
 internal object PicExtBizInfo : PbSchema() {
     val bizType = PbInt32[1]
     val textSummary = PbString[2]
+    val bytesPbReserveC2C = PbBytes[11]
+    val bytesPbReserveTroop = PbBytes[12]
 }
 
 internal object VideoExtBizInfo : PbSchema() {

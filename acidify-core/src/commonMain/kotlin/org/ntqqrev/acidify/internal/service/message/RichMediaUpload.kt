@@ -15,7 +15,7 @@ internal abstract class RichMediaUpload<T>(
     val requestType: Int,
     val businessType: Int,
     val scene: MessageScene,
-) : OidbService<T, RichMediaUpload.UploadResponse>(oidbCommand, oidbService) {
+) : OidbService<T, RichMediaUpload.UploadResponse>(oidbCommand, oidbService, true) {
     class UploadResponse(val respObj: PbObject<UploadResp>)
 
     class ImageUploadRequest(
@@ -97,7 +97,6 @@ internal abstract class RichMediaUpload<T>(
             it[clientRandomId] = Random.nextLong()
             it[this.compatQMsgSceneType] = compatQMsgSceneType
             it[this.extBizInfo] = extBizInfo
-            it[clientSeq] = 0
             it[noNeedCompatMsg] = false
         }
     }.toByteArray()
@@ -111,7 +110,7 @@ internal abstract class RichMediaUpload<T>(
                 it[fileSize] = payload.imageData.size
                 it[fileHash] = payload.imageMd5
                 it[fileSha1] = payload.imageSha1
-                it[fileName] = payload.imageMd5 + payload.imageExt
+                it[fileName] = payload.imageMd5.uppercase() + payload.imageExt
                 it[type] = FileType {
                     it[type] = 1
                     it[picFormat] = payload.picFormat
@@ -126,10 +125,36 @@ internal abstract class RichMediaUpload<T>(
             it[subFileType] = 0
         }
 
-    protected fun buildImageExtBizInfo(subType: Int, textSummary: String): PbObject<ExtBizInfo> =
+    protected fun buildPrivateImageExtBizInfo(subType: Int, textSummary: String): PbObject<ExtBizInfo> =
         ExtBizInfo {
             it[pic] = PicExtBizInfo {
                 it[bizType] = subType
+                it[bytesPbReserveC2C] = byteArrayOf(
+                    0x08, 0x00, 0x18, 0x00, 0x20, 0x00, 0x42, 0x00, 0x50, 0x00, 0x62, 0x00,
+                    0x92.toByte(), 0x01, 0x00, 0x9a.toByte(), 0x01, 0x00, 0xa2.toByte(), 0x01,
+                    0x0c, 0x08, 0x00, 0x12, 0x00, 0x18, 0x00, 0x20, 0x00, 0x28, 0x00, 0x3a, 0x00
+                )
+                it[this.textSummary] = textSummary.ifEmpty { if (subType == 1) "[动画表情]" else "[图片]" }
+            }
+            it[video] = VideoExtBizInfo {
+                it[bytesPbReserve] = ByteArray(0)
+            }
+            it[ptt] = PttExtBizInfo {
+                it[bytesReserve] = ByteArray(0)
+                it[bytesPbReserve] = ByteArray(0)
+                it[bytesGeneralFlags] = ByteArray(0)
+            }
+        }
+
+    protected fun buildGroupImageExtBizInfo(subType: Int, textSummary: String): PbObject<ExtBizInfo> =
+        ExtBizInfo {
+            it[pic] = PicExtBizInfo {
+                it[bizType] = subType
+                it[bytesPbReserveTroop] = byteArrayOf(
+                    0x08, 0x00, 0x18, 0x00, 0x20, 0x00, 0x42, 0x00, 0x50, 0x00, 0x62, 0x00,
+                    0x92.toByte(), 0x01, 0x00, 0x9a.toByte(), 0x01, 0x00, 0xa2.toByte(), 0x01,
+                    0x0c, 0x08, 0x00, 0x12, 0x00, 0x18, 0x00, 0x20, 0x00, 0x28, 0x00, 0x3a, 0x00
+                )
                 it[this.textSummary] = textSummary.ifEmpty { if (subType == 1) "[动画表情]" else "[图片]" }
             }
             it[video] = VideoExtBizInfo {
@@ -276,7 +301,7 @@ internal abstract class RichMediaUpload<T>(
     ) {
         override fun buildOidb(client: LagrangeClient, payload: ImageUploadRequest): ByteArray {
             val uploadInfoList = listOf(buildImageUploadInfo(payload))
-            val extBizInfo = buildImageExtBizInfo(payload.subType, payload.textSummary)
+            val extBizInfo = buildPrivateImageExtBizInfo(payload.subType, payload.textSummary)
             return buildBaseUploadReq(client, uploadInfoList, 1, extBizInfo)
         }
 
@@ -294,7 +319,7 @@ internal abstract class RichMediaUpload<T>(
     ) {
         override fun buildOidb(client: LagrangeClient, payload: ImageUploadRequest): ByteArray {
             val uploadInfoList = listOf(buildImageUploadInfo(payload))
-            val extBizInfo = buildImageExtBizInfo(payload.subType, payload.textSummary)
+            val extBizInfo = buildGroupImageExtBizInfo(payload.subType, payload.textSummary)
             return buildBaseUploadReq(client, uploadInfoList, 2, extBizInfo, payload.groupUin)
         }
 

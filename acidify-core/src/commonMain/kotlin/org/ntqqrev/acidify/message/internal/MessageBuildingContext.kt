@@ -141,7 +141,7 @@ internal class MessageBuildingContext(
         val ctx: MessageBuildingContext
     ) : BotOutgoingMessageBuilder.Forward {
         override fun node(
-            senderUin: String,
+            senderUin: Long,
             senderName: String,
             block: suspend BotOutgoingMessageBuilder.() -> Unit
         ) {

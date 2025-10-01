@@ -20,14 +20,11 @@ import org.ntqqrev.acidify.exception.MessageSendException
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.highway.FileId
 import org.ntqqrev.acidify.internal.packet.highway.IndexNode
-import org.ntqqrev.acidify.internal.service.common.FetchFriends
-import org.ntqqrev.acidify.internal.service.common.FetchGroupMembers
-import org.ntqqrev.acidify.internal.service.common.FetchGroups
-import org.ntqqrev.acidify.internal.service.common.FetchUserInfo
-import org.ntqqrev.acidify.internal.service.message.RichMediaDownload
-import org.ntqqrev.acidify.internal.service.message.SendFriendMessage
-import org.ntqqrev.acidify.internal.service.message.SendGroupMessage
+import org.ntqqrev.acidify.internal.service.common.*
+import org.ntqqrev.acidify.internal.service.message.*
 import org.ntqqrev.acidify.internal.service.system.*
+import org.ntqqrev.acidify.message.BotHistoryMessages
+import org.ntqqrev.acidify.message.BotIncomingMessage.Companion.parseMessage
 import org.ntqqrev.acidify.message.BotOutgoingMessageBuilder
 import org.ntqqrev.acidify.message.BotOutgoingMessageResult
 import org.ntqqrev.acidify.message.MessageScene
@@ -340,7 +337,7 @@ class Bot internal constructor(
     /**
      * 获取指定域名的 Cookie 键值对。
      */
-    suspend fun getCookies(domain: String) = mapOf<String, String>(
+    suspend fun getCookies(domain: String) = mapOf(
         "p_uin" to "o$uin",
         "p_skey" to getPSKey(domain),
         "skey" to getSKey(),
@@ -394,6 +391,59 @@ class Bot internal constructor(
             throw MessageSendException(resp.result, resp.errMsg)
         }
         return BotOutgoingMessageResult(resp.sequence, resp.sendTime)
+    }
+
+    /**
+     * 向上获取与好友的历史消息
+     * @param friendUin 好友 QQ 号
+     * @param limit 最多获取的消息数量，最大值为 30
+     * @param startSequence 起始消息序列号（包含该序列号），为 `null` 则从最新消息开始获取
+     */
+    suspend fun getFriendHistoryMessages(
+        friendUin: Long,
+        limit: Int,
+        startSequence: Long? = null
+    ): BotHistoryMessages {
+        require(limit in 1..30) { "limit 必须在 1 到 30 之间" }
+        val friendUid = getUidByUin(friendUin)
+        val end = startSequence ?: client.callService(GetFriendLatestSequence, friendUid)
+        val start = (end - limit + 1).coerceAtLeast(1)
+
+        val resp = client.callService(
+            FetchFriendMessages,
+            FetchFriendMessages.Req(friendUid, start, end)
+        )
+
+        val messages = resp.mapNotNull { parseMessage(it) }
+
+        val nextStartSeq = if (start > 1) (start - 1) else null
+        return BotHistoryMessages(messages, nextStartSeq)
+    }
+
+    /**
+     * 向上获取群聊的历史消息
+     * @param groupUin 群号
+     * @param limit 最多获取的消息数量，最大值为 30
+     * @param startSequence 起始消息序列号（包含该序列号），为 `null` 则从最新消息开始获取
+     */
+    suspend fun getGroupHistoryMessages(
+        groupUin: Long,
+        limit: Int,
+        startSequence: Long? = null
+    ): BotHistoryMessages {
+        require(limit in 1..30) { "limit 必须在 1 到 30 之间" }
+        val end = startSequence ?: client.callService(FetchGroupExtraInfo, groupUin).latestMessageSeq
+        val start = (end - limit + 1).coerceAtLeast(1)
+
+        val resp = client.callService(
+            FetchGroupMessages,
+            FetchGroupMessages.Req(groupUin, start, end)
+        )
+
+        val messages = resp.mapNotNull { parseMessage(it) }
+
+        val nextStartSeq = if (start > 1) (start - 1) else null
+        return BotHistoryMessages(messages, nextStartSeq)
     }
 
     /**

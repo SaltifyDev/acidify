@@ -133,6 +133,15 @@ class BotTest {
     }
 
     @Test
+    fun getMessageTest() = runBlocking {
+        val friendMessage = bot.getFriendHistoryMessages(0, 30) // replace 0 with a valid friend UIN
+        println("Friend messages size: ${friendMessage.messages.size}")
+
+        val groupMessage = bot.getGroupHistoryMessages(0, 30) // replace 0 with a valid group UIN
+        println("Group messages size: ${groupMessage.messages.size}")
+    }
+
+    @Test
     fun messageReceivingTest() = runBlocking {
         val logger = bot.createLogger(this)
         bot.launch {

@@ -242,7 +242,7 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
         override fun tryParse(ctx: MessageParsingContext): BotIncomingSegment.LightApp? {
             val elem = ctx.tryPeekType { lightAppElem } ?: return null
             ctx.consume()
-            if (ctx.tryPeekType { text }?.get { textMsg } == "当前QQ版本不支持此应用，请升级") {
+            if (ctx.tryPeekType { text } != null) {
                 ctx.skip()
             }
             val compressed = elem.get { bytesData }

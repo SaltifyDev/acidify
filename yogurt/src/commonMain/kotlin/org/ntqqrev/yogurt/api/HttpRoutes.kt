@@ -107,6 +107,8 @@ fun Route.configureMilkyApiHttpRoutes() {
 
     serve(SendPrivateMessage)
     serve(SendGroupMessage)
+    serve(RecallPrivateMessage)
+    serve(RecallGroupMessage)
     serve(GetMessage)
     serve(GetHistoryMessages)
     serve(GetResourceTempUrl)

@@ -488,6 +488,57 @@ class Bot internal constructor(
     }
 
     /**
+     * 撤回好友消息
+     * @param friendUin 好友 QQ 号
+     * @param sequence 消息序列号（clientSequence）
+     * @param privateSequence 消息的私聊序列号（用于获取消息详情）
+     * @param timestamp 消息时间戳（秒）
+     */
+    suspend fun recallFriendMessage(
+        friendUin: Long,
+        sequence: Long,
+        privateSequence: Long,
+        timestamp: Long
+    ) {
+        val friendUid = getUidByUin(friendUin)
+
+        // 从原始消息包中提取 random 字段
+        val raw = client.callService(
+            FetchFriendMessages,
+            FetchFriendMessages.Req(friendUid, privateSequence, privateSequence)
+        ).firstOrNull() ?: throw IllegalStateException("消息不存在")
+
+        val contentHead = raw.get { contentHead }
+        val random = contentHead.get { random }
+
+        client.callService(
+            RecallFriendMessage,
+            RecallFriendMessage.Req(
+                targetUid = friendUid,
+                clientSequence = sequence,
+                messageSequence = privateSequence,
+                random = random,
+                timestamp = timestamp
+            )
+        )
+    }
+
+    /**
+     * 撤回群消息
+     * @param groupUin 群号
+     * @param sequence 消息序列号
+     */
+    suspend fun recallGroupMessage(groupUin: Long, sequence: Long) {
+        client.callService(
+            RecallGroupMessage,
+            RecallGroupMessage.Req(
+                groupUin = groupUin,
+                sequence = sequence
+            )
+        )
+    }
+
+    /**
      * 获取合并转发消息内容
      * @param resId 合并转发消息的 resId
      * @return 转发消息列表

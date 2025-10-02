@@ -447,6 +447,49 @@ class Bot internal constructor(
     }
 
     /**
+     * 标记好友消息为已读
+     * @param friendUin 好友 QQ 号
+     * @param startSequence 消息序列号，标记该序列号及之前的消息为已读
+     * @param startTime 消息的 Unix 时间戳（秒）
+     */
+    suspend fun markFriendMessagesAsRead(
+        friendUin: Long,
+        startSequence: Long,
+        startTime: Long
+    ) {
+        val friendUid = getUidByUin(friendUin)
+        client.callService(
+            ReportMessageRead,
+            ReportMessageRead.Req(
+                groupUin = null,
+                targetUid = friendUid,
+                startSequence = startSequence,
+                time = startTime
+            )
+        )
+    }
+
+    /**
+     * 标记群消息为已读
+     * @param groupUin 群号
+     * @param startSequence 消息序列号，标记该序列号及之前的消息为已读
+     */
+    suspend fun markGroupMessagesAsRead(
+        groupUin: Long,
+        startSequence: Long
+    ) {
+        client.callService(
+            ReportMessageRead,
+            ReportMessageRead.Req(
+                groupUin = groupUin,
+                targetUid = null,
+                startSequence = startSequence,
+                time = 0L
+            )
+        )
+    }
+
+    /**
      * 获取给定资源 ID 的下载链接，支持图片、语音、视频。
      */
     suspend fun getDownloadUrl(resourceId: String): String {

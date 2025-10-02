@@ -110,4 +110,5 @@ fun Route.configureMilkyApiHttpRoutes() {
     serve(GetMessage)
     serve(GetHistoryMessages)
     serve(GetResourceTempUrl)
+    serve(MarkMessageAsRead)
 }

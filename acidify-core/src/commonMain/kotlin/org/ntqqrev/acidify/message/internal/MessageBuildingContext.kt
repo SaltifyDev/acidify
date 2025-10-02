@@ -244,8 +244,88 @@ internal class MessageBuildingContext(
         duration: Long,
         thumb: ByteArray,
         thumbFormat: ImageFormat
-    ) {
-        TODO("Not yet implemented")
+    ) = addAsync {
+        val videoMd5 = MD5.hashHex(raw)
+        val videoSha1Bytes = raw.sha1()
+        val videoSha1 = videoSha1Bytes.toHexString()
+
+        val thumbMd5 = MD5.hashHex(thumb)
+        val thumbSha1Bytes = thumb.sha1()
+        val thumbSha1 = thumbSha1Bytes.toHexString()
+
+        val uploadResp = when (scene) {
+            MessageScene.FRIEND -> {
+                bot.client.callService(
+                    RichMediaUpload.PrivateVideo,
+                    RichMediaUpload.VideoUploadRequest(
+                        videoData = raw,
+                        videoMd5 = videoMd5,
+                        videoSha1 = videoSha1,
+                        videoWidth = width,
+                        videoHeight = height,
+                        videoDuration = duration.toInt(),
+                        thumbnailData = thumb,
+                        thumbnailMd5 = thumbMd5,
+                        thumbnailSha1 = thumbSha1,
+                        thumbnailExt = thumbFormat.ext,
+                        thumbnailPicFormat = thumbFormat.underlying
+                    )
+                )
+            }
+
+            MessageScene.GROUP -> {
+                bot.client.callService(
+                    RichMediaUpload.GroupVideo,
+                    RichMediaUpload.VideoUploadRequest(
+                        videoData = raw,
+                        videoMd5 = videoMd5,
+                        videoSha1 = videoSha1,
+                        videoWidth = width,
+                        videoHeight = height,
+                        videoDuration = duration.toInt(),
+                        thumbnailData = thumb,
+                        thumbnailMd5 = thumbMd5,
+                        thumbnailSha1 = thumbSha1,
+                        thumbnailExt = thumbFormat.ext,
+                        thumbnailPicFormat = thumbFormat.underlying,
+                        groupUin = peerUin
+                    )
+                )
+            }
+
+            else -> throw IllegalArgumentException("不支持的消息场景: $scene")
+        }
+
+        // 上传视频文件
+        val videoAppId = if (scene == MessageScene.FRIEND) 1413 else 1415
+        bot.client.flashTransferLogic.uploadFile(
+            uKey = uploadResp.respObj.get { uKey },
+            appId = videoAppId,
+            bodyStream = raw
+        )
+
+        // 上传缩略图
+        val thumbAppId = if (scene == MessageScene.FRIEND) 1414 else 1416
+        bot.client.flashTransferLogic.uploadFile(
+            uKey = uploadResp.respObj.get { subFileInfos }[0].get { uKey },
+            appId = thumbAppId,
+            bodyStream = thumb
+        )
+
+        val msgInfo = uploadResp.respObj.get { msgInfo }
+        val businessType = when (scene) {
+            MessageScene.FRIEND -> 11
+            MessageScene.GROUP -> 21
+            else -> throw IllegalArgumentException("不支持的消息场景: $scene")
+        }
+
+        Elem {
+            it[commonElem] = CommonElem {
+                it[serviceType] = 48
+                it[pbElem] = msgInfo.toByteArray()
+                it[this.businessType] = businessType
+            }
+        }
     }
 
     override fun forward(block: suspend BotOutgoingMessageBuilder.Forward.() -> Unit) {

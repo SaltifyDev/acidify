@@ -49,6 +49,8 @@ internal abstract class RichMediaUpload<T>(
         val thumbnailData: ByteArray,
         val thumbnailMd5: String,
         val thumbnailSha1: String,
+        val thumbnailExt: String,
+        val thumbnailPicFormat: Int,
         val groupUin: Long? = null
     )
 
@@ -259,10 +261,10 @@ internal abstract class RichMediaUpload<T>(
                 it[fileSize] = payload.thumbnailData.size
                 it[fileHash] = payload.thumbnailMd5
                 it[fileSha1] = payload.thumbnailSha1
-                it[fileName] = "video.jpg"
+                it[fileName] = "video." + payload.thumbnailExt
                 it[type] = FileType {
                     it[type] = 1
-                    it[picFormat] = 0
+                    it[picFormat] = payload.thumbnailPicFormat
                     it[videoFormat] = 0
                     it[voiceFormat] = 0
                 }

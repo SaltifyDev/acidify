@@ -1,20 +1,27 @@
 package org.ntqqrev.acidify.message.internal
 
+import korlibs.io.compression.compress
+import korlibs.io.compression.deflate.ZLib
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.io.Buffer
+import kotlinx.io.readByteArray
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.crypto.hash.MD5
-import org.ntqqrev.acidify.internal.packet.message.Elem
-import org.ntqqrev.acidify.internal.packet.message.elem.CommonElem
-import org.ntqqrev.acidify.internal.packet.message.elem.Face
-import org.ntqqrev.acidify.internal.packet.message.elem.SourceMsg
-import org.ntqqrev.acidify.internal.packet.message.elem.Text
+import org.ntqqrev.acidify.internal.packet.message.*
+import org.ntqqrev.acidify.internal.packet.message.elem.*
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.SourceMsgResvAttr
 import org.ntqqrev.acidify.internal.packet.message.extra.TextResvAttr
+import org.ntqqrev.acidify.internal.packet.message.misc.ForwardLightAppPayload
 import org.ntqqrev.acidify.internal.service.message.RichMediaUpload
+import org.ntqqrev.acidify.internal.service.message.SendLongMsg
 import org.ntqqrev.acidify.internal.util.sha1
 import org.ntqqrev.acidify.message.BotOutgoingMessageBuilder
 import org.ntqqrev.acidify.message.ImageFormat
@@ -22,6 +29,10 @@ import org.ntqqrev.acidify.message.ImageSubType
 import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
+import kotlin.math.max
+import kotlin.random.Random
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 internal class MessageBuildingContext(
     val bot: Bot,
@@ -384,8 +395,68 @@ internal class MessageBuildingContext(
         }
     }
 
-    override fun forward(block: suspend BotOutgoingMessageBuilder.Forward.() -> Unit) {
-        TODO("Not yet implemented")
+    override fun forward(block: suspend BotOutgoingMessageBuilder.Forward.() -> Unit) = addAsync {
+        val forwardCtx = Forward(this)
+        forwardCtx.block()
+        val fakeMessages = forwardCtx.build()
+        val resId = bot.client.callService(
+            SendLongMsg,
+            SendLongMsg.Req(
+                scene = scene,
+                peerUin = peerUin,
+                peerUid = peerUid,
+                messages = fakeMessages.map { it.commonMsg }
+            )
+        ).resId
+
+        val uuid = Random.nextBytes(16).let {
+            "${it.sliceArray(0..3).toHexString()}-${it.sliceArray(4..5).toHexString()}-" +
+                    "${it.sliceArray(6..7).toHexString()}-${it.sliceArray(8..9).toHexString()}-" +
+                    it.sliceArray(10..15).toHexString()
+        }
+
+        val lightApp = ForwardLightAppPayload(
+            config = buildJsonObject {
+                put("autosize", 1)
+                put("forward", 1)
+                put("round", 1)
+                put("type", "normal")
+                put("width", 300)
+            },
+            meta = buildJsonObject {
+                put("detail", buildJsonObject {
+                    put("news", buildJsonArray {
+                        fakeMessages.take(max(4, fakeMessages.size)).forEach {
+                            add(buildJsonObject {
+                                put("text", "${it.senderName}: ${it.preview}")
+                            })
+                        }
+                    })
+                    put("resid", resId)
+                    put("source", "群聊的聊天记录")
+                    put("summary", "查看${fakeMessages.size}条转发消息")
+                    put("uniseq", uuid)
+                })
+            },
+            desc = "[聊天记录]",
+            extra = Json.encodeToString(buildJsonObject {
+                put("filename", uuid)
+                put("tsum", max(4, fakeMessages.size))
+            }),
+            prompt = "[聊天记录]",
+            ver = "0.0.0.5",
+            view = "contact"
+        )
+        val str = Json.encodeToString(lightApp).also { println(it) }
+        val buffer = Buffer()
+        buffer.writeByte(0x01)
+        buffer.write(ZLib.compress(str.encodeToByteArray()))
+
+        Elem {
+            it[lightAppElem] = LightAppElem {
+                it[bytesData] = buffer.readByteArray()
+            }
+        }
     }
 
     suspend fun build(): List<PbObject<Elem>> = elemsList.awaitAll().flatten()
@@ -393,12 +464,142 @@ internal class MessageBuildingContext(
     internal class Forward(
         val ctx: MessageBuildingContext
     ) : BotOutgoingMessageBuilder.Forward {
+        private val commonMsgList = mutableListOf<Deferred<FakeMessage>>()
+
+        private fun addAsync(elem: suspend () -> FakeMessage) {
+            commonMsgList.add(ctx.bot.async { elem() })
+        }
+
+        @OptIn(ExperimentalTime::class)
         override fun node(
             senderUin: Long,
             senderName: String,
             block: suspend BotOutgoingMessageBuilder.() -> Unit
-        ) {
-            TODO("Not yet implemented")
+        ) = addAsync {
+            val subCtx = MessageBuildingContext(
+                bot = ctx.bot,
+                scene = ctx.scene,
+                peerUin = ctx.peerUin,
+                peerUid = ctx.peerUid
+            )
+            val subCtxWithPreview = ContextWithPreview(subCtx)
+            subCtxWithPreview.block()
+            val subElems = subCtx.build()
+            val preview = subCtxWithPreview.preview
+            FakeMessage(
+                senderUin = senderUin,
+                senderName = senderName,
+                preview = preview,
+                commonMsg = CommonMessage {
+                    it[routingHead] = RoutingHead {
+                        it[fromUin] = senderUin
+                        it[toUid] = ctx.bot.uid
+                        when (ctx.scene) {
+                            MessageScene.FRIEND -> it[commonC2C] = RoutingHead.CommonC2C {
+                                it[name] = senderName
+                            }
+
+                            MessageScene.GROUP -> it[group] = RoutingHead.CommonGroup {
+                                it[groupCode] = ctx.peerUin
+                                it[groupCard] = senderName
+                                it[groupCardType] = 2
+                            }
+
+                            else -> {}
+                        }
+                    }
+                    it[contentHead] = ContentHead {
+                        it[type] = when (ctx.scene) {
+                            MessageScene.FRIEND -> PushMsgType.FriendMessage.value
+                            MessageScene.GROUP -> PushMsgType.GroupMessage.value
+                            MessageScene.TEMP -> PushMsgType.TempMessage.value
+                        }
+                        it[random] = Random.nextInt()
+                        it[sequence] = Random.nextInt(1000000, 9999999).toLong()
+                        it[time] = Clock.System.now().toEpochMilliseconds() / 1000L
+                        it[clientSequence] = it[sequence]
+                        it[msgUid] = Random.nextLong(1000000000000, 9999999999999)
+                        it[forwardExt] = ContentHead.Forward {
+                            it[field3] = 2
+                            it[avatar] = "https://q.qlogo.cn/headimg_dl?dst_uin=$senderUin&spec=640&img_type=jpg"
+                        }
+                    }
+                    it[messageBody] = MessageBody {
+                        it[richText] = RichText {
+                            it[elems] = subElems
+                        }
+                    }
+                }
+            )
+        }
+
+        suspend fun build() = commonMsgList.awaitAll()
+
+        internal class FakeMessage(
+            val senderUin: Long,
+            val senderName: String,
+            val preview: String,
+            val commonMsg: PbObject<CommonMessage>
+        )
+
+        internal class ContextWithPreview(val parent: MessageBuildingContext) : BotOutgoingMessageBuilder {
+            private val previewBuilder = StringBuilder()
+            val preview: String
+                get() = previewBuilder.toString()
+
+            override fun text(text: String) {
+                parent.text(text)
+                previewBuilder.append(text)
+            }
+
+            override fun face(faceId: Int, isLarge: Boolean) {
+                parent.face(faceId, isLarge)
+                previewBuilder.append("[表情]")
+            }
+
+            override fun mention(uin: Long?, name: String) {
+                parent.mention(uin, name)
+                previewBuilder.append("@$name")
+            }
+
+            override fun reply(sequence: Long) {
+                parent.reply(sequence)
+                previewBuilder.append("[回复消息]")
+            }
+
+            override fun image(
+                raw: ByteArray,
+                format: ImageFormat,
+                width: Int,
+                height: Int,
+                subType: ImageSubType,
+                summary: String
+            ) {
+                parent.image(raw, format, width, height, subType, summary)
+                previewBuilder.append("[图片]")
+            }
+
+            override fun record(rawSilk: ByteArray, duration: Long) {
+                parent.record(rawSilk, duration)
+                previewBuilder.append("[语音]")
+            }
+
+            override fun video(
+                raw: ByteArray,
+                width: Int,
+                height: Int,
+                duration: Long,
+                thumb: ByteArray,
+                thumbFormat: ImageFormat
+            ) {
+                parent.video(raw, width, height, duration, thumb, thumbFormat)
+                previewBuilder.append("[视频]")
+            }
+
+            override fun forward(block: suspend BotOutgoingMessageBuilder.Forward.() -> Unit) {
+                parent.forward(block)
+                previewBuilder.append("[聊天记录]")
+            }
         }
     }
 }

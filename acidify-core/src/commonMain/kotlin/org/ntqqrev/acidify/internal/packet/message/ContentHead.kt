@@ -1,8 +1,6 @@
 package org.ntqqrev.acidify.internal.packet.message
 
-import org.ntqqrev.acidify.pb.PbInt32
-import org.ntqqrev.acidify.pb.PbInt64
-import org.ntqqrev.acidify.pb.PbSchema
+import org.ntqqrev.acidify.pb.*
 
 internal object ContentHead : PbSchema() {
     val type = PbInt32[1]
@@ -17,4 +15,13 @@ internal object ContentHead : PbSchema() {
     val autoReply = PbInt32[10]
     val clientSequence = PbInt64[11]
     val msgUid = PbInt64[12]
+    val forwardExt = Forward[15]
+
+    internal object Forward : PbSchema() {
+        val field1 = PbInt32[1]
+        val field2 = PbInt32[2]
+        val field3 = PbInt32[3]
+        val unknownBase64 = PbString[4]
+        val avatar = PbString[5]
+    }
 }

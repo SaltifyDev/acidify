@@ -1,0 +1,6 @@
+yogurt-media-codec/lib/windows-x64/lagrangecodec.dll filter=lfs diff=lfs merge=lfs -text
+yogurt-media-codec/lib/windows-x86/lagrangecodec.dll filter=lfs diff=lfs merge=lfs -text
+yogurt-media-codec/lib/macos-x64/liblagrangecodec.dylib filter=lfs diff=lfs merge=lfs -text
+yogurt-media-codec/lib/macos-arm64/liblagrangecodec.dylib filter=lfs diff=lfs merge=lfs -text
+yogurt-media-codec/lib/linux-arm64/liblagrangecodec.so filter=lfs diff=lfs merge=lfs -text
+yogurt-media-codec/lib/linux-x64/liblagrangecodec.so filter=lfs diff=lfs merge=lfs -text

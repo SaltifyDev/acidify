@@ -221,6 +221,7 @@ suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) 
         is OutgoingSegment.Video -> {
             val videoData = resolveUri(segment.data.uri, httpClient)
             val videoInfo = getVideoInfo(videoData)
+            logger.d { "视频宽高 ${videoInfo.width}x${videoInfo.height}，时长 ${videoInfo.duration.inWholeSeconds} 秒" }
             val thumbData = if (segment.data.thumbUri != null) {
                 resolveUri(segment.data.thumbUri, httpClient)
             } else {

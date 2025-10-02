@@ -34,3 +34,22 @@
   提供二维码矩阵生成的实现
 - [LagrangeCodec](https://github.com/LagrangeDev/LagrangeCodec)
   提供多媒体编解码的实现
+- ... and all the contributors along the way!
+
+## Contributors
+
+### Directly to this repository
+
+![Contributors of Acidify](https://contributors-img.web.app/image?repo=LagrangeDev/Acidify)
+
+### Lagrange.Core
+
+![Contributors of Lagrange.Core](https://contributors-img.web.app/image?repo=LagrangeDev/Lagrange.Core)
+
+### LagrangeV2
+
+![Contributors of LagrangeV2](https://contributors-img.web.app/image?repo=LagrangeDev/LagrangeV2)
+
+### Konata.Core
+
+![Contributors of Konata.Core](https://contributors-img.web.app/image?repo=KonataDev/Konata.Core)

@@ -27,6 +27,7 @@ internal class MessageBuildingContext(
     val peerUin: Long,
     val peerUid: String,
 ) : BotOutgoingMessageBuilder {
+    private val logger = bot.createLogger(this)
     private val elemsList = mutableListOf<Deferred<List<PbObject<Elem>>>>()
 
     private fun addAsync(elem: suspend () -> PbObject<Elem>) {
@@ -159,11 +160,13 @@ internal class MessageBuildingContext(
             else -> throw IllegalArgumentException("不支持的消息场景: $scene")
         }
 
-        bot.client.flashTransferLogic.uploadFile(
-            uKey = uploadResp.respObj.get { uKey },
-            appId = if (scene == MessageScene.FRIEND) 1406 else 1407,
-            bodyStream = raw
-        )
+        uploadResp.respObj.get { uKey }.takeIf { it.isNotEmpty() }?.let {
+            bot.client.flashTransferLogic.uploadFile(
+                uKey = it,
+                appId = if (scene == MessageScene.FRIEND) 1406 else 1407,
+                bodyStream = raw
+            )
+        } ?: logger.d { "uKey 为空，服务器可能已存在该图片，跳过上传" }
 
         val msgInfo = uploadResp.respObj.get { msgInfo }
         val businessType = when (scene) {
@@ -215,11 +218,13 @@ internal class MessageBuildingContext(
             else -> throw IllegalArgumentException("不支持的消息场景: $scene")
         }
 
-        bot.client.flashTransferLogic.uploadFile(
-            uKey = uploadResp.respObj.get { uKey },
-            appId = if (scene == MessageScene.FRIEND) 1402 else 1403,
-            bodyStream = rawSilk
-        )
+        uploadResp.respObj.get { uKey }.takeIf { it.isNotEmpty() }?.let {
+            bot.client.flashTransferLogic.uploadFile(
+                uKey = it,
+                appId = if (scene == MessageScene.FRIEND) 1402 else 1403,
+                bodyStream = rawSilk
+            )
+        } ?: logger.d { "uKey 为空，服务器可能已存在该语音，跳过上传" }
 
         val msgInfo = uploadResp.respObj.get { msgInfo }
         val businessType = when (scene) {
@@ -297,20 +302,23 @@ internal class MessageBuildingContext(
         }
 
         // 上传视频文件
-        val videoAppId = if (scene == MessageScene.FRIEND) 1413 else 1415
-        bot.client.flashTransferLogic.uploadFile(
-            uKey = uploadResp.respObj.get { uKey },
-            appId = videoAppId,
-            bodyStream = raw
-        )
+        uploadResp.respObj.get { uKey }.takeIf { it.isNotEmpty() }?.let {
+            bot.client.flashTransferLogic.uploadFile(
+                uKey = it,
+                appId = if (scene == MessageScene.FRIEND) 1413 else 1415,
+                bodyStream = raw
+            )
+        } ?: logger.d { "uKey 为空，服务器可能已存在该视频，跳过上传" }
 
         // 上传缩略图
-        val thumbAppId = if (scene == MessageScene.FRIEND) 1414 else 1416
-        bot.client.flashTransferLogic.uploadFile(
-            uKey = uploadResp.respObj.get { subFileInfos }[0].get { uKey },
-            appId = thumbAppId,
-            bodyStream = thumb
-        )
+        uploadResp.respObj.get { subFileInfos }.getOrNull(0)?.get { uKey }
+            ?.takeIf { it.isNotEmpty() }?.let {
+                bot.client.flashTransferLogic.uploadFile(
+                    uKey = it,
+                    appId = if (scene == MessageScene.FRIEND) 1414 else 1416,
+                    bodyStream = thumb
+                )
+            } ?: logger.d { "视频缩略图 uKey 为空，服务器可能已存在该缩略图，跳过上传" }
 
         val msgInfo = uploadResp.respObj.get { msgInfo }
         val businessType = when (scene) {

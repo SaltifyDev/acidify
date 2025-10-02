@@ -57,7 +57,7 @@ class Bot internal constructor(
     internal val signals = listOf<Signal>(
         MsgPushSignal
     ).associateBy { it.cmd }
-    internal val faceDetailMap = mutableMapOf<String, BotFaceDetail>()
+    internal val faceDetailMapMut = mutableMapOf<String, BotFaceDetail>()
     internal val uin2uidMap = ConcurrentMutableMap<Long, String>()
     internal val uid2uinMap = ConcurrentMutableMap<String, Long>()
     internal var heartbeatJob: Job? = null
@@ -95,6 +95,12 @@ class Bot internal constructor(
     val uid: String
         get() = sessionStore.uid.takeIf { it.isNotEmpty() }
             ?: throw IllegalStateException("用户尚未登录")
+
+    /**
+     * 表情信息映射，键为 qSid，值为对应的 [BotFaceDetail] 实例。
+     */
+    val faceDetailMap: Map<String, BotFaceDetail>
+        get() = faceDetailMapMut
 
     /**
      * 表示当前 Bot 是否已登录
@@ -197,9 +203,9 @@ class Bot internal constructor(
             }
         }
 
-        faceDetailMap.putAll(
+        faceDetailMapMut.putAll(
             client.callService(FetchFaceDetails).associateBy { it.qSid }
-        ).also { logger.d { "加载了 ${faceDetailMap.size} 条表情信息" } }
+        ).also { logger.d { "加载了 ${faceDetailMapMut.size} 条表情信息" } }
     }
 
     /**
@@ -585,11 +591,6 @@ class Bot internal constructor(
             )
         )
     }
-
-    /**
-     * 获取已加载的表情信息映射，键为表情的 [qSid][BotFaceDetail.qSid]，值为对应的 [BotFaceDetail] 实例。
-     */
-    fun getFaceDetails(): Map<String, BotFaceDetail> = faceDetailMap
 
     companion object {
         /**

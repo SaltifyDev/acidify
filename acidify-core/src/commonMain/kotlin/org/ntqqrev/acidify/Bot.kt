@@ -21,7 +21,7 @@ import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.media.FileId
 import org.ntqqrev.acidify.internal.packet.media.IndexNode
 import org.ntqqrev.acidify.internal.service.common.*
-import org.ntqqrev.acidify.internal.service.group.SetMemberTitle
+import org.ntqqrev.acidify.internal.service.group.*
 import org.ntqqrev.acidify.internal.service.message.*
 import org.ntqqrev.acidify.internal.service.system.*
 import org.ntqqrev.acidify.message.*
@@ -594,6 +594,46 @@ class Bot internal constructor(
     }
 
     /**
+     * 设置群名称
+     * @param groupUin 群号
+     * @param groupName 新的群名称
+     */
+    suspend fun setGroupName(
+        groupUin: Long,
+        groupName: String
+    ) {
+        client.callService(
+            SetGroupName,
+            SetGroupName.Req(
+                groupUin = groupUin,
+                groupName = groupName
+            )
+        )
+    }
+
+    /**
+     * 设置群成员的群名片
+     * @param groupUin 群号
+     * @param memberUin 成员 QQ 号
+     * @param card 新的群名片
+     */
+    suspend fun setGroupMemberCard(
+        groupUin: Long,
+        memberUin: Long,
+        card: String
+    ) {
+        val memberUid = getUidByUin(memberUin, groupUin)
+        client.callService(
+            SetMemberCard,
+            SetMemberCard.Req(
+                groupUin = groupUin,
+                memberUid = memberUid,
+                card = card
+            )
+        )
+    }
+
+    /**
      * 设置群成员的专属头衔
      * @param groupUin 群号
      * @param memberUin 成员 QQ 号
@@ -605,13 +645,182 @@ class Bot internal constructor(
         specialTitle: String
     ) {
         require(specialTitle.encodeToByteArray().size <= 18) { "专属头衔长度不能超过 18 个字节" }
-        val memberUid = getUidByUin(memberUin)
+        val memberUid = getUidByUin(memberUin, groupUin)
         client.callService(
             SetMemberTitle,
             SetMemberTitle.Req(
                 groupUin = groupUin,
                 memberUid = memberUid,
                 specialTitle = specialTitle
+            )
+        )
+    }
+
+    /**
+     * 设置群管理员
+     * @param groupUin 群号
+     * @param memberUin 成员 QQ 号
+     * @param isAdmin 是否设置为管理员，`false` 表示取消管理员
+     */
+    suspend fun setGroupMemberAdmin(
+        groupUin: Long,
+        memberUin: Long,
+        isAdmin: Boolean
+    ) {
+        val memberUid = getUidByUin(memberUin, groupUin)
+        client.callService(
+            SetMemberAdmin,
+            SetMemberAdmin.Req(
+                groupUin = groupUin,
+                memberUid = memberUid,
+                isAdmin = isAdmin
+            )
+        )
+    }
+
+    /**
+     * 设置群成员禁言
+     * @param groupUin 群号
+     * @param memberUin 成员 QQ 号
+     * @param duration 禁言时长（秒），设为 `0` 表示取消禁言
+     */
+    suspend fun setGroupMemberMute(
+        groupUin: Long,
+        memberUin: Long,
+        duration: Int
+    ) {
+        val memberUid = getUidByUin(memberUin, groupUin)
+        client.callService(
+            SetMemberMute,
+            SetMemberMute.Req(
+                groupUin = groupUin,
+                memberUid = memberUid,
+                duration = duration
+            )
+        )
+    }
+
+    /**
+     * 设置群全员禁言
+     * @param groupUin 群号
+     * @param isMute 是否开启全员禁言，`false` 表示取消全员禁言
+     */
+    suspend fun setGroupWholeMute(
+        groupUin: Long,
+        isMute: Boolean
+    ) {
+        client.callService(
+            SetGroupWholeMute,
+            SetGroupWholeMute.Req(
+                groupUin = groupUin,
+                isMute = isMute
+            )
+        )
+    }
+
+    /**
+     * 踢出群成员
+     * @param groupUin 群号
+     * @param memberUin 成员 QQ 号
+     * @param rejectAddRequest 是否拒绝再次加群申请
+     * @param reason 踢出原因（可选）
+     */
+    suspend fun kickGroupMember(
+        groupUin: Long,
+        memberUin: Long,
+        rejectAddRequest: Boolean = false,
+        reason: String = ""
+    ) {
+        val memberUid = getUidByUin(memberUin, groupUin)
+        client.callService(
+            KickMember,
+            KickMember.Req(
+                groupUin = groupUin,
+                memberUid = memberUid,
+                rejectAddRequest = rejectAddRequest,
+                reason = reason
+            )
+        )
+    }
+
+    /**
+     * 设置群精华消息
+     * @param groupUin 群号
+     * @param sequence 消息序列号
+     * @param random 消息 random 字段
+     */
+    suspend fun setGroupEssenceMessage(
+        groupUin: Long,
+        sequence: Int
+    ) {
+        val random = client.callService(
+            FetchGroupMessages,
+            FetchGroupMessages.Req(groupUin, sequence.toLong(), sequence.toLong())
+        ).firstOrNull()?.get { contentHead }?.get { random }
+            ?: throw IllegalStateException("消息不存在，无法获取 random 字段")
+        client.callService(
+            SetGroupEssenceMessage,
+            SetGroupEssenceMessage.Req(
+                groupUin = groupUin,
+                sequence = sequence,
+                random = random
+            )
+        )
+    }
+
+    /**
+     * 退出群聊
+     * @param groupUin 群号
+     */
+    suspend fun quitGroup(
+        groupUin: Long
+    ) {
+        client.callService(
+            QuitGroup,
+            QuitGroup.Req(
+                groupUin = groupUin
+            )
+        )
+    }
+
+    /**
+     * 发送群消息表情回应
+     * @param groupUin 群号
+     * @param sequence 消息序列号
+     * @param code 表情代码
+     * @param isAdd 是否添加表情回应，`false` 表示取消回应
+     */
+    suspend fun setGroupMessageReaction(
+        groupUin: Long,
+        sequence: Int,
+        code: String,
+        isAdd: Boolean = true
+    ) {
+        client.callService(
+            SetGroupMessageReaction,
+            SetGroupMessageReaction.Req(
+                groupUin = groupUin,
+                sequence = sequence,
+                code = code,
+                isAdd = isAdd
+            )
+        )
+    }
+
+    /**
+     * 发送群戳一戳（poke）
+     * @param groupUin 群号
+     * @param targetUin 被戳的成员 QQ 号
+     */
+    suspend fun sendGroupPoke(
+        groupUin: Long,
+        targetUin: Long
+    ) {
+        client.callService(
+            SendGroupPoke,
+            SendGroupPoke.Req(
+                groupUin = groupUin,
+                targetUin = targetUin
             )
         )
     }

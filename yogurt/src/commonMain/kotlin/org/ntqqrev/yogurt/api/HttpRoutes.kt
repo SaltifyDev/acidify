@@ -11,7 +11,7 @@ import org.ntqqrev.acidify.exception.ServiceException
 import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
-import org.ntqqrev.yogurt.api.group.SetGroupMemberSpecialTitle
+import org.ntqqrev.yogurt.api.group.*
 import org.ntqqrev.yogurt.api.message.*
 import org.ntqqrev.yogurt.api.system.*
 import kotlin.time.DurationUnit
@@ -116,5 +116,15 @@ fun Route.configureMilkyApiHttpRoutes() {
     serve(GetForwardedMessages)
     serve(MarkMessageAsRead)
 
+    serve(SetGroupName)
+    serve(SetGroupMemberCard)
     serve(SetGroupMemberSpecialTitle)
+    serve(SetGroupMemberAdmin)
+    serve(SetGroupMemberMute)
+    serve(SetGroupWholeMute)
+    serve(KickGroupMember)
+    serve(SetGroupEssenceMessage)
+    serve(QuitGroup)
+    serve(SendGroupMessageReaction)
+    serve(SendGroupNudge)
 }

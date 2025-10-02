@@ -2,18 +2,14 @@ package org.ntqqrev.acidify.message.internal
 
 import korlibs.io.compression.deflate.ZLib
 import korlibs.io.compression.uncompress
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import nl.adaptivity.xmlutil.ExperimentalXmlUtilApi
-import nl.adaptivity.xmlutil.serialization.UnknownChildHandler
-import nl.adaptivity.xmlutil.serialization.XML
 import org.ntqqrev.acidify.internal.packet.media.MsgInfo
 import org.ntqqrev.acidify.internal.packet.message.elem.SourceMsg
 import org.ntqqrev.acidify.internal.packet.message.extra.GroupFileExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
+import org.ntqqrev.acidify.internal.packet.message.misc.IncomingForwardBody
+import org.ntqqrev.acidify.internal.packet.message.misc.LightAppPayload
 import org.ntqqrev.acidify.internal.util.BinaryReader
 import org.ntqqrev.acidify.internal.util.Prefix
 import org.ntqqrev.acidify.internal.util.readUInt32BE
@@ -212,20 +208,6 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
     }
 
     object Forward : IncomingSegmentFactory<BotIncomingSegment.Forward> {
-        @Serializable
-        data class ForwardBody(
-            @SerialName("m_resid") val resId: String,
-        )
-
-        @OptIn(ExperimentalXmlUtilApi::class)
-        val xmlModule = XML {
-            defaultPolicy {
-                unknownChildHandler = UnknownChildHandler {
-                    input, inputKind, descriptor, name, candidates -> emptyList()
-                }
-            }
-        }
-
         override fun tryParse(ctx: MessageParsingContext): BotIncomingSegment.Forward? {
             val forward = ctx.tryPeekType { richMsg } ?: return null
             ctx.consume()
@@ -233,7 +215,8 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
             val xml = ZLib.uncompress(
                 bytesTemplate1.sliceArray(1 until bytesTemplate1.size)
             ).decodeToString()
-            val resId = xmlModule.decodeFromString<ForwardBody>(xml).resId
+            val resId = IncomingForwardBody.xmlModule
+                .decodeFromString<IncomingForwardBody>(xml).resId
             return BotIncomingSegment.Forward(
                 resId = resId
             )
@@ -256,13 +239,6 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
     }
 
     object LightApp : IncomingSegmentFactory<BotIncomingSegment.LightApp> {
-        @Serializable
-        class AppPayload(
-            @SerialName("app") val appName: String,
-        )
-
-        val jsonModule = Json { ignoreUnknownKeys = true }
-
         override fun tryParse(ctx: MessageParsingContext): BotIncomingSegment.LightApp? {
             val elem = ctx.tryPeekType { lightAppElem } ?: return null
             ctx.consume()
@@ -271,7 +247,7 @@ internal interface IncomingSegmentFactory<T : BotIncomingSegment> {
             }
             val compressed = elem.get { bytesData }
             val json = ZLib.uncompress(compressed.sliceArray(1 until compressed.size)).decodeToString()
-            val appName = jsonModule.decodeFromString<AppPayload>(json).appName
+            val appName = LightAppPayload.jsonModule.decodeFromString<LightAppPayload>(json).app
             return BotIncomingSegment.LightApp(
                 appName = appName,
                 jsonPayload = json,

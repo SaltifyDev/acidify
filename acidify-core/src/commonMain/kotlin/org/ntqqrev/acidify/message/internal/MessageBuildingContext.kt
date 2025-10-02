@@ -8,9 +8,11 @@ import org.ntqqrev.acidify.crypto.hash.MD5
 import org.ntqqrev.acidify.internal.packet.message.Elem
 import org.ntqqrev.acidify.internal.packet.message.elem.CommonElem
 import org.ntqqrev.acidify.internal.packet.message.elem.Face
+import org.ntqqrev.acidify.internal.packet.message.elem.SourceMsg
 import org.ntqqrev.acidify.internal.packet.message.elem.Text
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
+import org.ntqqrev.acidify.internal.packet.message.extra.SourceMsgResvAttr
 import org.ntqqrev.acidify.internal.packet.message.extra.TextResvAttr
 import org.ntqqrev.acidify.internal.service.message.RichMediaUpload
 import org.ntqqrev.acidify.internal.util.sha1
@@ -105,8 +107,54 @@ internal class MessageBuildingContext(
         }
     }
 
-    override fun reply(sequence: Long) {
-        TODO("Not yet implemented")
+    override fun reply(sequence: Long) = addMultipleAsync {
+        val replied = when (scene) {
+            MessageScene.FRIEND -> bot::getFriendHistoryMessages
+            MessageScene.GROUP -> bot::getGroupHistoryMessages
+            else -> throw IllegalArgumentException("不支持的消息场景: $scene")
+        }(peerUin, 1, sequence).messages.firstOrNull()
+
+        if (replied == null) {
+            logger.w { "无法引用消息: 找不到对应的消息 (seq=$sequence)" }
+            return@addMultipleAsync emptyList()
+        }
+
+        val srcMsgElem = Elem {
+            it[srcMsg] = SourceMsg {
+                it[origSeqs] = listOf(
+                    if (scene == MessageScene.FRIEND) replied.privateSequence!!
+                    else replied.sequence
+                )
+                it[senderUin] = 0L
+                it[time] = replied.timestamp
+                it[flag] = 0
+                it[elems] = emptyList() // 客户端会自行获取原始消息内容
+                it[pbReserve] = SourceMsgResvAttr {
+                    it[oriMsgType] = 2
+                    it[sourceMsgId] = replied.sequence
+                    it[senderUid] = replied.senderUid
+                }.toByteArray()
+            }
+        }
+
+        // 群消息需要额外添加 @ 提及（客户端会根据 uid 显示昵称）
+        if (scene == MessageScene.GROUP) {
+            listOf(
+                srcMsgElem,
+                Elem {
+                    it[text] = Text {
+                        it[textMsg] = "@${replied.senderUin}" // 显示 uin，客户端可能会替换为昵称
+                        it[pbReserve] = TextResvAttr {
+                            it[atType] = 2
+                            it[atMemberUin] = replied.senderUin
+                            it[atMemberUid] = replied.senderUid
+                        }.toByteArray()
+                    }
+                }
+            )
+        } else {
+            listOf(srcMsgElem)
+        }
     }
 
     override fun image(

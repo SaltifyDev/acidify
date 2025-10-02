@@ -5,7 +5,7 @@ import org.ntqqrev.acidify.pb.*
 internal object SourceMsg : PbSchema() {
     val origSeqs = PbRepeatedInt64[1]
     val senderUin = PbInt64[2]
-    val time = PbInt32[3]
+    val time = PbInt64[3]
     val flag = PbInt32[4]
     val elems = PbRepeatedBytes[5]
     val type = PbInt32[6]

@@ -24,7 +24,7 @@ import org.ntqqrev.acidify.pb.invoke
  * @property senderUid 发送者的 uid
  * @property segments 消息内容
  */
-class BotIncomingMessage(
+class BotIncomingMessage internal constructor(
     val scene: MessageScene,
     val peerUin: Long,
     val peerUid: String,
@@ -32,7 +32,10 @@ class BotIncomingMessage(
     val timestamp: Long,
     val senderUin: Long,
     val senderUid: String,
+    internal val messageUid: Long,
+    internal val privateSequence: Long? = null,
 ) {
+
     internal val segmentsMut = mutableListOf<BotIncomingSegment>()
     val segments: List<BotIncomingSegment>
         get() = segmentsMut
@@ -56,6 +59,7 @@ class BotIncomingMessage(
             val routingHead = raw.get { routingHead }
             val contentHead = raw.get { contentHead }
             val pushMsgType = PushMsgType.from(contentHead.get { type })
+            val elems = raw.get { messageBody }.get { richText }.get { elems }
             val draftMsg = when (pushMsgType) {
                 PushMsgType.FriendMessage,
                 PushMsgType.FriendRecordMessage,
@@ -69,6 +73,8 @@ class BotIncomingMessage(
                         timestamp = contentHead.get { time },
                         senderUin = routingHead.get { fromUin },
                         senderUid = routingHead.get { fromUid },
+                        messageUid = contentHead.get { msgUid },
+                        privateSequence = contentHead.get { sequence }
                     )
                 }
 
@@ -81,6 +87,7 @@ class BotIncomingMessage(
                         timestamp = contentHead.get { time },
                         senderUin = routingHead.get { fromUin },
                         senderUid = routingHead.get { fromUid },
+                        messageUid = contentHead.get { msgUid },
                     )
                 }
 
@@ -88,7 +95,6 @@ class BotIncomingMessage(
             }
 
             if (pushMsgType != PushMsgType.FriendFileMessage) {
-                val elems = raw.get { messageBody }.get { richText }.get { elems }
                 val ctx = MessageParsingContext(draftMsg, elems, this)
                 while (ctx.hasNext()) {
                     var matched = false

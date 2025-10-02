@@ -4,7 +4,8 @@ Yogurt 的多媒体编解码支持模块，是 [LagrangeCodec](https://github.co
 
 在 JVM 平台，该模块使用 JNA 调用 LagrangeCodec 的动态链接库；在 Native 平台，该模块通过 `kotlinx.cinterop` 调用 LagrangeCodec 的动态链接库。
 
-使用时，工作目录下需要包含 LagrangeCodec 的动态链接库文件，目录结构为：
+JVM 平台的 jar 文件已经将动态库文件包含在内；Native 平台的可执行文件需要在运行时加载动态库文件。具体来说，Native
+平台的程序在运行时，其工作目录下需要包含 LagrangeCodec 的动态链接库文件，目录结构为：
 
 ```
 working-directory/
@@ -24,4 +25,4 @@ working-directory/
 └── application.jar/exe/kexe
 ```
 
-支持的平台和架构如上所示。
+上述目录结构也说明了该模块支持的平台。

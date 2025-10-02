@@ -21,6 +21,7 @@ import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.media.FileId
 import org.ntqqrev.acidify.internal.packet.media.IndexNode
 import org.ntqqrev.acidify.internal.service.common.*
+import org.ntqqrev.acidify.internal.service.group.SetMemberTitle
 import org.ntqqrev.acidify.internal.service.message.*
 import org.ntqqrev.acidify.internal.service.system.*
 import org.ntqqrev.acidify.message.*
@@ -588,6 +589,29 @@ class Bot internal constructor(
                 targetUid = null,
                 startSequence = startSequence,
                 time = 0L
+            )
+        )
+    }
+
+    /**
+     * 设置群成员的专属头衔
+     * @param groupUin 群号
+     * @param memberUin 成员 QQ 号
+     * @param specialTitle 专属头衔内容，长度不能超过 18 个字节（通常为 6 个汉字或 18 个英文字符）
+     */
+    suspend fun setGroupMemberSpecialTitle(
+        groupUin: Long,
+        memberUin: Long,
+        specialTitle: String
+    ) {
+        require(specialTitle.encodeToByteArray().size <= 18) { "专属头衔长度不能超过 18 个字节" }
+        val memberUid = getUidByUin(memberUin)
+        client.callService(
+            SetMemberTitle,
+            SetMemberTitle.Req(
+                groupUin = groupUin,
+                memberUid = memberUid,
+                specialTitle = specialTitle
             )
         )
     }

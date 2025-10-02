@@ -23,11 +23,9 @@ import org.ntqqrev.acidify.internal.packet.media.IndexNode
 import org.ntqqrev.acidify.internal.service.common.*
 import org.ntqqrev.acidify.internal.service.message.*
 import org.ntqqrev.acidify.internal.service.system.*
-import org.ntqqrev.acidify.message.BotHistoryMessages
+import org.ntqqrev.acidify.message.*
+import org.ntqqrev.acidify.message.BotForwardedMessage.Companion.parseForwardedMessage
 import org.ntqqrev.acidify.message.BotIncomingMessage.Companion.parseMessage
-import org.ntqqrev.acidify.message.BotOutgoingMessageBuilder
-import org.ntqqrev.acidify.message.BotOutgoingMessageResult
-import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.message.internal.MessageBuildingContext
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.struct.*
@@ -487,6 +485,16 @@ class Bot internal constructor(
                 time = 0L
             )
         )
+    }
+
+    /**
+     * 获取合并转发消息内容
+     * @param resId 合并转发消息的 resId
+     * @return 转发消息列表
+     */
+    suspend fun getForwardedMessages(resId: String): List<BotForwardedMessage> {
+        val resp = client.callService(RecvLongMsg, RecvLongMsg.Req(resId, isGroup = false))
+        return resp.messages.mapNotNull { parseForwardedMessage(it) }
     }
 
     /**

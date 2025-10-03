@@ -1,5 +1,6 @@
 package org.ntqqrev.acidify.internal.logic
 
+import kotlinx.coroutines.async
 import org.ntqqrev.acidify.crypto.hash.SHA1Stream
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferSha1StateV
@@ -68,7 +69,7 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
         start: Int,
         sha1StateList: List<ByteArray>,
         body: ByteArray
-    ): Boolean {
+    ): Boolean = client.async {
         val chunkSha1 = body.sha1()
         val end = start + body.size - 1
 
@@ -100,15 +101,15 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
 
             if (status != "success") {
                 logger.e { "FlashTransfer 上传块 $start 失败: $status" }
-                return false
+                return@async false
             }
 
             logger.d { "FlashTransfer 上传块 $start 成功" }
-            return true
+            true
         } catch (e: Exception) {
             logger.e(e) { "FlashTransfer 上传块 $start 异常: ${e.message}" }
-            return false
+            false
         }
-    }
+    }.await()
 }
 

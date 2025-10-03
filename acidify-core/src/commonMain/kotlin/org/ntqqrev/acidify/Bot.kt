@@ -1,17 +1,19 @@
 package org.ntqqrev.acidify
 
 import co.touchlab.stately.collections.ConcurrentMutableMap
-import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.call.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
@@ -28,6 +30,7 @@ import org.ntqqrev.acidify.internal.packet.media.FileId
 import org.ntqqrev.acidify.internal.packet.media.IndexNode
 import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceResponse
 import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceSendResponse
+import org.ntqqrev.acidify.internal.packet.misc.GroupEssenceResponse
 import org.ntqqrev.acidify.internal.service.common.*
 import org.ntqqrev.acidify.internal.service.group.*
 import org.ntqqrev.acidify.internal.service.message.*
@@ -860,6 +863,82 @@ class Bot internal constructor(
         if (!response.status.isSuccess()) {
             throw RuntimeException("删除群公告失败: ${response.status}")
         }
+    }
+
+    /**
+     * 获取群精华消息列表
+     * @param groupUin 群号
+     * @param pageIndex 页码索引
+     * @param pageSize 每页包含的精华消息数量
+     * @return 精华消息列表
+     */
+    suspend fun getGroupEssenceMessages(
+        groupUin: Long,
+        pageIndex: Int,
+        pageSize: Int
+    ): BotEssenceMessageResult {
+        val bkn = getCsrfToken()
+        val url = "https://qun.qq.com/cgi-bin/group_digest/digest_list" +
+                "?random=7800&X-CROSS-ORIGIN=fetch&group_code=$groupUin" +
+                "&page_start=$pageIndex&page_limit=$pageSize&bkn=$bkn"
+
+        val cookie = getCookies("qun.qq.com").entries.joinToString("; ") { (k, v) -> "$k=$v" }
+        val response = httpClient.get(url) {
+            headers {
+                append(HttpHeaders.Cookie, cookie)
+            }
+        }
+
+        if (!response.status.isSuccess()) {
+            throw RuntimeException("获取群精华消息失败: ${response.status}")
+        }
+
+        val essenceResp = response.body<GroupEssenceResponse>()
+        val msgList = essenceResp.data.msgList ?: emptyList()
+
+        return BotEssenceMessageResult(
+            messages = msgList.map { msg ->
+                val segments = msg.msgContent.mapNotNull { element ->
+                    val msgType = element["msg_type"]?.jsonPrimitive?.int ?: return@mapNotNull null
+                    when (msgType) {
+                        1 -> {
+                            val text = element["text"]?.jsonPrimitive?.content ?: ""
+                            BotEssenceSegment.Text(text)
+                        }
+
+                        2 -> {
+                            val faceIndex = element["face_index"]?.jsonPrimitive?.int ?: 0
+                            BotEssenceSegment.Face(faceIndex)
+                        }
+
+                        3 -> {
+                            val imageUrl = element["image_url"]?.jsonPrimitive?.content ?: ""
+                            BotEssenceSegment.Image(imageUrl)
+                        }
+
+                        4 -> {
+                            val thumbnailUrl = element["file_thumbnail_url"]?.jsonPrimitive?.content ?: ""
+                            BotEssenceSegment.Video(thumbnailUrl)
+                        }
+
+                        else -> null
+                    }
+                }
+
+                BotEssenceMessage(
+                    groupUin = groupUin,
+                    messageSeq = msg.msgSeq,
+                    messageTime = msg.senderTime,
+                    senderUin = msg.senderUin.toLongOrNull() ?: 0L,
+                    senderName = msg.senderNick,
+                    operatorUin = msg.addDigestUin.toLongOrNull() ?: 0L,
+                    operatorName = msg.addDigestNick,
+                    operationTime = msg.addDigestTime,
+                    segments = segments
+                )
+            },
+            isEnd = essenceResp.data.isEnd
+        )
     }
 
     /**

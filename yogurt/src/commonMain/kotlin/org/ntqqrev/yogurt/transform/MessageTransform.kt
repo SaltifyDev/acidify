@@ -2,9 +2,12 @@ package org.ntqqrev.yogurt.transform
 
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.message.*
 import org.ntqqrev.acidify.util.log.Logger
+import org.ntqqrev.milky.GroupEssenceMessage
 import org.ntqqrev.milky.IncomingMessage
 import org.ntqqrev.milky.IncomingSegment
 import org.ntqqrev.milky.OutgoingSegment
@@ -248,6 +251,69 @@ suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) 
                     }
                 }
             }
+        }
+    }
+}
+
+suspend fun Application.transformEssenceMessage(msg: BotEssenceMessage): GroupEssenceMessage {
+    return GroupEssenceMessage(
+        groupId = msg.groupUin,
+        messageSeq = msg.messageSeq,
+        messageTime = msg.messageTime,
+        senderId = msg.senderUin,
+        senderName = msg.senderName,
+        operatorId = msg.operatorUin,
+        operatorName = msg.operatorName,
+        operationTime = msg.operationTime,
+        segments = msg.segments.map { segment ->
+            async { transformEssenceSegment(segment) } // parallel transform
+        }.awaitAll()
+    )
+}
+
+suspend fun transformEssenceSegment(segment: BotEssenceSegment): IncomingSegment {
+    return when (segment) {
+        is BotEssenceSegment.Text -> IncomingSegment.Text(
+            data = IncomingSegment.Text.Data(
+                text = segment.text
+            )
+        )
+
+        is BotEssenceSegment.Face -> IncomingSegment.Face(
+            data = IncomingSegment.Face.Data(
+                faceId = segment.faceId.toString()
+            )
+        )
+
+        is BotEssenceSegment.Image -> {
+            val imageData = resolveUri(segment.imageUrl)
+            val imageInfo = getImageInfo(imageData)
+            IncomingSegment.Image(
+                data = IncomingSegment.Image.Data(
+                    resourceId = segment.imageUrl,
+                    tempUrl = segment.imageUrl,
+                    width = imageInfo.width,
+                    height = imageInfo.height,
+                    summary = "[图片]",
+                    subType = "normal"
+                )
+            )
+        }
+
+        is BotEssenceSegment.Video -> {
+            // also transform to image
+            val imageData = resolveUri(segment.thumbnailUrl)
+            val imageInfo = getImageInfo(imageData)
+            IncomingSegment.Image(
+                data = IncomingSegment.Image.Data(
+                    resourceId = segment.thumbnailUrl,
+                    tempUrl = segment.thumbnailUrl,
+                    width = imageInfo.width,
+                    height = imageInfo.height,
+                    summary = "[图片]",
+                    subType = "normal"
+                )
+            )
         }
     }
 }

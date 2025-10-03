@@ -126,6 +126,7 @@ fun Route.configureMilkyApiHttpRoutes() {
     serve(GetGroupAnnouncements)
     serve(SendGroupAnnouncement)
     serve(DeleteGroupAnnouncement)
+    serve(GetGroupEssenceMessages)
     serve(SetGroupEssenceMessage)
     serve(QuitGroup)
     serve(SendGroupMessageReaction)

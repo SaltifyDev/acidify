@@ -1,6 +1,5 @@
 package org.ntqqrev.yogurt.transform
 
-import io.ktor.client.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 import org.ntqqrev.acidify.Bot
@@ -146,11 +145,10 @@ class YogurtMessageBuildingContext(
     val application: Application,
     val builder: BotOutgoingMessageBuilder,
     val scene: MessageScene,
-    val peerUin: Long,
-    val httpClient: HttpClient
+    val peerUin: Long
 ) : BotOutgoingMessageBuilder by builder {
     fun switchTo(newBuilder: BotOutgoingMessageBuilder): YogurtMessageBuildingContext {
-        return YogurtMessageBuildingContext(application, newBuilder, scene, peerUin, httpClient)
+        return YogurtMessageBuildingContext(application, newBuilder, scene, peerUin)
     }
 }
 
@@ -187,7 +185,7 @@ suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) 
         }
 
         is OutgoingSegment.Image -> {
-            val imageData = resolveUri(segment.data.uri, httpClient)
+            val imageData = resolveUri(segment.data.uri)
             val imageInfo = getImageInfo(imageData)
             image(
                 raw = imageData,
@@ -200,7 +198,7 @@ suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) 
         }
 
         is OutgoingSegment.Record -> {
-            val audioData = resolveUri(segment.data.uri, httpClient)
+            val audioData = resolveUri(segment.data.uri)
             // try to convert to pcm, if fails, assume it's already pcm
             val pcmData = try {
                 audioToPcm(audioData)
@@ -219,11 +217,11 @@ suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) 
         }
 
         is OutgoingSegment.Video -> {
-            val videoData = resolveUri(segment.data.uri, httpClient)
+            val videoData = resolveUri(segment.data.uri)
             val videoInfo = getVideoInfo(videoData)
             logger.d { "视频宽高 ${videoInfo.width}x${videoInfo.height}，时长 ${videoInfo.duration.inWholeSeconds} 秒" }
             val thumbData = if (segment.data.thumbUri != null) {
-                resolveUri(segment.data.thumbUri, httpClient)
+                resolveUri(segment.data.thumbUri)
             } else {
                 getVideoFirstFrameJpg(videoData)
             }

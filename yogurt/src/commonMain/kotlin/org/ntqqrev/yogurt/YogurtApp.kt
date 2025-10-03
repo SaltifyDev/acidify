@@ -24,7 +24,6 @@ import kotlinx.serialization.json.io.encodeToSink
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.util.UrlSignProvider
-import org.ntqqrev.acidify.util.createHttpClient
 import org.ntqqrev.milky.milkyJsonModule
 import org.ntqqrev.yogurt.api.configureMilkyApiAuth
 import org.ntqqrev.yogurt.api.configureMilkyApiHttpRoutes
@@ -81,7 +80,6 @@ object YogurtApp {
                 runBlocking { bot.offline() }
             }
             provide { logger }
-            provide { createHttpClient { } }
         }
         configureCacheDeps()
 

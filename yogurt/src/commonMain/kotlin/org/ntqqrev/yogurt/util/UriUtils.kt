@@ -1,6 +1,5 @@
 package org.ntqqrev.yogurt.util
 
-import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.Dispatchers
@@ -9,9 +8,12 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
+import org.ntqqrev.acidify.util.createHttpClient
 import kotlin.io.encoding.Base64
 
-suspend fun resolveUri(uri: String, httpClient: HttpClient): ByteArray {
+val httpClient = createHttpClient {  }
+
+suspend fun resolveUri(uri: String): ByteArray {
     return when {
         uri.startsWith("file://") -> {
             val filePath = uri.removePrefix("file://")

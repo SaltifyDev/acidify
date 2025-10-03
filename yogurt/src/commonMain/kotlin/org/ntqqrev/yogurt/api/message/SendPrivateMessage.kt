@@ -1,6 +1,5 @@
 package org.ntqqrev.yogurt.api.message
 
-import io.ktor.client.*
 import io.ktor.server.plugins.di.*
 import io.ktor.server.routing.*
 import org.ntqqrev.acidify.Bot
@@ -15,7 +14,6 @@ import org.ntqqrev.yogurt.util.invoke
 
 val SendPrivateMessage = ApiEndpoint.SendPrivateMessage {
     val bot = application.dependencies.resolve<Bot>()
-    val httpClient = application.dependencies.resolve<HttpClient>()
     val friendCache = application.dependencies.resolve<FriendCache>()
     
     // 检查好友是否存在
@@ -28,8 +26,7 @@ val SendPrivateMessage = ApiEndpoint.SendPrivateMessage {
                 application,
                 this,
                 MessageScene.FRIEND,
-                it.userId,
-                httpClient
+                it.userId
             )
         ) {
             it.message.forEach { segment ->

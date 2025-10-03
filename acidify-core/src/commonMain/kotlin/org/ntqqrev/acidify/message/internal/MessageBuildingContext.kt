@@ -142,7 +142,7 @@ internal class MessageBuildingContext(
                 it[elems] = emptyList() // 客户端会自行获取原始消息内容
                 it[pbReserve] = SourceMsgResvAttr {
                     it[oriMsgType] = 2
-                    it[sourceMsgId] = replied.sequence
+                    it[sourceMsgId] = replied.messageUid
                     it[senderUid] = replied.senderUid
                 }.toByteArray()
             }

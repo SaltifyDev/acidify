@@ -1,11 +1,17 @@
 package org.ntqqrev.acidify
 
 import co.touchlab.stately.collections.ConcurrentMutableMap
+import io.ktor.client.call.body
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.serialization.json.Json
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
@@ -20,6 +26,8 @@ import org.ntqqrev.acidify.exception.MessageSendException
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.media.FileId
 import org.ntqqrev.acidify.internal.packet.media.IndexNode
+import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceResponse
+import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceSendResponse
 import org.ntqqrev.acidify.internal.service.common.*
 import org.ntqqrev.acidify.internal.service.group.*
 import org.ntqqrev.acidify.internal.service.message.*
@@ -30,6 +38,8 @@ import org.ntqqrev.acidify.message.BotIncomingMessage.Companion.parseMessage
 import org.ntqqrev.acidify.message.internal.MessageBuildingContext
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.struct.*
+import org.ntqqrev.acidify.util.HtmlEntities
+import org.ntqqrev.acidify.util.createHttpClient
 import org.ntqqrev.acidify.util.log.LogHandler
 import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.LogMessage
@@ -108,6 +118,15 @@ class Bot internal constructor(
      */
     var isLoggedIn: Boolean = false
         internal set
+
+    /**
+     * HTTP 客户端实例，可用于发起自定义的 HTTP 请求。
+     */
+    val httpClient = createHttpClient {
+        install(ContentNegotiation) {
+            json(Json { ignoreUnknownKeys = true })
+        }
+    }
 
     /**
      * 创建一个 [Logger] 实例，通常用于库内部日志记录，并将产生的日志发送到提供的 [LogHandler]。
@@ -741,6 +760,106 @@ class Bot internal constructor(
                 reason = reason
             )
         )
+    }
+
+    /**
+     * 获取群公告列表
+     * @param groupUin 群号
+     * @return 群公告列表
+     */
+    suspend fun getGroupAnnouncements(groupUin: Long): List<BotGroupAnnouncement> {
+        val bkn = getCsrfToken()
+        val url = "https://web.qun.qq.com/cgi-bin/announce/get_t_list" +
+                "?bkn=$bkn&qid=$groupUin&ft=23&ni=1&n=1&i=1&log_read=1&platform=1&s=-1&n=20"
+
+        val cookie = getCookies("qun.qq.com").entries.joinToString("; ") { (k, v) -> "$k=$v" }
+        val response = httpClient.get(url) {
+            headers {
+                append(HttpHeaders.Cookie, cookie)
+            }
+        }
+
+        if (!response.status.isSuccess()) {
+            throw RuntimeException("获取群公告失败: ${response.status}")
+        }
+
+        val announceResp = response.body<GroupAnnounceResponse>()
+        return (announceResp.feeds + announceResp.inst).map { feed ->
+            BotGroupAnnouncement(
+                groupUin = groupUin,
+                announcementId = feed.noticeId,
+                senderId = feed.senderId,
+                time = feed.publishTime,
+                content = HtmlEntities.unescape(feed.message.text),
+                imageUrl = feed.message.images.firstOrNull()?.let {
+                    "https://gdynamic.qpic.cn/gdynamic/${it.id}/0"
+                }
+            )
+        }
+    }
+
+    /**
+     * 发送群公告
+     * @param groupUin 群号
+     * @param content 公告内容
+     * @param imageUrl 公告图片 URL（可选，暂不支持）
+     * @return 公告 ID
+     */
+    suspend fun sendGroupAnnouncement(
+        groupUin: Long,
+        content: String,
+        imageUrl: String? = null
+    ): String {
+        if (imageUrl != null) {
+            TODO("暂不支持带图片的群公告")
+        }
+
+        val bkn = getCsrfToken()
+        val url = "https://web.qun.qq.com/cgi-bin/announce/add_qun_notice?bkn=$bkn"
+        val body = "qid=$groupUin&bkn=$bkn&text=${content.encodeURLParameter()}" +
+                "&pinned=0&type=1&settings={\"is_show_edit_card\":0,\"tip_window_type\":1,\"confirm_required\":1}"
+
+        val cookie = getCookies("qun.qq.com").entries.joinToString("; ") { (k, v) -> "$k=$v" }
+        val response = httpClient.post(url) {
+            headers {
+                append(HttpHeaders.Cookie, cookie)
+                append(HttpHeaders.UserAgent, "Dalvik/2.1.0 (Linux; U; Android 7.1.2; PCRT00 Build/N2G48H)")
+                append(HttpHeaders.ContentType, ContentType.Application.FormUrlEncoded)
+            }
+            setBody(body)
+        }
+
+        if (!response.status.isSuccess()) {
+            throw RuntimeException("发送群公告失败: ${response.status}")
+        }
+
+        val sendResp = response.body<GroupAnnounceSendResponse>()
+        return sendResp.noticeId
+    }
+
+    /**
+     * 删除群公告
+     * @param groupUin 群号
+     * @param announcementId 公告 ID
+     */
+    suspend fun deleteGroupAnnouncement(
+        groupUin: Long,
+        announcementId: String
+    ) {
+        val bkn = getCsrfToken()
+        val url = "https://web.qun.qq.com/cgi-bin/announce/del_feed" +
+                "?fid=$announcementId&qid=$groupUin&bkn=$bkn&ft=23&op=1"
+
+        val cookie = getCookies("qun.qq.com").entries.joinToString("; ") { (k, v) -> "$k=$v" }
+        val response = httpClient.get(url) {
+            headers {
+                append(HttpHeaders.Cookie, cookie)
+            }
+        }
+
+        if (!response.status.isSuccess()) {
+            throw RuntimeException("删除群公告失败: ${response.status}")
+        }
     }
 
     /**

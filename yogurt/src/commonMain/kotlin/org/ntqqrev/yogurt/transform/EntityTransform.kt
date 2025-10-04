@@ -89,3 +89,45 @@ fun BotGroupFolderEntry.toMilkyEntity(groupId: Long) =
         creatorId = creatorUin,
         fileCount = totalFileCount
     )
+
+fun BotGroupNotification.toMilkyEntity() = when (this) {
+    is BotGroupNotification.JoinRequest -> GroupNotification.JoinRequest(
+        groupId = groupUin,
+        notificationSeq = notificationSeq,
+        isFiltered = isFiltered,
+        initiatorId = initiatorUin,
+        state = state,
+        operatorId = operatorUin,
+        comment = comment
+    )
+
+    is BotGroupNotification.AdminChange -> GroupNotification.AdminChange(
+        groupId = groupUin,
+        notificationSeq = notificationSeq,
+        targetUserId = targetUserUin,
+        isSet = isSet,
+        operatorId = operatorUin
+    )
+
+    is BotGroupNotification.Kick -> GroupNotification.Kick(
+        groupId = groupUin,
+        notificationSeq = notificationSeq,
+        targetUserId = targetUserUin,
+        operatorId = operatorUin
+    )
+
+    is BotGroupNotification.Quit -> GroupNotification.Quit(
+        groupId = groupUin,
+        notificationSeq = notificationSeq,
+        targetUserId = targetUserUin
+    )
+
+    is BotGroupNotification.InvitedJoinRequest -> GroupNotification.InvitedJoinRequest(
+        groupId = groupUin,
+        notificationSeq = notificationSeq,
+        initiatorId = initiatorUin,
+        targetUserId = targetUserUin,
+        state = state,
+        operatorId = operatorUin
+    )
+}

@@ -31,7 +31,8 @@ import org.ntqqrev.acidify.internal.packet.media.IndexNode
 import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceResponse
 import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceSendResponse
 import org.ntqqrev.acidify.internal.packet.misc.GroupEssenceResponse
-import org.ntqqrev.acidify.internal.service.common.*
+import org.ntqqrev.acidify.internal.service.file.GroupFileBroadcast
+import org.ntqqrev.acidify.internal.service.file.GroupFileUpload
 import org.ntqqrev.acidify.internal.service.group.*
 import org.ntqqrev.acidify.internal.service.message.*
 import org.ntqqrev.acidify.internal.service.system.*

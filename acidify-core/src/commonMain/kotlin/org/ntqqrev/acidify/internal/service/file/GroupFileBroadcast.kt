@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.internal.service.group
+package org.ntqqrev.acidify.internal.service.file
 
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.oidb.Oidb0x6D6Req

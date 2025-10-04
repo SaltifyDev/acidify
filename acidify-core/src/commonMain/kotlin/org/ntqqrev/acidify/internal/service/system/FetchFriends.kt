@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.internal.service.common
+package org.ntqqrev.acidify.internal.service.system
 
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.oidb.FetchFriendsCookie

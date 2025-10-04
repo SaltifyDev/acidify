@@ -1,9 +1,8 @@
 package org.ntqqrev.acidify.internal.service.file
 
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.oidb.PrivateFileDownloadReq
-import org.ntqqrev.acidify.internal.packet.oidb.PrivateFileDownloadReqBody
-import org.ntqqrev.acidify.internal.packet.oidb.PrivateFileDownloadResp
+import org.ntqqrev.acidify.internal.packet.oidb.Oidb0xE37Req
+import org.ntqqrev.acidify.internal.packet.oidb.Oidb0xE37Resp
 import org.ntqqrev.acidify.internal.service.OidbService
 import org.ntqqrev.acidify.pb.invoke
 
@@ -15,17 +14,24 @@ internal object GetPrivateFileDownloadUrl : OidbService<GetPrivateFileDownloadUr
     )
 
     override fun buildOidb(client: LagrangeClient, payload: Req): ByteArray =
-        PrivateFileDownloadReq {
-            it[body] = PrivateFileDownloadReqBody {
+        Oidb0xE37Req {
+            it[subCommand] = 1200
+            it[seq] = 1
+            it[downloadBody] = Oidb0xE37Req.DownloadBody {
                 it[receiverUid] = payload.receiverUid
                 it[fileUuid] = payload.fileUuid
+                it[type] = 2
                 it[fileHash] = payload.fileHash
                 it[t2] = 0
             }
+            it[field101] = 3
+            it[field102] = 103
+            it[field200] = 1
+            it[field99999] = byteArrayOf(0xc0.toByte(), 0x85.toByte(), 0x2c, 0x01)
         }.toByteArray()
 
     override fun parseOidb(client: LagrangeClient, payload: ByteArray): String {
-        val resp = PrivateFileDownloadResp(payload).get { body }.get { result }
+        val resp = Oidb0xE37Resp(payload).get { downloadBody }.get { result }
         val server = resp.get { server }
         val port = resp.get { port }
         val urlPath = resp.get { url }

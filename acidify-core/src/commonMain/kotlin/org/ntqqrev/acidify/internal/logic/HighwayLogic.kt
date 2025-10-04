@@ -71,6 +71,78 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         upload(3000, imageData, md5, extra)
     }
 
+    /**
+     * 上传群文件
+     * @param senderUin 发送者 UIN
+     * @param groupUin 群号
+     * @param fileName 文件名
+     * @param fileData 文件数据
+     * @param fileId 文件 ID
+     * @param fileKey 文件密钥
+     * @param checkKey 校验密钥
+     * @param uploadIp 上传服务器 IP
+     * @param uploadPort 上传服务器端口
+     */
+    suspend fun uploadGroupFile(
+        senderUin: Long,
+        groupUin: Long,
+        fileName: String,
+        fileData: ByteArray,
+        fileId: String,
+        fileKey: ByteArray,
+        checkKey: ByteArray,
+        uploadIp: String,
+        uploadPort: Int
+    ) {
+        // 计算前 10MB 的 MD5
+        val md510M = fileData.copyOfRange(0, minOf(10 * 1024 * 1024, fileData.size)).md5()
+
+        // 构建上传扩展信息
+        val ext = FileUploadExt {
+            it[unknown1] = 100
+            it[unknown2] = 1
+            it[entry] = FileUploadEntry {
+                it[busiBuff] = ExcitingBusiInfo {
+                    it[this.senderUin] = senderUin
+                    it[receiverUin] = groupUin
+                    it[groupCode] = groupUin
+                }
+                it[fileEntry] = ExcitingFileEntry {
+                    it[fileSize] = fileData.size.toLong()
+                    it[md5] = fileData.md5()
+                    it[this.checkKey] = fileKey
+                    it[this.md510M] = md510M
+                    it[this.fileId] = fileId
+                    it[uploadKey] = checkKey
+                }
+                it[clientInfo] = ExcitingClientInfo {
+                    it[clientType] = 3
+                    it[appId] = "100"
+                    it[terminalType] = 3
+                    it[clientVer] = "1.1.1"
+                    it[unknown] = 4
+                }
+                it[fileNameInfo] = ExcitingFileNameInfo {
+                    it[this.fileName] = fileName
+                }
+                it[host] = ExcitingHostConfig {
+                    it[hosts] = listOf(
+                        ExcitingHostInfo {
+                            it[url] = ExcitingUrlInfo {
+                                it[unknown] = 1
+                                it[host] = uploadIp
+                            }
+                            it[port] = uploadPort
+                        }
+                    )
+                }
+            }
+        }.toByteArray()
+
+        val md5 = fileData.md5()
+        upload(71, fileData, md5, ext)
+    }
+
     private class HttpSession(
         private val client: LagrangeClient,
         private val highwayHost: String,

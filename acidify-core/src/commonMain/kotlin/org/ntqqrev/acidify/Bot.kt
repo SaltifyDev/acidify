@@ -35,6 +35,9 @@ import org.ntqqrev.acidify.internal.service.common.*
 import org.ntqqrev.acidify.internal.service.group.*
 import org.ntqqrev.acidify.internal.service.message.*
 import org.ntqqrev.acidify.internal.service.system.*
+import org.ntqqrev.acidify.internal.util.md5
+import org.ntqqrev.acidify.internal.util.sha1
+import org.ntqqrev.acidify.internal.util.triSha1
 import org.ntqqrev.acidify.message.*
 import org.ntqqrev.acidify.message.BotForwardedMessage.Companion.parseForwardedMessage
 import org.ntqqrev.acidify.message.BotIncomingMessage.Companion.parseMessage
@@ -1028,6 +1031,58 @@ class Bot internal constructor(
                 targetUin = targetUin
             )
         )
+    }
+
+    /**
+     * 上传群文件
+     * @param groupUin 群号
+     * @param fileName 文件名
+     * @param fileData 文件数据
+     * @param parentFolderId 父文件夹 ID，默认为根目录 "/"
+     * @return 文件 ID
+     */
+    suspend fun uploadGroupFile(
+        groupUin: Long,
+        fileName: String,
+        fileData: ByteArray,
+        parentFolderId: String = "/"
+    ): String {
+        val uploadResp = client.callService(
+            GroupFileUpload,
+            GroupFileUpload.Req(
+                groupUin = groupUin,
+                fileName = fileName,
+                fileSize = fileData.size.toLong(),
+                fileMd5 = fileData.md5(),
+                fileSha1 = fileData.sha1(),
+                fileTriSha1 = fileData.triSha1(),
+                parentFolderId = parentFolderId
+            )
+        )
+
+        if (!uploadResp.fileExist) {
+            client.highwayLogic.uploadGroupFile(
+                senderUin = uin,
+                groupUin = groupUin,
+                fileName = fileName,
+                fileData = fileData,
+                fileId = uploadResp.fileId,
+                fileKey = uploadResp.fileKey,
+                checkKey = uploadResp.checkKey,
+                uploadIp = uploadResp.uploadIp,
+                uploadPort = uploadResp.uploadPort
+            )
+        }
+
+        client.callService(
+            GroupFileBroadcast,
+            GroupFileBroadcast.Req(
+                groupUin = groupUin,
+                fileId = uploadResp.fileId
+            )
+        )
+
+        return uploadResp.fileId
     }
 
     companion object {

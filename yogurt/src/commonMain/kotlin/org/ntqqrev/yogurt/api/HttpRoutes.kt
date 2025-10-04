@@ -11,6 +11,7 @@ import org.ntqqrev.acidify.exception.ServiceException
 import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
+import org.ntqqrev.yogurt.api.file.UploadGroupFile
 import org.ntqqrev.yogurt.api.group.*
 import org.ntqqrev.yogurt.api.message.*
 import org.ntqqrev.yogurt.api.system.*
@@ -132,4 +133,6 @@ fun Route.configureMilkyApiHttpRoutes() {
     serve(QuitGroup)
     serve(SendGroupMessageReaction)
     serve(SendGroupNudge)
+
+    serve(UploadGroupFile)
 }

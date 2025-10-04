@@ -96,7 +96,7 @@ fun BotGroupNotification.toMilkyEntity() = when (this) {
         notificationSeq = notificationSeq,
         isFiltered = isFiltered,
         initiatorId = initiatorUin,
-        state = state,
+        state = state.toMilkyString(),
         operatorId = operatorUin,
         comment = comment
     )
@@ -127,7 +127,14 @@ fun BotGroupNotification.toMilkyEntity() = when (this) {
         notificationSeq = notificationSeq,
         initiatorId = initiatorUin,
         targetUserId = targetUserUin,
-        state = state,
+        state = state.toMilkyString(),
         operatorId = operatorUin
     )
+}
+
+fun RequestState.toMilkyString() = when (this) {
+    RequestState.PENDING -> "pending"
+    RequestState.ACCEPTED -> "accepted"
+    RequestState.REJECTED -> "rejected"
+    else -> "ignored"
 }

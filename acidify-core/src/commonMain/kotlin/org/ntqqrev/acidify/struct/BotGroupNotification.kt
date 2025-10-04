@@ -22,7 +22,7 @@ sealed class BotGroupNotification {
         val isFiltered: Boolean,
         val initiatorUin: Long,
         val initiatorUid: String,
-        val state: String,
+        val state: RequestState,
         val operatorUin: Long?,
         val operatorUid: String?,
         val comment: String
@@ -99,7 +99,7 @@ sealed class BotGroupNotification {
         val initiatorUid: String,
         val targetUserUin: Long,
         val targetUserUid: String,
-        val state: String,
+        val state: RequestState,
         val operatorUin: Long?,
         val operatorUid: String?
     ) : BotGroupNotification()

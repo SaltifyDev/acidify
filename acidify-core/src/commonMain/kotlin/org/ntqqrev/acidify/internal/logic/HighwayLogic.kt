@@ -1,14 +1,11 @@
 package org.ntqqrev.acidify.internal.logic
 
-import io.ktor.client.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeout
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.media.*
+import org.ntqqrev.acidify.internal.util.highwayPostWithBlock
 import org.ntqqrev.acidify.internal.util.md5
 import org.ntqqrev.acidify.internal.util.toIpString
 import org.ntqqrev.acidify.message.MessageScene
@@ -140,9 +137,7 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
                     cmd = cmd,
                     data = data,
                     md5 = md5,
-                    extendInfo = extendInfo,
-                    httpClient = httpClient,
-                    timeout = timeout,
+                    extendInfo = extendInfo
                 )
                 session.upload()
             }
@@ -159,16 +154,13 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         private val cmd: Int,
         private val data: ByteArray,
         private val md5: ByteArray,
-        private val extendInfo: ByteArray,
-        private val httpClient: HttpClient,
-        private val timeout: Long,
+        private val extendInfo: ByteArray
     ) {
         suspend fun upload() {
             var offset = 0
             while (offset < data.size) {
-                val blockSize = minOf(HighwayLogic.MAX_BLOCK_SIZE, data.size - offset)
+                val blockSize = minOf(MAX_BLOCK_SIZE, data.size - offset)
                 val block = data.copyOfRange(offset, offset + blockSize)
-
                 uploadBlock(block, offset)
                 offset += blockSize
             }
@@ -182,7 +174,9 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
             val serverUrl =
                 "http://$highwayHost:$highwayPort/cgi-bin/httpconn?htcmd=0x6FF0087&uin=${client.sessionStore.uin}"
 
-            val response = uploadFrame(frame, serverUrl)
+            val response = client.async {
+                highwayPostWithBlock(serverUrl, frame)
+            }.await()
             val (responseHead, _) = unpackFrame(response)
 
             val headData = RespDataHighwayHead(responseHead)
@@ -263,24 +257,6 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
             val body = frame.copyOfRange(9 + headLen, 9 + headLen + bodyLen)
 
             return Pair(head, body)
-        }
-
-        private suspend fun uploadFrame(frame: ByteArray, serverUrl: String): ByteArray {
-            val response = httpClient.post(serverUrl) {
-                headers {
-                    append(HttpHeaders.Connection, "keep-alive")
-                    append(HttpHeaders.AcceptEncoding, "identity")
-                    append(HttpHeaders.UserAgent, "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2)")
-                    append(HttpHeaders.ContentLength, frame.size.toString())
-                }
-                setBody(frame)
-                this@post.timeout {
-                    requestTimeoutMillis = timeout
-                    connectTimeoutMillis = timeout / 2
-                    socketTimeoutMillis = timeout
-                }
-            }
-            return response.readRawBytes()
         }
     }
 }

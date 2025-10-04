@@ -7,7 +7,7 @@ import org.ntqqrev.acidify.internal.packet.media.FlashTransferSha1StateV
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadBody
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadReq
 import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadResp
-import org.ntqqrev.acidify.internal.util.postWithBlock
+import org.ntqqrev.acidify.internal.util.flashTransferPostWithBlock
 import org.ntqqrev.acidify.internal.util.sha1
 import org.ntqqrev.acidify.pb.invoke
 
@@ -95,7 +95,7 @@ internal class FlashTransferLogic(client: LagrangeClient) : AbstractLogic(client
 
         try {
             // 发送 HTTP POST 请求
-            val responseBytes = postWithBlock(url, payload)
+            val responseBytes = flashTransferPostWithBlock(url, payload)
             val resp = FlashTransferUploadResp(responseBytes)
             val status = resp.get { this.status }
 

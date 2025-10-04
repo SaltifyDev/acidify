@@ -5,7 +5,10 @@ import org.ntqqrev.acidify.pb.*
 internal object Oidb0x6D6Req : PbSchema() {
     val uploadFile = UploadFile[1]
     val downloadFile = DownloadFile[3]
+    val deleteFile = DeleteFile[4]
     val broadcastFile = BroadcastFile[5]
+    val renameFile = RenameFile[5]
+    val moveFile = MoveFile[6]
 
     internal object UploadFile : PbSchema() {
         val groupUin = PbInt64[1]
@@ -29,24 +32,53 @@ internal object Oidb0x6D6Req : PbSchema() {
         val fileId = PbString[4]
     }
 
+    internal object DeleteFile : PbSchema() {
+        val groupUin = PbInt64[1]
+        val appId = PbInt32[2]
+        val busId = PbInt32[3]
+        val parentFolderId = PbString[4]
+        val fileId = PbString[5]
+    }
+
     internal object BroadcastFile : PbSchema() {
         val groupUin = PbInt64[1]
-        val type = PbInt32[2]  // 2
+        val type = PbInt32[2]
         val info = Info[3]
 
         internal object Info : PbSchema() {
-            val busiType = PbInt32[1]  // 102
+            val busiType = PbInt32[1]
             val fileId = PbString[2]
-            val field3 = PbInt32[3]  // random
-            val field4 = PbString[4]  // nullable
-            val field5 = PbBoolean[5]  // true
+            val field3 = PbInt32[3]
+            val field4 = PbString[4]
+            val field5 = PbBoolean[5]
         }
+    }
+
+    internal object RenameFile : PbSchema() {
+        val groupUin = PbInt64[1]
+        val appId = PbInt32[2]
+        val busId = PbInt32[3]
+        val fileId = PbString[4]
+        val parentFolderId = PbString[5]
+        val newFileName = PbString[6]
+    }
+
+    internal object MoveFile : PbSchema() {
+        val groupUin = PbInt64[1]
+        val appId = PbInt32[2]
+        val busId = PbInt32[3]
+        val fileId = PbString[4]
+        val parentFolderId = PbString[5]
+        val destFolderId = PbString[6]
     }
 }
 
 internal object Oidb0x6D6Resp : PbSchema() {
     val uploadFile = UploadFile[1]
     val downloadFile = DownloadFile[3]
+    val deleteFile = SimpleResp[4]
+    val renameFile = SimpleResp[5]
+    val moveFile = MoveFileResp[6]
 
     internal object UploadFile : PbSchema() {
         val retCode = PbInt32[1]
@@ -67,5 +99,18 @@ internal object Oidb0x6D6Resp : PbSchema() {
     internal object DownloadFile : PbSchema() {
         val downloadDns = PbString[5]
         val downloadUrl = PbBytes[6]
+    }
+
+    internal object SimpleResp : PbSchema() {
+        val retCode = PbInt32[1]
+        val retMsg = PbString[2]
+        val clientWording = PbString[3]
+    }
+
+    internal object MoveFileResp : PbSchema() {
+        val retCode = PbInt32[1]
+        val retMsg = PbString[2]
+        val clientWording = PbString[3]
+        val parentFolderId = PbString[4]
     }
 }

@@ -1084,6 +1084,118 @@ class Bot(
     }
 
     /**
+     * 删除群文件
+     * @param groupUin 群号
+     * @param fileId 文件 ID
+     */
+    suspend fun deleteGroupFile(
+        groupUin: Long,
+        fileId: String
+    ) = client.callService(
+        DeleteGroupFile,
+        DeleteGroupFile.Req(
+            groupUin = groupUin,
+            fileId = fileId
+        )
+    )
+
+    /**
+     * 重命名群文件
+     * @param groupUin 群号
+     * @param fileId 文件 ID
+     * @param parentFolderId 父文件夹 ID
+     * @param newFileName 新文件名
+     */
+    suspend fun renameGroupFile(
+        groupUin: Long,
+        fileId: String,
+        parentFolderId: String,
+        newFileName: String
+    ) = client.callService(
+        RenameGroupFile,
+        RenameGroupFile.Req(
+            groupUin = groupUin,
+            fileId = fileId,
+            parentFolderId = parentFolderId,
+            newFileName = newFileName
+        )
+    )
+
+    /**
+     * 移动群文件
+     * @param groupUin 群号
+     * @param fileId 文件 ID
+     * @param parentFolderId 父文件夹 ID
+     * @param targetFolderId 目标文件夹 ID
+     */
+    suspend fun moveGroupFile(
+        groupUin: Long,
+        fileId: String,
+        parentFolderId: String,
+        targetFolderId: String
+    ) = client.callService(
+        MoveGroupFile,
+        MoveGroupFile.Req(
+            groupUin = groupUin,
+            fileId = fileId,
+            parentFolderId = parentFolderId,
+            targetFolderId = targetFolderId
+        )
+    )
+
+    /**
+     * 创建群文件夹
+     * @param groupUin 群号
+     * @param folderName 文件夹名称
+     * @return 文件夹 ID
+     */
+    suspend fun createGroupFolder(
+        groupUin: Long,
+        folderName: String
+    ): String = client.callService(
+        CreateGroupFolder,
+        CreateGroupFolder.Req(
+            groupUin = groupUin,
+            folderName = folderName
+        )
+    ).folderId
+
+    /**
+     * 删除群文件夹
+     * @param groupUin 群号
+     * @param folderId 文件夹 ID
+     */
+    suspend fun deleteGroupFolder(
+        groupUin: Long,
+        folderId: String
+    ) = client.callService(
+        DeleteGroupFolder,
+        DeleteGroupFolder.Req(
+            groupUin = groupUin,
+            folderId = folderId
+        )
+    )
+
+    /**
+     * 重命名群文件夹
+     * @param groupUin 群号
+     * @param folderId 文件夹 ID
+     * @param newFolderName 新文件夹名称
+     */
+    suspend fun renameGroupFolder(
+        groupUin: Long,
+        folderId: String,
+        newFolderName: String
+    ) = client.callService(
+        RenameGroupFolder,
+        RenameGroupFolder.Req(
+            groupUin = groupUin,
+            folderId = folderId,
+            newFolderName = newFolderName
+        )
+    )
+
+    /**
      * 上传群文件
      * @param groupUin 群号
      * @param fileName 文件名

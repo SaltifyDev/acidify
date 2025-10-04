@@ -274,6 +274,16 @@ class Bot(
     }
 
     /**
+     * 通过 uin（QQ 号）获取用户信息。
+     */
+    suspend fun fetchUserInfoByUin(uin: Long) = client.callService(FetchUserInfo.ByUin, uin)
+
+    /**
+     * 通过 uid 获取用户信息。
+     */
+    suspend fun fetchUserInfoByUid(uid: String) = client.callService(FetchUserInfo.ByUid, uid)
+
+    /**
      * 获取好友与好友分组信息。
      */
     suspend fun fetchFriends(): List<BotFriendData> {
@@ -323,16 +333,6 @@ class Bot(
     }
 
     /**
-     * 通过 uin（QQ 号）获取用户信息。
-     */
-    suspend fun fetchUserInfoByUin(uin: Long) = client.callService(FetchUserInfo.ByUin, uin)
-
-    /**
-     * 通过 uid 获取用户信息。
-     */
-    suspend fun fetchUserInfoByUid(uid: String) = client.callService(FetchUserInfo.ByUid, uid)
-
-    /**
      * 解析 uid 到 uin（QQ 号）。
      * 如果之前未解析过该 uid，会发起网络请求获取用户信息。
      */
@@ -372,11 +372,6 @@ class Bot(
     suspend fun getPSKey(domain: String) = client.ticketLogic.getPSKey(domain)
 
     /**
-     * 获取 CSRF Token。
-     */
-    suspend fun getCsrfToken() = client.ticketLogic.getCsrfToken()
-
-    /**
      * 获取指定域名的 Cookie 键值对。
      */
     suspend fun getCookies(domain: String) = mapOf(
@@ -385,6 +380,11 @@ class Bot(
         "skey" to getSKey(),
         "uin" to uin.toString(),
     )
+
+    /**
+     * 获取 CSRF Token。
+     */
+    suspend fun getCsrfToken() = client.ticketLogic.getCsrfToken()
 
     /**
      * 发送好友消息
@@ -434,6 +434,48 @@ class Bot(
         }
         return BotOutgoingMessageResult(resp.sequence, resp.sendTime)
     }
+
+    /**
+     * 撤回好友消息
+     * @param friendUin 好友 QQ 号
+     * @param sequence 消息序列号（clientSequence）
+     * @param privateSequence 消息的私聊序列号（用于获取消息详情）
+     * @param timestamp 消息时间戳（秒）
+     */
+    suspend fun recallFriendMessage(
+        friendUin: Long, sequence: Long, privateSequence: Long, timestamp: Long
+    ) {
+        val friendUid = getUidByUin(friendUin)
+
+        // 从原始消息包中提取 random 字段
+        val raw = client.callService(
+            FetchFriendMessages, FetchFriendMessages.Req(friendUid, privateSequence, privateSequence)
+        ).firstOrNull() ?: throw IllegalStateException("消息不存在")
+
+        val contentHead = raw.get { contentHead }
+        val random = contentHead.get { random }
+
+        client.callService(
+            RecallFriendMessage, RecallFriendMessage.Req(
+                targetUid = friendUid,
+                clientSequence = sequence,
+                messageSequence = privateSequence,
+                random = random,
+                timestamp = timestamp
+            )
+        )
+    }
+
+    /**
+     * 撤回群消息
+     * @param groupUin 群号
+     * @param sequence 消息序列号
+     */
+    suspend fun recallGroupMessage(groupUin: Long, sequence: Long) = client.callService(
+        RecallGroupMessage, RecallGroupMessage.Req(
+            groupUin = groupUin, sequence = sequence
+        )
+    )
 
     /**
      * 向上获取与好友的历史消息
@@ -488,66 +530,6 @@ class Bot(
         return BotHistoryMessages(messages, nextStartSeq)
     }
 
-
-    /**
-     * 撤回好友消息
-     * @param friendUin 好友 QQ 号
-     * @param sequence 消息序列号（clientSequence）
-     * @param privateSequence 消息的私聊序列号（用于获取消息详情）
-     * @param timestamp 消息时间戳（秒）
-     */
-    suspend fun recallFriendMessage(
-        friendUin: Long,
-        sequence: Long,
-        privateSequence: Long,
-        timestamp: Long
-    ) {
-        val friendUid = getUidByUin(friendUin)
-
-        // 从原始消息包中提取 random 字段
-        val raw = client.callService(
-            FetchFriendMessages,
-            FetchFriendMessages.Req(friendUid, privateSequence, privateSequence)
-        ).firstOrNull() ?: throw IllegalStateException("消息不存在")
-
-        val contentHead = raw.get { contentHead }
-        val random = contentHead.get { random }
-
-        client.callService(
-            RecallFriendMessage,
-            RecallFriendMessage.Req(
-                targetUid = friendUid,
-                clientSequence = sequence,
-                messageSequence = privateSequence,
-                random = random,
-                timestamp = timestamp
-            )
-        )
-    }
-
-    /**
-     * 撤回群消息
-     * @param groupUin 群号
-     * @param sequence 消息序列号
-     */
-    suspend fun recallGroupMessage(groupUin: Long, sequence: Long) = client.callService(
-        RecallGroupMessage,
-        RecallGroupMessage.Req(
-            groupUin = groupUin,
-            sequence = sequence
-        )
-    )
-
-    /**
-     * 获取合并转发消息内容
-     * @param resId 合并转发消息的 resId
-     * @return 转发消息列表
-     */
-    suspend fun getForwardedMessages(resId: String): List<BotForwardedMessage> {
-        return client.callService(RecvLongMsg, RecvLongMsg.Req(resId))
-            .mapNotNull { parseForwardedMessage(it) }
-    }
-
     /**
      * 获取给定资源 ID 的下载链接，支持图片、语音、视频。
      */
@@ -586,6 +568,15 @@ class Bot(
     }
 
     /**
+     * 获取合并转发消息内容
+     * @param resId 合并转发消息的 resId
+     * @return 转发消息列表
+     */
+    suspend fun getForwardedMessages(resId: String): List<BotForwardedMessage> {
+        return client.callService(RecvLongMsg, RecvLongMsg.Req(resId)).mapNotNull { parseForwardedMessage(it) }
+    }
+
+    /**
      * 标记好友消息为已读
      * @param friendUin 好友 QQ 号
      * @param startSequence 消息序列号，标记该序列号及之前的消息为已读
@@ -602,6 +593,32 @@ class Bot(
             targetUid = getUidByUin(friendUin),
             startSequence = startSequence,
             time = startTime
+        )
+    )
+
+    /**
+     * 发送好友戳一戳
+     * @param friendUin 好友 QQ 号
+     * @param isSelf 是否戳自己（默认为 false）
+     */
+    suspend fun sendFriendNudge(
+        friendUin: Long, isSelf: Boolean = false
+    ) = client.callService(
+        SendFriendNudge, SendFriendNudge.Req(
+            friendUin = friendUin, isSelf = isSelf
+        )
+    )
+
+    /**
+     * 给好友点赞
+     * @param friendUin 好友 QQ 号
+     * @param count 点赞次数（默认为 1）
+     */
+    suspend fun sendProfileLike(
+        friendUin: Long, count: Int = 1
+    ) = client.callService(
+        SendProfileLike, SendProfileLike.Req(
+            targetUid = getUidByUin(friendUin), count = count
         )
     )
 
@@ -977,36 +994,50 @@ class Bot(
     )
 
     /**
-     * 发送好友戳一戳
-     * @param friendUin 好友 QQ 号
-     * @param isSelf 是否戳自己（默认为 false）
+     * 上传群文件
+     * @param groupUin 群号
+     * @param fileName 文件名
+     * @param fileData 文件数据
+     * @param parentFolderId 父文件夹 ID，默认为根目录 "/"
+     * @return 文件 ID
      */
-    suspend fun sendFriendNudge(
-        friendUin: Long,
-        isSelf: Boolean = false
-    ) = client.callService(
-        SendFriendNudge,
-        SendFriendNudge.Req(
-            friendUin = friendUin,
-            isSelf = isSelf
+    suspend fun uploadGroupFile(
+        groupUin: Long, fileName: String, fileData: ByteArray, parentFolderId: String = "/"
+    ): String {
+        val uploadResp = client.callService(
+            UploadGroupFile, UploadGroupFile.Req(
+                groupUin = groupUin,
+                fileName = fileName,
+                fileSize = fileData.size.toLong(),
+                fileMd5 = fileData.md5(),
+                fileSha1 = fileData.sha1(),
+                fileTriSha1 = fileData.triSha1(),
+                parentFolderId = parentFolderId
+            )
         )
-    )
 
-    /**
-     * 给好友点赞
-     * @param friendUin 好友 QQ 号
-     * @param count 点赞次数（默认为 1）
-     */
-    suspend fun sendProfileLike(
-        friendUin: Long,
-        count: Int = 1
-    ) = client.callService(
-        SendProfileLike,
-        SendProfileLike.Req(
-            targetUid = getUidByUin(friendUin),
-            count = count
+        if (!uploadResp.fileExist) {
+            client.highwayLogic.uploadGroupFile(
+                senderUin = uin,
+                groupUin = groupUin,
+                fileName = fileName,
+                fileData = fileData,
+                fileId = uploadResp.fileId,
+                fileKey = uploadResp.fileKey,
+                checkKey = uploadResp.checkKey,
+                uploadIp = uploadResp.uploadIp,
+                uploadPort = uploadResp.uploadPort
+            )
+        }
+
+        client.callService(
+            BroadcastGroupFile, BroadcastGroupFile.Req(
+                groupUin = groupUin, fileId = uploadResp.fileId
+            )
         )
-    )
+
+        return uploadResp.fileId
+    }
 
     /**
      * 获取私聊文件下载链接
@@ -1084,22 +1115,6 @@ class Bot(
     }
 
     /**
-     * 删除群文件
-     * @param groupUin 群号
-     * @param fileId 文件 ID
-     */
-    suspend fun deleteGroupFile(
-        groupUin: Long,
-        fileId: String
-    ) = client.callService(
-        DeleteGroupFile,
-        DeleteGroupFile.Req(
-            groupUin = groupUin,
-            fileId = fileId
-        )
-    )
-
-    /**
      * 重命名群文件
      * @param groupUin 群号
      * @param fileId 文件 ID
@@ -1144,6 +1159,19 @@ class Bot(
     )
 
     /**
+     * 删除群文件
+     * @param groupUin 群号
+     * @param fileId 文件 ID
+     */
+    suspend fun deleteGroupFile(
+        groupUin: Long, fileId: String
+    ) = client.callService(
+        DeleteGroupFile, DeleteGroupFile.Req(
+            groupUin = groupUin, fileId = fileId
+        )
+    )
+
+    /**
      * 创建群文件夹
      * @param groupUin 群号
      * @param folderName 文件夹名称
@@ -1159,22 +1187,6 @@ class Bot(
             folderName = folderName
         )
     ).folderId
-
-    /**
-     * 删除群文件夹
-     * @param groupUin 群号
-     * @param folderId 文件夹 ID
-     */
-    suspend fun deleteGroupFolder(
-        groupUin: Long,
-        folderId: String
-    ) = client.callService(
-        DeleteGroupFolder,
-        DeleteGroupFolder.Req(
-            groupUin = groupUin,
-            folderId = folderId
-        )
-    )
 
     /**
      * 重命名群文件夹
@@ -1196,54 +1208,15 @@ class Bot(
     )
 
     /**
-     * 上传群文件
+     * 删除群文件夹
      * @param groupUin 群号
-     * @param fileName 文件名
-     * @param fileData 文件数据
-     * @param parentFolderId 父文件夹 ID，默认为根目录 "/"
-     * @return 文件 ID
+     * @param folderId 文件夹 ID
      */
-    suspend fun uploadGroupFile(
-        groupUin: Long,
-        fileName: String,
-        fileData: ByteArray,
-        parentFolderId: String = "/"
-    ): String {
-        val uploadResp = client.callService(
-            UploadGroupFile,
-            UploadGroupFile.Req(
-                groupUin = groupUin,
-                fileName = fileName,
-                fileSize = fileData.size.toLong(),
-                fileMd5 = fileData.md5(),
-                fileSha1 = fileData.sha1(),
-                fileTriSha1 = fileData.triSha1(),
-                parentFolderId = parentFolderId
-            )
+    suspend fun deleteGroupFolder(
+        groupUin: Long, folderId: String
+    ) = client.callService(
+        DeleteGroupFolder, DeleteGroupFolder.Req(
+            groupUin = groupUin, folderId = folderId
         )
-
-        if (!uploadResp.fileExist) {
-            client.highwayLogic.uploadGroupFile(
-                senderUin = uin,
-                groupUin = groupUin,
-                fileName = fileName,
-                fileData = fileData,
-                fileId = uploadResp.fileId,
-                fileKey = uploadResp.fileKey,
-                checkKey = uploadResp.checkKey,
-                uploadIp = uploadResp.uploadIp,
-                uploadPort = uploadResp.uploadPort
-            )
-        }
-
-        client.callService(
-            BroadcastGroupFile,
-            BroadcastGroupFile.Req(
-                groupUin = groupUin,
-                fileId = uploadResp.fileId
-            )
-        )
-
-        return uploadResp.fileId
-    }
+    )
 }

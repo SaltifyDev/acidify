@@ -64,3 +64,28 @@ fun GroupMemberRole.toMilkyString() = when (this) {
     GroupMemberRole.ADMIN -> "admin"
     GroupMemberRole.MEMBER -> "member"
 }
+
+fun BotGroupFileEntry.toMilkyEntity(groupId: Long) =
+    GroupFileEntity(
+        groupId = groupId,
+        fileId = fileId,
+        fileName = fileName,
+        parentFolderId = parentFolderId,
+        fileSize = fileSize,
+        uploadedTime = uploadedTime,
+        expireTime = expireTime,
+        uploaderId = uploaderUin,
+        downloadedTimes = downloadedTimes
+    )
+
+fun BotGroupFolderEntry.toMilkyEntity(groupId: Long) =
+    GroupFolderEntity(
+        groupId = groupId,
+        folderId = folderId,
+        parentFolderId = parentFolderId,
+        folderName = folderName,
+        createdTime = createTime,
+        lastModifiedTime = modifiedTime,
+        creatorId = creatorUin,
+        fileCount = totalFileCount
+    )

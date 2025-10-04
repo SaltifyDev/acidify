@@ -11,6 +11,9 @@ import org.ntqqrev.acidify.exception.ServiceException
 import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
+import org.ntqqrev.yogurt.api.file.GetGroupFileDownloadUrl
+import org.ntqqrev.yogurt.api.file.GetGroupFiles
+import org.ntqqrev.yogurt.api.file.GetPrivateFileDownloadUrl
 import org.ntqqrev.yogurt.api.file.UploadGroupFile
 import org.ntqqrev.yogurt.api.friend.SendFriendNudge
 import org.ntqqrev.yogurt.api.friend.SendProfileLike
@@ -139,5 +142,8 @@ fun Route.configureMilkyApiHttpRoutes() {
     serve(SendGroupMessageReaction)
     serve(SendGroupNudge)
 
+    serve(GetPrivateFileDownloadUrl)
+    serve(GetGroupFileDownloadUrl)
+    serve(GetGroupFiles)
     serve(UploadGroupFile)
 }

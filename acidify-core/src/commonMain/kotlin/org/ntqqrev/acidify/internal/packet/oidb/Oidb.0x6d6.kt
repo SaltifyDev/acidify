@@ -4,6 +4,7 @@ import org.ntqqrev.acidify.pb.*
 
 internal object Oidb0x6D6Req : PbSchema() {
     val uploadFile = UploadFile[1]
+    val downloadFile = DownloadFile[3]
     val broadcastFile = BroadcastFile[5]
 
     internal object UploadFile : PbSchema() {
@@ -19,6 +20,13 @@ internal object Oidb0x6D6Req : PbSchema() {
         val sha3 = PbBytes[10]
         val md5 = PbBytes[11]
         val supportMultiUpload = PbBoolean[12]
+    }
+
+    internal object DownloadFile : PbSchema() {
+        val groupUin = PbInt64[1]
+        val appId = PbInt32[2]
+        val busId = PbInt32[3]
+        val fileId = PbString[4]
     }
 
     internal object BroadcastFile : PbSchema() {
@@ -38,6 +46,7 @@ internal object Oidb0x6D6Req : PbSchema() {
 
 internal object Oidb0x6D6Resp : PbSchema() {
     val uploadFile = UploadFile[1]
+    val downloadFile = DownloadFile[3]
 
     internal object UploadFile : PbSchema() {
         val retCode = PbInt32[1]
@@ -53,5 +62,10 @@ internal object Oidb0x6D6Resp : PbSchema() {
         val uploadIpLanV4 = PbRepeatedString[12]
         val uploadIpLanV6 = PbRepeatedString[13]
         val uploadPort = PbInt32[14]
+    }
+
+    internal object DownloadFile : PbSchema() {
+        val downloadDns = PbString[5]
+        val downloadUrl = PbBytes[6]
     }
 }

@@ -31,8 +31,7 @@ import org.ntqqrev.acidify.internal.packet.message.media.IndexNode
 import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceResponse
 import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceSendResponse
 import org.ntqqrev.acidify.internal.packet.misc.GroupEssenceResponse
-import org.ntqqrev.acidify.internal.service.file.BroadcastGroupFile
-import org.ntqqrev.acidify.internal.service.file.UploadGroupFile
+import org.ntqqrev.acidify.internal.service.file.*
 import org.ntqqrev.acidify.internal.service.group.*
 import org.ntqqrev.acidify.internal.service.message.*
 import org.ntqqrev.acidify.internal.service.system.*
@@ -1086,6 +1085,88 @@ class Bot(
                 targetUid = friendUid,
                 count = count
             )
+        )
+    }
+
+    /**
+     * 获取私聊文件下载链接
+     * @param friendUin 好友 QQ 号
+     * @param fileId 文件 ID
+     * @param fileHash 文件的 TriSHA1 哈希值
+     * @return 文件下载链接
+     */
+    suspend fun getPrivateFileDownloadUrl(
+        friendUin: Long,
+        fileId: String,
+        fileHash: String
+    ): String {
+        val friendUid = getUidByUin(friendUin)
+        val resp = client.callService(
+            GetPrivateFileDownloadUrl,
+            GetPrivateFileDownloadUrl.Req(
+                receiverUid = friendUid,
+                fileUuid = fileId,
+                fileHash = fileHash
+            )
+        )
+        return resp.url
+    }
+
+    /**
+     * 获取群文件下载链接
+     * @param groupUin 群号
+     * @param fileId 文件 ID
+     * @return 文件下载链接
+     */
+    suspend fun getGroupFileDownloadUrl(
+        groupUin: Long,
+        fileId: String
+    ): String {
+        val resp = client.callService(
+            GetGroupFileDownloadUrl,
+            GetGroupFileDownloadUrl.Req(
+                groupUin = groupUin,
+                fileId = fileId
+            )
+        )
+        return resp.url
+    }
+
+    /**
+     * 获取群文件/文件夹列表
+     * @param groupUin 群号
+     * @param targetDirectory 目标目录路径，默认为根目录 "/"
+     * @param startIndex 起始索引，用于分页，默认为 0
+     * @return 文件系统列表，包含文件列表、文件夹列表和是否到达末尾的标志
+     */
+    suspend fun getGroupFileList(
+        groupUin: Long,
+        targetDirectory: String = "/",
+        startIndex: Int = 0
+    ): BotGroupFileSystemList {
+        var isEnd = false
+        var currentIndex = startIndex
+        val batchSize = 100
+        val allFiles = mutableListOf<BotGroupFileEntry>()
+        val allFolders = mutableListOf<BotGroupFolderEntry>()
+        while (!isEnd) {
+            val resp = client.callService(
+                GetGroupFileList,
+                GetGroupFileList.Req(
+                    groupUin = groupUin,
+                    targetDirectory = targetDirectory,
+                    startIndex = currentIndex,
+                    batchSize = batchSize
+                )
+            )
+            allFiles.addAll(resp.files)
+            allFolders.addAll(resp.folders)
+            isEnd = resp.isEnd
+            currentIndex += batchSize
+        }
+        return BotGroupFileSystemList(
+            files = allFiles,
+            folders = allFolders
         )
     }
 

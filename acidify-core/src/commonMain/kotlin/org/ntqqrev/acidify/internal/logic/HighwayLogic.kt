@@ -7,9 +7,6 @@ import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.media.*
 import org.ntqqrev.acidify.internal.util.highwayPostWithBlock
 import org.ntqqrev.acidify.internal.util.md5
-import org.ntqqrev.acidify.internal.util.toIpString
-import org.ntqqrev.acidify.message.MessageScene
-import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.util.createHttpClient
 
@@ -53,6 +50,25 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         } catch (_: TimeoutCancellationException) {
             throw Exception("上传超时 (${timeout / 1000}s)")
         }
+    }
+
+    /**
+     * 上传群头像
+     * @param groupUin 群号
+     * @param imageData 图片数据
+     */
+    suspend fun uploadGroupAvatar(groupUin: Long, imageData: ByteArray) {
+        val md5 = imageData.md5()
+        val extra = GroupAvatarExtra {
+            it[type] = 101
+            it[this.groupUin] = groupUin
+            it[field3] = GroupAvatarExtraField3 {
+                it[field1] = 1
+            }
+            it[field5] = 3
+            it[field6] = 1
+        }.toByteArray()
+        upload(3000, imageData, md5, extra)
     }
 
     private class HttpSession(

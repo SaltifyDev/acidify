@@ -629,6 +629,18 @@ class Bot internal constructor(
     }
 
     /**
+     * 设置群头像
+     * @param groupUin 群号
+     * @param imageData 图片数据（字节数组）
+     */
+    suspend fun setGroupAvatar(
+        groupUin: Long,
+        imageData: ByteArray
+    ) {
+        client.highwayLogic.uploadGroupAvatar(groupUin, imageData)
+    }
+
+    /**
      * 设置群成员的群名片
      * @param groupUin 群号
      * @param memberUin 成员 QQ 号

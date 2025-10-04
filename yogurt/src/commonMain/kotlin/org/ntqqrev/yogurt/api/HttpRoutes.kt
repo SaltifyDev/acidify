@@ -117,6 +117,7 @@ fun Route.configureMilkyApiHttpRoutes() {
     serve(MarkMessageAsRead)
 
     serve(SetGroupName)
+    serve(SetGroupAvatar)
     serve(SetGroupMemberCard)
     serve(SetGroupMemberSpecialTitle)
     serve(SetGroupMemberAdmin)

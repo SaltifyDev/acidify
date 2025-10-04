@@ -39,6 +39,7 @@ import org.ntqqrev.acidify.internal.util.md5
 import org.ntqqrev.acidify.internal.util.sha1
 import org.ntqqrev.acidify.internal.util.triSha1
 import org.ntqqrev.acidify.message.*
+import org.ntqqrev.acidify.message.BotEssenceMessage.Companion.toBotEssenceMessage
 import org.ntqqrev.acidify.message.BotForwardedMessage.Companion.parseForwardedMessage
 import org.ntqqrev.acidify.message.BotIncomingMessage.Companion.parseMessage
 import org.ntqqrev.acidify.message.internal.MessageBuildingContext
@@ -898,46 +899,7 @@ class Bot(
         val msgList = essenceResp.data.msgList ?: emptyList()
 
         return BotEssenceMessageResult(
-            messages = msgList.map { msg ->
-                val segments = msg.msgContent.mapNotNull { element ->
-                    val msgType = element["msg_type"]?.jsonPrimitive?.int ?: return@mapNotNull null
-                    when (msgType) {
-                        1 -> {
-                            val text = element["text"]?.jsonPrimitive?.content ?: ""
-                            BotEssenceSegment.Text(text)
-                        }
-
-                        2 -> {
-                            val faceIndex = element["face_index"]?.jsonPrimitive?.int ?: 0
-                            BotEssenceSegment.Face(faceIndex)
-                        }
-
-                        3 -> {
-                            val imageUrl = element["image_url"]?.jsonPrimitive?.content ?: ""
-                            BotEssenceSegment.Image(imageUrl)
-                        }
-
-                        4 -> {
-                            val thumbnailUrl = element["file_thumbnail_url"]?.jsonPrimitive?.content ?: ""
-                            BotEssenceSegment.Video(thumbnailUrl)
-                        }
-
-                        else -> null
-                    }
-                }
-
-                BotEssenceMessage(
-                    groupUin = groupUin,
-                    messageSeq = msg.msgSeq,
-                    messageTime = msg.senderTime,
-                    senderUin = msg.senderUin.toLongOrNull() ?: 0L,
-                    senderName = msg.senderNick,
-                    operatorUin = msg.addDigestUin.toLongOrNull() ?: 0L,
-                    operatorName = msg.addDigestNick,
-                    operationTime = msg.addDigestTime,
-                    segments = segments
-                )
-            },
+            messages = msgList.mapNotNull { it.toBotEssenceMessage(groupUin) },
             isEnd = essenceResp.data.isEnd
         )
     }

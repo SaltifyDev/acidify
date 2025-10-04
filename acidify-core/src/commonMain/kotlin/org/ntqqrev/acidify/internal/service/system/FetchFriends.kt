@@ -11,8 +11,8 @@ import org.ntqqrev.acidify.struct.UserInfoGender
 import org.ntqqrev.acidify.struct.UserInfoKey
 
 internal object FetchFriends : OidbService<FetchFriends.Req, FetchFriends.Resp>(0xfd4, 1) {
-    internal class Req(val nextUin: Long?)
-    internal class Resp(
+    class Req(val nextUin: Long?)
+    class Resp(
         val nextUin: Long?,
         val friendDataList: List<BotFriendData>,
     )

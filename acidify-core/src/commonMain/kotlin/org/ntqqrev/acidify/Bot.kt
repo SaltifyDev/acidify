@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider

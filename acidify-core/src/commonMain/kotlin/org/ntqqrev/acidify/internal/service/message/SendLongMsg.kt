@@ -19,8 +19,6 @@ internal object SendLongMsg :
         val messages: List<PbObject<CommonMessage>>
     )
 
-    class Resp(val resId: String)
-
     override fun build(client: LagrangeClient, payload: Req): ByteArray {
         val content = PbMultiMsgTransmit {
             it[items] = listOf(

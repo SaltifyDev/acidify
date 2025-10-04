@@ -12,8 +12,7 @@ import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
 import org.ntqqrev.yogurt.api.file.*
-import org.ntqqrev.yogurt.api.friend.SendFriendNudge
-import org.ntqqrev.yogurt.api.friend.SendProfileLike
+import org.ntqqrev.yogurt.api.friend.*
 import org.ntqqrev.yogurt.api.group.*
 import org.ntqqrev.yogurt.api.message.*
 import org.ntqqrev.yogurt.api.system.*
@@ -121,6 +120,9 @@ fun Route.configureMilkyApiHttpRoutes() {
 
     serve(SendFriendNudge)
     serve(SendProfileLike)
+    serve(GetFriendRequests)
+    serve(AcceptFriendRequest)
+    serve(RejectFriendRequest)
 
     serve(SetGroupName)
     serve(SetGroupAvatar)

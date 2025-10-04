@@ -43,6 +43,8 @@ import org.ntqqrev.acidify.message.BotIncomingMessage.Companion.parseMessage
 import org.ntqqrev.acidify.message.internal.MessageBuildingContext
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.struct.*
+import org.ntqqrev.acidify.struct.BotFriendRequest.Companion.parseFilteredFriendRequest
+import org.ntqqrev.acidify.struct.BotFriendRequest.Companion.parseFriendRequest
 import org.ntqqrev.acidify.util.HtmlEntities
 import org.ntqqrev.acidify.util.createHttpClient
 import org.ntqqrev.acidify.util.log.LogHandler
@@ -595,6 +597,46 @@ class Bot(
             time = startTime
         )
     )
+
+    /**
+     * 获取好友请求列表
+     * @param isFiltered 是否只获取被过滤的请求（风险账号发起）
+     * @param limit 获取的最大请求数量
+     * @return 好友请求列表
+     */
+    suspend fun getFriendRequests(isFiltered: Boolean = false, limit: Int = 20): List<BotFriendRequest> {
+        if (isFiltered) {
+            return client.callService(FetchFriendRequests.Filtered, limit).map {
+                parseFilteredFriendRequest(it)
+            }
+        } else {
+            return client.callService(FetchFriendRequests.Normal, limit).map {
+                parseFriendRequest(it)
+            }
+        }
+    }
+
+    /**
+     * 处理好友请求（同意/拒绝）
+     * @param initiatorUid 请求发起者 UID
+     * @param accept 是否同意
+     * @param isFiltered 是否是被过滤的请求
+     */
+    suspend fun setFriendRequest(initiatorUid: String, accept: Boolean, isFiltered: Boolean = false) {
+        if (isFiltered) {
+            if (accept) {
+                client.callService(SetFilteredFriendRequest, initiatorUid)
+            }
+        } else {
+            client.callService(
+                SetNormalFriendRequest,
+                SetNormalFriendRequest.Req(
+                    targetUid = initiatorUid,
+                    accept = accept
+                )
+            )
+        }
+    }
 
     /**
      * 发送好友戳一戳

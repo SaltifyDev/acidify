@@ -90,6 +90,19 @@ fun BotGroupFolderEntry.toMilkyEntity(groupId: Long) =
         fileCount = totalFileCount
     )
 
+fun BotFriendRequest.toMilkyEntity() =
+    FriendRequest(
+        time = time,
+        initiatorId = initiatorUin,
+        initiatorUid = initiatorUid,
+        targetUserId = targetUserUin,
+        targetUserUid = targetUserUid,
+        state = state.toMilkyString(),
+        comment = comment,
+        via = via,
+        isFiltered = isFiltered
+    )
+
 fun BotGroupNotification.toMilkyEntity() = when (this) {
     is BotGroupNotification.JoinRequest -> GroupNotification.JoinRequest(
         groupId = groupUin,

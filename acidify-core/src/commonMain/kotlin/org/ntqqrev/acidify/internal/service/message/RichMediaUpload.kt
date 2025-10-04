@@ -131,20 +131,8 @@ internal abstract class RichMediaUpload<T>(
         ExtBizInfo {
             it[pic] = PicExtBizInfo {
                 it[bizType] = subType
-                it[bytesPbReserveC2C] = byteArrayOf(
-                    0x08, 0x00, 0x18, 0x00, 0x20, 0x00, 0x42, 0x00, 0x50, 0x00, 0x62, 0x00,
-                    0x92.toByte(), 0x01, 0x00, 0x9a.toByte(), 0x01, 0x00, 0xa2.toByte(), 0x01,
-                    0x0c, 0x08, 0x00, 0x12, 0x00, 0x18, 0x00, 0x20, 0x00, 0x28, 0x00, 0x3a, 0x00
-                )
+                it[bytesPbReserveC2C] = "0800180020004200500062009201009a0100a2010c080012001800200028003a00".hexToByteArray()
                 it[this.textSummary] = textSummary.ifEmpty { if (subType == 1) "[动画表情]" else "[图片]" }
-            }
-            it[video] = VideoExtBizInfo {
-                it[bytesPbReserve] = ByteArray(0)
-            }
-            it[ptt] = PttExtBizInfo {
-                it[bytesReserve] = ByteArray(0)
-                it[bytesPbReserve] = ByteArray(0)
-                it[bytesGeneralFlags] = ByteArray(0)
             }
         }
 
@@ -152,20 +140,8 @@ internal abstract class RichMediaUpload<T>(
         ExtBizInfo {
             it[pic] = PicExtBizInfo {
                 it[bizType] = subType
-                it[bytesPbReserveTroop] = byteArrayOf(
-                    0x08, 0x00, 0x18, 0x00, 0x20, 0x00, 0x42, 0x00, 0x50, 0x00, 0x62, 0x00,
-                    0x92.toByte(), 0x01, 0x00, 0x9a.toByte(), 0x01, 0x00, 0xa2.toByte(), 0x01,
-                    0x0c, 0x08, 0x00, 0x12, 0x00, 0x18, 0x00, 0x20, 0x00, 0x28, 0x00, 0x3a, 0x00
-                )
+                it[bytesPbReserveTroop] = "0800180020004200500062009201009a0100a2010c080012001800200028003a00".hexToByteArray()
                 it[this.textSummary] = textSummary.ifEmpty { if (subType == 1) "[动画表情]" else "[图片]" }
-            }
-            it[video] = VideoExtBizInfo {
-                it[bytesPbReserve] = ByteArray(0)
-            }
-            it[ptt] = PttExtBizInfo {
-                it[bytesReserve] = ByteArray(0)
-                it[bytesPbReserve] = ByteArray(0)
-                it[bytesGeneralFlags] = ByteArray(0)
             }
         }
 

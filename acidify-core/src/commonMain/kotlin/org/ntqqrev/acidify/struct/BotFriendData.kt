@@ -2,7 +2,7 @@ package org.ntqqrev.acidify.struct
 
 /**
  * Bot 好友数据
- * @property uin 好友的 uin（QQ 号）
+ * @property uin 好友的 QQ 号
  * @property uid 好友的 uid
  * @property nickname 好友的昵称
  * @property remark 好友的备注

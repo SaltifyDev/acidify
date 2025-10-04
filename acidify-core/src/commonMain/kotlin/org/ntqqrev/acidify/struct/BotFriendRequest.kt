@@ -10,9 +10,9 @@ import org.ntqqrev.acidify.pb.PbObject
  *
  * @property time 请求发起时间（Unix 时间戳，秒）
  * @property initiatorUin 请求发起者 QQ 号
- * @property initiatorUid 请求发起者 UID
+ * @property initiatorUid 请求发起者 uid
  * @property targetUserUin 目标用户 QQ 号
- * @property targetUserUid 目标用户 UID
+ * @property targetUserUid 目标用户 uid
  * @property state 请求状态
  * @property comment 申请附加信息
  * @property via 申请来源

@@ -12,7 +12,7 @@ interface BotOutgoingMessageBuilder {
 
     /**
      * 添加提及（At）消息段
-     * @param uin 被提及的用户的 uin（QQ 号），为 `null` 表示提及了所有人（`@全体成员`）
+     * @param uin 被提及的用户的 QQ 号，为 `null` 表示提及了所有人（`@全体成员`）
      * @param name 被提及的用户的外显名称（仅在电脑端可见）
      */
     fun mention(uin: Long?, name: String)
@@ -87,7 +87,7 @@ interface BotOutgoingMessageBuilder {
     interface Forward {
         /**
          * 添加一个伪造合并转发消息
-         * @param senderUin 该消息的发送者 uin（QQ 号）
+         * @param senderUin 该消息的发送者 QQ 号
          * @param senderName 该消息的发送者昵称
          * @param block 构建该消息的内容
          */

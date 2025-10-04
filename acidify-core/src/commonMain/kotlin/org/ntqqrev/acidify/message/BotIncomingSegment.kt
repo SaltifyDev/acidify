@@ -16,7 +16,7 @@ sealed class BotIncomingSegment {
 
     /**
      * 提及（At）消息段
-     * @property uin 被提及的用户的 uin（QQ 号），为 `null` 表示提及了所有人（`@全体成员`）
+     * @property uin 被提及的用户的 QQ 号，为 `null` 表示提及了所有人（`@全体成员`）
      * @property name 被提及的用户的名称，视情况有可能是昵称 / 备注 / 群名片 / `@全体成员`
      */
     class Mention internal constructor(

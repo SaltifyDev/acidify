@@ -103,7 +103,7 @@ class Bot(
         get() = sharedEventFlow
 
     /**
-     * 当前登录用户的 uin（QQ 号）
+     * 当前登录用户的 QQ 号
      */
     val uin: Long
         get() = sessionStore.uin.takeIf { it != 0L }
@@ -276,7 +276,7 @@ class Bot(
     }
 
     /**
-     * 通过 uin（QQ 号）获取用户信息。
+     * 通过 QQ 号获取用户信息。
      */
     suspend fun fetchUserInfoByUin(uin: Long) = client.callService(FetchUserInfo.ByUin, uin)
 
@@ -335,7 +335,7 @@ class Bot(
     }
 
     /**
-     * 解析 uid 到 uin（QQ 号）。
+     * 解析 uid 到 QQ 号。
      * 如果之前未解析过该 uid，会发起网络请求获取用户信息。
      */
     suspend fun getUinByUid(uid: String): Long {
@@ -345,7 +345,7 @@ class Bot(
     }
 
     /**
-     * 解析 uin（QQ 号）到 uid，该过程可能失败，此时抛出 [NoSuchElementException]。
+     * 解析 QQ 号到 uid，该过程可能失败，此时抛出 [NoSuchElementException]。
      * 若 [mayComeFromGroupUin] 非空且在缓存中未找到对应 uid，会尝试从该群的成员列表中查找；
      * 否则，会尝试从好友列表中查找。
      */
@@ -599,44 +599,22 @@ class Bot(
     )
 
     /**
-     * 获取好友请求列表
-     * @param isFiltered 是否只获取被过滤的请求（风险账号发起）
-     * @param limit 获取的最大请求数量
-     * @return 好友请求列表
+     * 标记群消息为已读
+     * @param groupUin 群号
+     * @param startSequence 消息序列号，标记该序列号及之前的消息为已读
      */
-    suspend fun getFriendRequests(isFiltered: Boolean = false, limit: Int = 20): List<BotFriendRequest> {
-        if (isFiltered) {
-            return client.callService(FetchFriendRequests.Filtered, limit).map {
-                parseFilteredFriendRequest(it)
-            }
-        } else {
-            return client.callService(FetchFriendRequests.Normal, limit).map {
-                parseFriendRequest(it)
-            }
-        }
-    }
-
-    /**
-     * 处理好友请求（同意/拒绝）
-     * @param initiatorUid 请求发起者 UID
-     * @param accept 是否同意
-     * @param isFiltered 是否是被过滤的请求
-     */
-    suspend fun setFriendRequest(initiatorUid: String, accept: Boolean, isFiltered: Boolean = false) {
-        if (isFiltered) {
-            if (accept) {
-                client.callService(SetFilteredFriendRequest, initiatorUid)
-            }
-        } else {
-            client.callService(
-                SetNormalFriendRequest,
-                SetNormalFriendRequest.Req(
-                    targetUid = initiatorUid,
-                    accept = accept
-                )
-            )
-        }
-    }
+    suspend fun markGroupMessagesAsRead(
+        groupUin: Long,
+        startSequence: Long
+    ) = client.callService(
+        ReportMessageRead,
+        ReportMessageRead.Req(
+            groupUin = groupUin,
+            targetUid = null,
+            startSequence = startSequence,
+            time = 0L
+        )
+    )
 
     /**
      * 发送好友戳一戳
@@ -665,22 +643,44 @@ class Bot(
     )
 
     /**
-     * 标记群消息为已读
-     * @param groupUin 群号
-     * @param startSequence 消息序列号，标记该序列号及之前的消息为已读
+     * 获取好友请求列表
+     * @param isFiltered 是否只获取被过滤的请求（风险账号发起）
+     * @param limit 获取的最大请求数量
+     * @return 好友请求列表
      */
-    suspend fun markGroupMessagesAsRead(
-        groupUin: Long,
-        startSequence: Long
-    ) = client.callService(
-        ReportMessageRead,
-        ReportMessageRead.Req(
-            groupUin = groupUin,
-            targetUid = null,
-            startSequence = startSequence,
-            time = 0L
-        )
-    )
+    suspend fun getFriendRequests(isFiltered: Boolean = false, limit: Int = 20): List<BotFriendRequest> {
+        if (isFiltered) {
+            return client.callService(FetchFriendRequests.Filtered, limit).map {
+                parseFilteredFriendRequest(it)
+            }
+        } else {
+            return client.callService(FetchFriendRequests.Normal, limit).map {
+                parseFriendRequest(it)
+            }
+        }
+    }
+
+    /**
+     * 处理好友请求（同意/拒绝）
+     * @param initiatorUid 请求发起者 uid
+     * @param accept 是否同意
+     * @param isFiltered 是否是被过滤的请求
+     */
+    suspend fun setFriendRequest(initiatorUid: String, accept: Boolean, isFiltered: Boolean = false) {
+        if (isFiltered) {
+            if (accept) {
+                client.callService(SetFilteredFriendRequest, initiatorUid)
+            }
+        } else {
+            client.callService(
+                SetNormalFriendRequest,
+                SetNormalFriendRequest.Req(
+                    targetUid = initiatorUid,
+                    accept = accept
+                )
+            )
+        }
+    }
 
     /**
      * 设置群名称
@@ -1036,6 +1036,83 @@ class Bot(
     )
 
     /**
+     * 获取群通知列表
+     * @param startSequence 起始通知序列号，为 null 则从最新通知开始获取
+     * @param isFiltered 是否只获取被过滤的通知（风险账号发起）
+     * @param count 获取的最大通知数量
+     * @return 群通知列表和下一页起始序列号
+     */
+    suspend fun getGroupNotifications(
+        startSequence: Long? = null,
+        isFiltered: Boolean = false,
+        count: Int = 20
+    ): Pair<List<BotGroupNotification>, Long?> {
+        val resp = client.callService(
+            if (isFiltered) FetchGroupNotifications.Filtered else FetchGroupNotifications.Normal,
+            FetchGroupNotifications.Req(
+                startSequence = startSequence ?: 0,
+                count = count
+            )
+        )
+        val notifications = resp.notifications.mapNotNull {
+            with(BotGroupNotification) { parseNotification(it, isFiltered) }
+        }
+        return notifications to resp.nextSequence.takeIf { it != 0L }
+    }
+
+    /**
+     * 处理群请求（同意/拒绝）
+     * @param groupUin 群号
+     * @param sequence 通知序列号
+     * @param eventType 事件类型（1=入群请求, 22=邀请他人入群）
+     * @param accept 是否同意（true=同意, false=拒绝）
+     * @param isFiltered 是否是被过滤的请求
+     * @param reason 拒绝理由（仅在拒绝时使用）
+     */
+    suspend fun setGroupRequest(
+        groupUin: Long,
+        sequence: Long,
+        eventType: Int,
+        accept: Boolean,
+        isFiltered: Boolean = false,
+        reason: String = ""
+    ) {
+        client.callService(
+            if (isFiltered) SetGroupRequest.Filtered else SetGroupRequest.Normal,
+            SetGroupRequest.Req(
+                groupUin = groupUin,
+                sequence = sequence,
+                eventType = eventType,
+                accept = if (accept) 1 else 2,
+                reason = reason
+            )
+        )
+    }
+
+    /**
+     * 处理群邀请（他人邀请自己入群）
+     * @param groupUin 群号
+     * @param invitationSeq 邀请序列号
+     * @param accept 是否同意
+     */
+    suspend fun setGroupInvitation(
+        groupUin: Long,
+        invitationSeq: Long,
+        accept: Boolean
+    ) {
+        client.callService(
+            SetGroupRequest.Normal,
+            SetGroupRequest.Req(
+                groupUin = groupUin,
+                sequence = invitationSeq,
+                eventType = 2,
+                accept = if (accept) 1 else 2,
+                reason = ""
+            )
+        )
+    }
+
+    /**
      * 上传群文件
      * @param groupUin 群号
      * @param fileName 文件名
@@ -1179,83 +1256,6 @@ class Bot(
             fileId = fileId
         )
     )
-
-    /**
-     * 获取群通知列表
-     * @param startSequence 起始通知序列号，为 null 则从最新通知开始获取
-     * @param isFiltered 是否只获取被过滤的通知（风险账号发起）
-     * @param count 获取的最大通知数量
-     * @return 群通知列表和下一页起始序列号
-     */
-    suspend fun getGroupNotifications(
-        startSequence: Long? = null,
-        isFiltered: Boolean = false,
-        count: Int = 20
-    ): Pair<List<BotGroupNotification>, Long?> {
-        val resp = client.callService(
-            if (isFiltered) FetchGroupNotifications.Filtered else FetchGroupNotifications.Normal,
-            FetchGroupNotifications.Req(
-                startSequence = startSequence ?: 0,
-                count = count
-            )
-        )
-        val notifications = resp.notifications.mapNotNull {
-            with(BotGroupNotification) { parseNotification(it, isFiltered) }
-        }
-        return notifications to resp.nextSequence.takeIf { it != 0L }
-    }
-
-    /**
-     * 处理群请求（同意/拒绝）
-     * @param groupUin 群号
-     * @param sequence 通知序列号
-     * @param eventType 事件类型（1=入群请求, 22=邀请他人入群）
-     * @param accept 是否同意（true=同意, false=拒绝）
-     * @param isFiltered 是否是被过滤的请求
-     * @param reason 拒绝理由（仅在拒绝时使用）
-     */
-    suspend fun setGroupRequest(
-        groupUin: Long,
-        sequence: Long,
-        eventType: Int,
-        accept: Boolean,
-        isFiltered: Boolean = false,
-        reason: String = ""
-    ) {
-        client.callService(
-            if (isFiltered) SetGroupRequest.Filtered else SetGroupRequest.Normal,
-            SetGroupRequest.Req(
-                groupUin = groupUin,
-                sequence = sequence,
-                eventType = eventType,
-                accept = if (accept) 1 else 2,
-                reason = reason
-            )
-        )
-    }
-
-    /**
-     * 处理群邀请（他人邀请自己入群）
-     * @param groupUin 群号
-     * @param invitationSeq 邀请序列号
-     * @param accept 是否同意
-     */
-    suspend fun setGroupInvitation(
-        groupUin: Long,
-        invitationSeq: Long,
-        accept: Boolean
-    ) {
-        client.callService(
-            SetGroupRequest.Normal,
-            SetGroupRequest.Req(
-                groupUin = groupUin,
-                sequence = invitationSeq,
-                eventType = 2,
-                accept = if (accept) 1 else 2,
-                reason = ""
-            )
-        )
-    }
 
     /**
      * 获取群文件/文件夹列表

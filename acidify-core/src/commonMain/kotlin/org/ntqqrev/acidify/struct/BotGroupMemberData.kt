@@ -2,7 +2,7 @@ package org.ntqqrev.acidify.struct
 
 /**
  * Bot 群成员数据
- * @property uin 群成员的 uin（QQ 号）
+ * @property uin 群成员的 QQ 号
  * @property uid 群成员的 uid
  * @property nickname 群成员的昵称
  * @property card 群成员的群名片

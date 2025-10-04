@@ -2,7 +2,7 @@ package org.ntqqrev.acidify.struct
 
 /**
  * 用户信息
- * @property uin 用户的 uin（QQ 号）
+ * @property uin 用户的 QQ 号
  * @property nickname 用户的昵称
  * @property bio 用户的个性签名
  * @property gender 用户的性别

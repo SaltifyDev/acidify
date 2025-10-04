@@ -138,3 +138,9 @@ fun RequestState.toMilkyString() = when (this) {
     RequestState.REJECTED -> "rejected"
     else -> "ignored"
 }
+
+fun String.toEventType() = when (this) {
+    "join_request" -> 1
+    "invited_join_request" -> 22
+    else -> throw IllegalArgumentException("Unknown notification type: $this")
+}

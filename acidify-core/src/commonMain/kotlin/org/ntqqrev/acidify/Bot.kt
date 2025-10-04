@@ -1139,6 +1139,83 @@ class Bot(
     )
 
     /**
+     * 获取群通知列表
+     * @param startSequence 起始通知序列号，为 null 则从最新通知开始获取
+     * @param isFiltered 是否只获取被过滤的通知（风险账号发起）
+     * @param count 获取的最大通知数量
+     * @return 群通知列表和下一页起始序列号
+     */
+    suspend fun getGroupNotifications(
+        startSequence: Long? = null,
+        isFiltered: Boolean = false,
+        count: Int = 20
+    ): Pair<List<BotGroupNotification>, Long?> {
+        val resp = client.callService(
+            if (isFiltered) FetchGroupNotifications.Filtered else FetchGroupNotifications.Normal,
+            FetchGroupNotifications.Req(
+                startSequence = startSequence ?: 0,
+                count = count
+            )
+        )
+        val notifications = resp.notifications.mapNotNull {
+            with(BotGroupNotification) { parseNotification(it, isFiltered) }
+        }
+        return notifications to resp.nextSequence.takeIf { it != 0L }
+    }
+
+    /**
+     * 处理群请求（同意/拒绝）
+     * @param groupUin 群号
+     * @param sequence 通知序列号
+     * @param eventType 事件类型（1=入群请求, 22=邀请他人入群）
+     * @param accept 是否同意（true=同意, false=拒绝）
+     * @param isFiltered 是否是被过滤的请求
+     * @param reason 拒绝理由（仅在拒绝时使用）
+     */
+    suspend fun setGroupRequest(
+        groupUin: Long,
+        sequence: Long,
+        eventType: Int,
+        accept: Boolean,
+        isFiltered: Boolean = false,
+        reason: String = ""
+    ) {
+        client.callService(
+            if (isFiltered) SetGroupRequest.Filtered else SetGroupRequest.Normal,
+            SetGroupRequest.Req(
+                groupUin = groupUin,
+                sequence = sequence,
+                eventType = eventType,
+                accept = if (accept) 1 else 2,
+                reason = reason
+            )
+        )
+    }
+
+    /**
+     * 处理群邀请（他人邀请自己入群）
+     * @param groupUin 群号
+     * @param invitationSeq 邀请序列号
+     * @param accept 是否同意
+     */
+    suspend fun setGroupInvitation(
+        groupUin: Long,
+        invitationSeq: Long,
+        accept: Boolean
+    ) {
+        client.callService(
+            SetGroupRequest.Normal,
+            SetGroupRequest.Req(
+                groupUin = groupUin,
+                sequence = invitationSeq,
+                eventType = 2,
+                accept = if (accept) 1 else 2,
+                reason = ""
+            )
+        )
+    }
+
+    /**
      * 获取群文件/文件夹列表
      * @param groupUin 群号
      * @param targetDirectory 目标目录路径，默认为根目录 "/"

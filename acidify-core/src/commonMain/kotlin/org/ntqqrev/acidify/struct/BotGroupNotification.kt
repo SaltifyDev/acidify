@@ -1,5 +1,9 @@
 package org.ntqqrev.acidify.struct
 
+import org.ntqqrev.acidify.Bot
+import org.ntqqrev.acidify.internal.packet.oidb.GroupNotification
+import org.ntqqrev.acidify.pb.PbObject
+
 /**
  * 群通知实体
  */
@@ -103,4 +107,104 @@ sealed class BotGroupNotification {
         val operatorUin: Long?,
         val operatorUid: String?
     ) : BotGroupNotification()
+
+    companion object {
+        internal suspend fun Bot.parseNotification(
+            raw: PbObject<GroupNotification>,
+            isFiltered: Boolean
+        ): BotGroupNotification? {
+            val sequence = raw.get { sequence }
+            val notifyType = raw.get { notifyType }
+            val requestState = RequestState.from(raw.get { requestState })
+            val group = raw.get { group }
+            val groupUin = group.get { groupUin }
+            val user1 = raw.get { user1 }
+            val user1Uid = user1.get { uid }
+            val comment = raw.get { comment }
+
+            return when (notifyType) {
+                1 -> {
+                    val user1Uin = getUinByUid(user1Uid)
+                    val user2 = raw.get { user2 }
+                    val operatorUid = user2?.get { uid }
+                    val operatorUin = operatorUid?.let { getUinByUid(it) }
+                    JoinRequest(
+                        groupUin = groupUin,
+                        notificationSeq = sequence,
+                        isFiltered = isFiltered,
+                        initiatorUin = user1Uin,
+                        initiatorUid = user1Uid,
+                        state = requestState,
+                        operatorUin = operatorUin,
+                        operatorUid = operatorUid,
+                        comment = comment
+                    )
+                }
+
+                3, 16 -> {
+                    val user1Uin = getUinByUid(user1Uid)
+                    val user2 = raw.get { user2 } ?: return null
+                    val user2Uid = user2.get { uid }
+                    val user2Uin = getUinByUid(user2Uid)
+                    AdminChange(
+                        groupUin = groupUin,
+                        notificationSeq = sequence,
+                        targetUserUin = user1Uin,
+                        targetUserUid = user1Uid,
+                        isSet = notifyType == 3,
+                        operatorUin = user2Uin,
+                        operatorUid = user2Uid
+                    )
+                }
+
+                6 -> {
+                    val user1Uin = getUinByUid(user1Uid)
+                    val operator = raw.get { user2 } ?: raw.get { user3 } ?: return null
+                    val operatorUid = operator.get { uid }
+                    val operatorUin = getUinByUid(operatorUid)
+                    Kick(
+                        groupUin = groupUin,
+                        notificationSeq = sequence,
+                        targetUserUin = user1Uin,
+                        targetUserUid = user1Uid,
+                        operatorUin = operatorUin,
+                        operatorUid = operatorUid
+                    )
+                }
+
+                13 -> {
+                    val user1Uin = getUinByUid(user1Uid)
+                    Quit(
+                        groupUin = groupUin,
+                        notificationSeq = sequence,
+                        targetUserUin = user1Uin,
+                        targetUserUid = user1Uid
+                    )
+                }
+
+                22 -> {
+                    val user1Uin = getUinByUid(user1Uid)
+                    val user2 = raw.get { user2 } ?: return null
+                    val user2Uid = user2.get { uid }
+                    val user2Uin = getUinByUid(user2Uid)
+                    val user3 = raw.get { user3 }
+                    val operatorUid = user3?.get { uid }
+                    val operatorUin = operatorUid?.let { getUinByUid(it) }
+                    InvitedJoinRequest(
+                        groupUin = groupUin,
+                        notificationSeq = sequence,
+                        initiatorUin = user2Uin,
+                        initiatorUid = user2Uid,
+                        targetUserUin = user1Uin,
+                        targetUserUid = user1Uid,
+                        state = requestState,
+                        operatorUin = operatorUin,
+                        operatorUid = operatorUid
+                    )
+                }
+
+                else -> null
+            }
+        }
+    }
 }

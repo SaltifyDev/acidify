@@ -138,6 +138,11 @@ fun Route.configureMilkyApiHttpRoutes() {
     serve(QuitGroup)
     serve(SendGroupMessageReaction)
     serve(SendGroupNudge)
+    serve(GetGroupNotifications)
+    serve(AcceptGroupRequest)
+    serve(RejectGroupRequest)
+    serve(AcceptGroupInvitation)
+    serve(RejectGroupInvitation)
 
     serve(UploadPrivateFile)
     serve(UploadGroupFile)

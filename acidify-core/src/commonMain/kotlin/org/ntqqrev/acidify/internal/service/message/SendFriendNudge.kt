@@ -1,22 +1,21 @@
-package org.ntqqrev.acidify.internal.service.group
+package org.ntqqrev.acidify.internal.service.message
 
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.oidb.PokeReq
 import org.ntqqrev.acidify.internal.service.NoOutputOidbService
 import org.ntqqrev.acidify.pb.invoke
 
-internal object SendGroupNudge : NoOutputOidbService<SendGroupNudge.Req>(0xed3, 1) {
+internal object SendFriendNudge : NoOutputOidbService<SendFriendNudge.Req>(0xed3, 1) {
     class Req(
-        val groupUin: Long,
-        val targetUin: Long
+        val friendUin: Long,
+        val isSelf: Boolean = false
     )
 
     override fun buildOidb(client: LagrangeClient, payload: Req): ByteArray =
         PokeReq {
-            it[targetUin] = payload.targetUin
-            it[groupUin] = payload.groupUin
-            it[friendUin] = 0L
+            it[targetUin] = if (payload.isSelf) client.sessionStore.uin else payload.friendUin
+            it[groupUin] = 0
+            it[friendUin] = payload.friendUin
             it[ext] = 0
         }.toByteArray()
 }
-

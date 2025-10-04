@@ -1053,6 +1053,43 @@ class Bot(
     }
 
     /**
+     * 发送好友戳一戳
+     * @param friendUin 好友 QQ 号
+     * @param isSelf 是否戳自己（默认为 false）
+     */
+    suspend fun sendFriendNudge(
+        friendUin: Long,
+        isSelf: Boolean = false
+    ) {
+        client.callService(
+            SendFriendNudge,
+            SendFriendNudge.Req(
+                friendUin = friendUin,
+                isSelf = isSelf
+            )
+        )
+    }
+
+    /**
+     * 给好友点赞
+     * @param friendUin 好友 QQ 号
+     * @param count 点赞次数（默认为 1）
+     */
+    suspend fun sendProfileLike(
+        friendUin: Long,
+        count: Int = 1
+    ) {
+        val friendUid = getUidByUin(friendUin)
+        client.callService(
+            SendProfileLike,
+            SendProfileLike.Req(
+                targetUid = friendUid,
+                count = count
+            )
+        )
+    }
+
+    /**
      * 上传群文件
      * @param groupUin 群号
      * @param fileName 文件名

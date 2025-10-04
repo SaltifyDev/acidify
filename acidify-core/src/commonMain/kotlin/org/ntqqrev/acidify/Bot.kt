@@ -56,11 +56,13 @@ import kotlin.io.encoding.Base64
 /**
  * Acidify Bot 实例
  */
-class Bot internal constructor(
+class Bot(
     val appInfo: AppInfo,
     val sessionStore: SessionStore,
     signProvider: SignProvider,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    minLogLevel: LogLevel,
+    logHandler: LogHandler,
 ) : CoroutineScope by scope {
     private val logger = this.createLogger(this)
     internal val client = LagrangeClient(appInfo, sessionStore, signProvider, this::createLogger, scope)
@@ -133,6 +135,22 @@ class Bot internal constructor(
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })
         }
+    }
+
+    init {
+        launch {
+            sharedLogFlow
+                .filter { it.level >= minLogLevel }
+                .collect {
+                    logHandler.handleLog(
+                        it.level,
+                        it.tag,
+                        it.messageSupplier(),
+                        it.throwable
+                    )
+                }
+        }
+        client.packetLogic.startConnectLoop()
     }
 
     /**
@@ -1084,35 +1102,5 @@ class Bot internal constructor(
         )
 
         return uploadResp.fileId
-    }
-
-    companion object {
-        /**
-         * 创建新的 Bot 实例
-         */
-        fun create(
-            appInfo: AppInfo,
-            sessionStore: SessionStore,
-            signProvider: SignProvider,
-            scope: CoroutineScope,
-            minLogLevel: LogLevel,
-            logHandler: LogHandler,
-        ): Bot {
-            val bot = Bot(appInfo, sessionStore, signProvider, scope)
-            bot.launch {
-                bot.sharedLogFlow
-                    .filter { it.level >= minLogLevel }
-                    .collect {
-                        logHandler.handleLog(
-                            it.level,
-                            it.tag,
-                            it.messageSupplier(),
-                            it.throwable
-                        )
-                    }
-            }
-            bot.client.packetLogic.startConnectLoop()
-            return bot
-        }
     }
 }

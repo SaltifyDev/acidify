@@ -29,7 +29,7 @@ class BotTest {
     } else {
         SessionStore.empty()
     }
-    private val bot = Bot.create(
+    private val bot = Bot(
         appInfo = defaultSignProvider.getAppInfo()!!,
         sessionStore = session,
         signProvider = defaultSignProvider,

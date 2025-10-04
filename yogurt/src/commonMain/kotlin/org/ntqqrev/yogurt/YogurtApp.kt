@@ -56,7 +56,7 @@ object YogurtApp {
             emptySessionStore
         }
         val appInfo = signProvider.getAppInfo()!!
-        val bot = Bot.create(
+        val bot = Bot(
             appInfo = appInfo,
             sessionStore = sessionStore,
             signProvider = signProvider,

@@ -191,14 +191,9 @@ class Bot internal constructor(
         logger.i { "用户 $uin 已上线" }
         
         val highwayInfo = client.callService(FetchHighwayInfo)
-        val firstServer = highwayInfo.servers.values.firstOrNull()?.firstOrNull()
-        if (firstServer != null) {
-            val (host, port) = firstServer
-            client.highwayLogic.setHighwayUrl(host, port, highwayInfo.sigSession)
-            logger.d { "已配置 Highway 服务器: $host:$port" }
-        } else {
-            logger.w { "未获取到 Highway 服务器信息" }
-        }
+        val (host, port) = highwayInfo.servers[1]!![0]
+        client.highwayLogic.setHighwayUrl(host, port, highwayInfo.sigSession)
+        logger.d { "已配置 Highway 服务器: $host:$port" }
 
         heartbeatJob = launch {
             while (isLoggedIn) {

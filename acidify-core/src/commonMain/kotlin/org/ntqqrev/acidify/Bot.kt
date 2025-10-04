@@ -19,8 +19,8 @@ import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QRCodeStateQueryEvent
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
+import org.ntqqrev.acidify.event.internal.KickSignal
 import org.ntqqrev.acidify.event.internal.MsgPushSignal
-import org.ntqqrev.acidify.event.internal.Signal
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.exception.MessageSendException
 import org.ntqqrev.acidify.internal.LagrangeClient
@@ -74,8 +74,9 @@ class Bot(
         extraBufferCapacity = 100,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    internal val signals = listOf<Signal>(
-        MsgPushSignal
+    internal val signals = listOf(
+        MsgPushSignal,
+        KickSignal
     ).associateBy { it.cmd }
     internal val faceDetailMapMut = mutableMapOf<String, BotFaceDetail>()
     internal val uin2uidMap = ConcurrentMutableMap<Long, String>()

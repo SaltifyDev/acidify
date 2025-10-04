@@ -8,8 +8,8 @@ import org.ntqqrev.acidify.internal.packet.message.PushMsgType
 import org.ntqqrev.acidify.message.BotIncomingMessage.Companion.parseMessage
 import org.ntqqrev.acidify.pb.invoke
 
-internal object MsgPushSignal : Signal("trpc.msg.olpush.OlPushService.MsgPush") {
-    override fun parse(bot: Bot, payload: ByteArray): List<AcidifyEvent> {
+internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.MsgPush") {
+    override suspend fun parse(bot: Bot, payload: ByteArray): List<AcidifyEvent> {
         val commonMsg = PushMsg(payload).get { message }
         return when (PushMsgType.from(commonMsg.get { contentHead }.get { type })) {
             PushMsgType.FriendMessage,

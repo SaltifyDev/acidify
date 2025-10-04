@@ -1040,6 +1040,68 @@ class Bot(
     }
 
     /**
+     * TODO: THIS API IS BROKEN
+     * 上传私聊文件
+     * @param friendUin 好友 QQ 号
+     * @param fileName 文件名
+     * @param fileData 文件数据
+     * @return 文件 ID
+     */
+    suspend fun uploadPrivateFile(
+        friendUin: Long, fileName: String, fileData: ByteArray
+    ): String {
+        val friendUid = getUidByUin(friendUin)
+        val fileMd5 = fileData.md5()
+        val fileSha1 = fileData.sha1()
+        val md510M = fileData.copyOfRange(0, minOf(10 * 1024 * 1024, fileData.size)).md5()
+        val fileTriSha1 = fileData.triSha1()
+
+        val uploadResp = client.callService(
+            UploadPrivateFile,
+            UploadPrivateFile.Req(
+                senderUid = uid,
+                receiverUid = friendUid,
+                fileName = fileName,
+                fileSize = fileData.size,
+                fileMd5 = fileMd5,
+                fileSha1 = fileSha1,
+                md510M = md510M,
+                fileTriSha1 = fileTriSha1
+            )
+        )
+
+        if (!uploadResp.fileExist) {
+            client.highwayLogic.uploadPrivateFile(
+                receiverUin = friendUin,
+                fileName = fileName,
+                fileData = fileData,
+                fileMd5 = fileMd5,
+                fileSha1 = fileSha1,
+                md510M = md510M,
+                fileTriSha1 = fileTriSha1,
+                fileId = uploadResp.fileId,
+                uploadKey = uploadResp.uploadKey,
+                uploadIpAndPorts = uploadResp.ipAndPorts
+            )
+        }
+
+        client.callService(
+            BroadcastPrivateFile,
+            BroadcastPrivateFile.Req(
+                friendUin = friendUin,
+                friendUid = friendUid,
+                fileId = uploadResp.fileId,
+                fileMd5 = fileMd5,
+                fileName = fileName,
+                fileSize = fileData.size.toLong(),
+                crcMedia = uploadResp.fileCrcMedia
+            )
+        )
+
+        return uploadResp.fileId
+    }
+
+    /**
      * 获取私聊文件下载链接
      * @param friendUin 好友 QQ 号
      * @param fileId 文件 ID

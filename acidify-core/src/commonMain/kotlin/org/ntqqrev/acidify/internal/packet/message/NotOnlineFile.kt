@@ -20,7 +20,7 @@ internal object NotOnlineFile : PbSchema() {
     val uploadTime = PbInt32[52]
     val absFileType = PbInt32[53]
     val clientType = PbInt32[54]
-    val expireTime = PbInt32[55]
+    val expireTime = PbInt64[55]
     val pbReserve = PbBytes[56]
     val fileIdCrcMedia = PbString[57]
 }

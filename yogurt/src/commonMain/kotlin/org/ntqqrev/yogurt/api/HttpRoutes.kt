@@ -139,6 +139,7 @@ fun Route.configureMilkyApiHttpRoutes() {
     serve(SendGroupMessageReaction)
     serve(SendGroupNudge)
 
+    serve(UploadPrivateFile)
     serve(UploadGroupFile)
     serve(GetPrivateFileDownloadUrl)
     serve(GetGroupFileDownloadUrl)

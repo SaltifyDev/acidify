@@ -72,6 +72,77 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
     }
 
     /**
+     * 上传私聊文件
+     * @param receiverUin 接收者 uin（好友 QQ 号）
+     * @param fileName 文件名
+     * @param fileData 文件数据
+     * @param fileMd5 文件 MD5
+     * @param fileSha1 文件 SHA1
+     * @param md510M 前10MB的MD5
+     * @param fileTriSha1 文件 TriSHA1
+     * @param fileId 文件 ID
+     * @param uploadKey 上传密钥
+     * @param uploadIpAndPorts 上传服务器 IP 和端口列表
+     */
+    suspend fun uploadPrivateFile(
+        receiverUin: Long,
+        fileName: String,
+        fileData: ByteArray,
+        fileMd5: ByteArray,
+        fileSha1: ByteArray,
+        md510M: ByteArray,
+        fileTriSha1: ByteArray,
+        fileId: String,
+        uploadKey: ByteArray,
+        uploadIpAndPorts: List<Pair<String, Int>>
+    ) {
+        val ext = FileUploadExt {
+            it[unknown1] = 100
+            it[unknown2] = 1
+            it[unknown3] = 0
+            it[entry] = FileUploadEntry {
+                it[busiBuff] = ExcitingBusiInfo {
+                    it[senderUin] = client.sessionStore.uin
+                    it[this.receiverUin] = receiverUin
+                }
+                it[fileEntry] = ExcitingFileEntry {
+                    it[fileSize] = fileData.size.toLong()
+                    it[md5] = fileMd5
+                    it[checkKey] = fileSha1
+                    it[this.md510M] = md510M
+                    it[sha3] = fileTriSha1
+                    it[this.fileId] = fileId
+                    it[this.uploadKey] = uploadKey
+                }
+                it[clientInfo] = ExcitingClientInfo {
+                    it[clientType] = 3
+                    it[appId] = "100"
+                    it[terminalType] = 3
+                    it[clientVer] = "1.1.1"
+                    it[unknown] = 4
+                }
+                it[fileNameInfo] = ExcitingFileNameInfo {
+                    it[this.fileName] = fileName
+                }
+                it[host] = ExcitingHostConfig {
+                    it[hosts] = uploadIpAndPorts.map { (uploadIp, uploadPort) ->
+                        ExcitingHostInfo {
+                            it[url] = ExcitingUrlInfo {
+                                it[unknown] = 1
+                                it[host] = uploadIp
+                            }
+                            it[port] = uploadPort
+                        }
+                    }
+                }
+            }
+            it[unknown200] = 1
+        }.toByteArray()
+
+        upload(95, fileData, fileMd5, ext)
+    }
+
+    /**
      * 上传群文件
      * @param senderUin 发送者 UIN
      * @param groupUin 群号

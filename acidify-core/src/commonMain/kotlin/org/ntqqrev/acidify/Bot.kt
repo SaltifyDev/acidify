@@ -531,15 +531,13 @@ class Bot(
      * @param groupUin 群号
      * @param sequence 消息序列号
      */
-    suspend fun recallGroupMessage(groupUin: Long, sequence: Long) {
-        client.callService(
-            RecallGroupMessage,
-            RecallGroupMessage.Req(
-                groupUin = groupUin,
-                sequence = sequence
-            )
+    suspend fun recallGroupMessage(groupUin: Long, sequence: Long) = client.callService(
+        RecallGroupMessage,
+        RecallGroupMessage.Req(
+            groupUin = groupUin,
+            sequence = sequence
         )
-    }
+    )
 
     /**
      * 获取合并转发消息内容
@@ -547,8 +545,8 @@ class Bot(
      * @return 转发消息列表
      */
     suspend fun getForwardedMessages(resId: String): List<BotForwardedMessage> {
-        val resp = client.callService(RecvLongMsg, RecvLongMsg.Req(resId, isGroup = false))
-        return resp.messages.mapNotNull { parseForwardedMessage(it) }
+        return client.callService(RecvLongMsg, RecvLongMsg.Req(resId))
+            .mapNotNull { parseForwardedMessage(it) }
     }
 
     /**
@@ -598,18 +596,15 @@ class Bot(
         friendUin: Long,
         startSequence: Long,
         startTime: Long
-    ) {
-        val friendUid = getUidByUin(friendUin)
-        client.callService(
-            ReportMessageRead,
-            ReportMessageRead.Req(
-                groupUin = null,
-                targetUid = friendUid,
-                startSequence = startSequence,
-                time = startTime
-            )
+    ) = client.callService(
+        ReportMessageRead,
+        ReportMessageRead.Req(
+            groupUin = null,
+            targetUid = getUidByUin(friendUin),
+            startSequence = startSequence,
+            time = startTime
         )
-    }
+    )
 
     /**
      * 标记群消息为已读
@@ -619,17 +614,15 @@ class Bot(
     suspend fun markGroupMessagesAsRead(
         groupUin: Long,
         startSequence: Long
-    ) {
-        client.callService(
-            ReportMessageRead,
-            ReportMessageRead.Req(
-                groupUin = groupUin,
-                targetUid = null,
-                startSequence = startSequence,
-                time = 0L
-            )
+    ) = client.callService(
+        ReportMessageRead,
+        ReportMessageRead.Req(
+            groupUin = groupUin,
+            targetUid = null,
+            startSequence = startSequence,
+            time = 0L
         )
-    }
+    )
 
     /**
      * 设置群名称
@@ -639,15 +632,13 @@ class Bot(
     suspend fun setGroupName(
         groupUin: Long,
         groupName: String
-    ) {
-        client.callService(
-            SetGroupName,
-            SetGroupName.Req(
-                groupUin = groupUin,
-                groupName = groupName
-            )
+    ) = client.callService(
+        SetGroupName,
+        SetGroupName.Req(
+            groupUin = groupUin,
+            groupName = groupName
         )
-    }
+    )
 
     /**
      * 设置群头像
@@ -657,9 +648,7 @@ class Bot(
     suspend fun setGroupAvatar(
         groupUin: Long,
         imageData: ByteArray
-    ) {
-        client.highwayLogic.uploadGroupAvatar(groupUin, imageData)
-    }
+    ) = client.highwayLogic.uploadGroupAvatar(groupUin, imageData)
 
     /**
      * 设置群成员的群名片
@@ -671,17 +660,14 @@ class Bot(
         groupUin: Long,
         memberUin: Long,
         card: String
-    ) {
-        val memberUid = getUidByUin(memberUin, groupUin)
-        client.callService(
-            SetMemberCard,
-            SetMemberCard.Req(
-                groupUin = groupUin,
-                memberUid = memberUid,
-                card = card
-            )
+    ) = client.callService(
+        SetMemberCard,
+        SetMemberCard.Req(
+            groupUin = groupUin,
+            memberUid = getUidByUin(memberUin, groupUin),
+            card = card
         )
-    }
+    )
 
     /**
      * 设置群成员的专属头衔
@@ -693,18 +679,16 @@ class Bot(
         groupUin: Long,
         memberUin: Long,
         specialTitle: String
-    ) {
-        require(specialTitle.encodeToByteArray().size <= 18) { "专属头衔长度不能超过 18 个字节" }
-        val memberUid = getUidByUin(memberUin, groupUin)
-        client.callService(
-            SetMemberTitle,
-            SetMemberTitle.Req(
-                groupUin = groupUin,
-                memberUid = memberUid,
-                specialTitle = specialTitle
-            )
+    ) = client.callService(
+        SetMemberTitle,
+        SetMemberTitle.Req(
+            groupUin = groupUin,
+            memberUid = getUidByUin(memberUin, groupUin),
+            specialTitle = specialTitle.takeIf {
+                it.encodeToByteArray().size <= 18
+            } ?: throw IllegalArgumentException("专属头衔长度不能超过 18 个字节")
         )
-    }
+    )
 
     /**
      * 设置群管理员
@@ -716,17 +700,14 @@ class Bot(
         groupUin: Long,
         memberUin: Long,
         isAdmin: Boolean
-    ) {
-        val memberUid = getUidByUin(memberUin, groupUin)
-        client.callService(
-            SetMemberAdmin,
-            SetMemberAdmin.Req(
-                groupUin = groupUin,
-                memberUid = memberUid,
-                isAdmin = isAdmin
-            )
+    ) = client.callService(
+        SetMemberAdmin,
+        SetMemberAdmin.Req(
+            groupUin = groupUin,
+            memberUid = getUidByUin(memberUin, groupUin),
+            isAdmin = isAdmin
         )
-    }
+    )
 
     /**
      * 设置群成员禁言
@@ -738,17 +719,14 @@ class Bot(
         groupUin: Long,
         memberUin: Long,
         duration: Int
-    ) {
-        val memberUid = getUidByUin(memberUin, groupUin)
-        client.callService(
-            SetMemberMute,
-            SetMemberMute.Req(
-                groupUin = groupUin,
-                memberUid = memberUid,
-                duration = duration
-            )
+    ) = client.callService(
+        SetMemberMute,
+        SetMemberMute.Req(
+            groupUin = groupUin,
+            memberUid = getUidByUin(memberUin, groupUin),
+            duration = duration
         )
-    }
+    )
 
     /**
      * 设置群全员禁言
@@ -758,15 +736,13 @@ class Bot(
     suspend fun setGroupWholeMute(
         groupUin: Long,
         isMute: Boolean
-    ) {
-        client.callService(
-            SetGroupWholeMute,
-            SetGroupWholeMute.Req(
-                groupUin = groupUin,
-                isMute = isMute
-            )
+    ) = client.callService(
+        SetGroupWholeMute,
+        SetGroupWholeMute.Req(
+            groupUin = groupUin,
+            isMute = isMute
         )
-    }
+    )
 
     /**
      * 踢出群成员
@@ -780,18 +756,15 @@ class Bot(
         memberUin: Long,
         rejectAddRequest: Boolean = false,
         reason: String = ""
-    ) {
-        val memberUid = getUidByUin(memberUin, groupUin)
-        client.callService(
-            KickMember,
-            KickMember.Req(
-                groupUin = groupUin,
-                memberUid = memberUid,
-                rejectAddRequest = rejectAddRequest,
-                reason = reason
-            )
+    ) = client.callService(
+        KickMember,
+        KickMember.Req(
+            groupUin = groupUin,
+            memberUid = getUidByUin(memberUin, groupUin),
+            rejectAddRequest = rejectAddRequest,
+            reason = reason
         )
-    }
+    )
 
     /**
      * 获取群公告列表
@@ -998,16 +971,12 @@ class Bot(
      * 退出群聊
      * @param groupUin 群号
      */
-    suspend fun quitGroup(
-        groupUin: Long
-    ) {
-        client.callService(
-            QuitGroup,
-            QuitGroup.Req(
-                groupUin = groupUin
-            )
+    suspend fun quitGroup(groupUin: Long) = client.callService(
+        QuitGroup,
+        QuitGroup.Req(
+            groupUin = groupUin
         )
-    }
+    )
 
     /**
      * 发送群消息表情回应
@@ -1021,17 +990,15 @@ class Bot(
         sequence: Int,
         code: String,
         isAdd: Boolean = true
-    ) {
-        client.callService(
-            SetGroupMessageReaction,
-            SetGroupMessageReaction.Req(
-                groupUin = groupUin,
-                sequence = sequence,
-                code = code,
-                isAdd = isAdd
-            )
+    ) = client.callService(
+        SetGroupMessageReaction,
+        SetGroupMessageReaction.Req(
+            groupUin = groupUin,
+            sequence = sequence,
+            code = code,
+            isAdd = isAdd
         )
-    }
+    )
 
     /**
      * 发送群戳一戳
@@ -1041,15 +1008,13 @@ class Bot(
     suspend fun sendGroupNudge(
         groupUin: Long,
         targetUin: Long
-    ) {
-        client.callService(
-            SendGroupNudge,
-            SendGroupNudge.Req(
-                groupUin = groupUin,
-                targetUin = targetUin
-            )
+    ) = client.callService(
+        SendGroupNudge,
+        SendGroupNudge.Req(
+            groupUin = groupUin,
+            targetUin = targetUin
         )
-    }
+    )
 
     /**
      * 发送好友戳一戳
@@ -1059,15 +1024,13 @@ class Bot(
     suspend fun sendFriendNudge(
         friendUin: Long,
         isSelf: Boolean = false
-    ) {
-        client.callService(
-            SendFriendNudge,
-            SendFriendNudge.Req(
-                friendUin = friendUin,
-                isSelf = isSelf
-            )
+    ) = client.callService(
+        SendFriendNudge,
+        SendFriendNudge.Req(
+            friendUin = friendUin,
+            isSelf = isSelf
         )
-    }
+    )
 
     /**
      * 给好友点赞
@@ -1077,16 +1040,13 @@ class Bot(
     suspend fun sendProfileLike(
         friendUin: Long,
         count: Int = 1
-    ) {
-        val friendUid = getUidByUin(friendUin)
-        client.callService(
-            SendProfileLike,
-            SendProfileLike.Req(
-                targetUid = friendUid,
-                count = count
-            )
+    ) = client.callService(
+        SendProfileLike,
+        SendProfileLike.Req(
+            targetUid = getUidByUin(friendUin),
+            count = count
         )
-    }
+    )
 
     /**
      * 获取私聊文件下载链接
@@ -1099,18 +1059,14 @@ class Bot(
         friendUin: Long,
         fileId: String,
         fileHash: String
-    ): String {
-        val friendUid = getUidByUin(friendUin)
-        val resp = client.callService(
-            GetPrivateFileDownloadUrl,
-            GetPrivateFileDownloadUrl.Req(
-                receiverUid = friendUid,
-                fileUuid = fileId,
-                fileHash = fileHash
-            )
+    ): String = client.callService(
+        GetPrivateFileDownloadUrl,
+        GetPrivateFileDownloadUrl.Req(
+            receiverUid = getUidByUin(friendUin),
+            fileUuid = fileId,
+            fileHash = fileHash
         )
-        return resp.url
-    }
+    )
 
     /**
      * 获取群文件下载链接
@@ -1121,16 +1077,13 @@ class Bot(
     suspend fun getGroupFileDownloadUrl(
         groupUin: Long,
         fileId: String
-    ): String {
-        val resp = client.callService(
-            GetGroupFileDownloadUrl,
-            GetGroupFileDownloadUrl.Req(
-                groupUin = groupUin,
-                fileId = fileId
-            )
+    ): String = client.callService(
+        GetGroupFileDownloadUrl,
+        GetGroupFileDownloadUrl.Req(
+            groupUin = groupUin,
+            fileId = fileId
         )
-        return resp.url
-    }
+    )
 
     /**
      * 获取群文件/文件夹列表

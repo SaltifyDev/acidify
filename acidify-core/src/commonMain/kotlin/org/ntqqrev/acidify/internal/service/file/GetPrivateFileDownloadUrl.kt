@@ -7,16 +7,11 @@ import org.ntqqrev.acidify.internal.packet.oidb.PrivateFileDownloadResp
 import org.ntqqrev.acidify.internal.service.OidbService
 import org.ntqqrev.acidify.pb.invoke
 
-internal object GetPrivateFileDownloadUrl :
-    OidbService<GetPrivateFileDownloadUrl.Req, GetPrivateFileDownloadUrl.Resp>(0xe37, 1200, true) {
+internal object GetPrivateFileDownloadUrl : OidbService<GetPrivateFileDownloadUrl.Req, String>(0xe37, 1200, true) {
     class Req(
         val receiverUid: String,
         val fileUuid: String,
         val fileHash: String
-    )
-
-    class Resp(
-        val url: String
     )
 
     override fun buildOidb(client: LagrangeClient, payload: Req): ByteArray =
@@ -29,11 +24,11 @@ internal object GetPrivateFileDownloadUrl :
             }
         }.toByteArray()
 
-    override fun parseOidb(client: LagrangeClient, payload: ByteArray): Resp {
+    override fun parseOidb(client: LagrangeClient, payload: ByteArray): String {
         val resp = PrivateFileDownloadResp(payload).get { body }.get { result }
         val server = resp.get { server }
         val port = resp.get { port }
         val urlPath = resp.get { url }
-        return Resp("http://$server:$port$urlPath&isthumb=0")
+        return "http://$server:$port$urlPath&isthumb=0"
     }
 }

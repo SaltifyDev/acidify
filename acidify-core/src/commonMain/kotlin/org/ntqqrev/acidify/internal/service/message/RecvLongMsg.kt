@@ -10,10 +10,8 @@ import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
 
 internal object RecvLongMsg :
-    Service<RecvLongMsg.Req, RecvLongMsg.Resp>("trpc.group.long_msg_interface.MsgService.SsoRecvLongMsg") {
-    class Req(val resId: String, val isGroup: Boolean)
-
-    class Resp(val messages: List<PbObject<CommonMessage>>)
+    Service<RecvLongMsg.Req, List<PbObject<CommonMessage>>>("trpc.group.long_msg_interface.MsgService.SsoRecvLongMsg") {
+    class Req(val resId: String, val isGroup: Boolean = false)
 
     override fun build(client: LagrangeClient, payload: Req): ByteArray {
         return LongMsgInterfaceReq {
@@ -38,7 +36,7 @@ internal object RecvLongMsg :
         }.toByteArray()
     }
 
-    override fun parse(client: LagrangeClient, payload: ByteArray): Resp {
+    override fun parse(client: LagrangeClient, payload: ByteArray): List<PbObject<CommonMessage>> {
         val resp = PbObject(LongMsgInterfaceResp, payload)
         val compressedPayload = resp.get { recvResp }?.get { this.payload }
             ?: throw IllegalStateException("No payload in LongMsgInterfaceResp")
@@ -46,12 +44,10 @@ internal object RecvLongMsg :
         val decompressed = GZIP.uncompress(compressedPayload)
         val content = PbObject(PbMultiMsgTransmit, decompressed)
 
-        val multiMsg = content.get { items }
+        return content.get { items }
             .firstOrNull { it.get { fileName } == "MultiMsg" }
             ?.get { buffer }?.get { msg }
             ?: emptyList()
-
-        return Resp(multiMsg)
     }
 }
 

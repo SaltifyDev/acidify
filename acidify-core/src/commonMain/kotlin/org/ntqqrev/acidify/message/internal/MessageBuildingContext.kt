@@ -219,7 +219,7 @@ internal class MessageBuildingContext(
             else -> throw IllegalArgumentException("不支持的消息场景: $scene")
         }
 
-        uploadResp.respObj.get { uKey }.takeIf { it.isNotEmpty() }?.let {
+        uploadResp.get { uKey }.takeIf { it.isNotEmpty() }?.let {
             bot.client.flashTransferLogic.uploadFile(
                 uKey = it,
                 appId = if (scene == MessageScene.FRIEND) 1406 else 1407,
@@ -227,7 +227,7 @@ internal class MessageBuildingContext(
             )
         } ?: logger.d { "uKey 为空，服务器可能已存在该图片，跳过上传" }
 
-        val msgInfo = uploadResp.respObj.get { msgInfo }
+        val msgInfo = uploadResp.get { msgInfo }
         val businessType = when (scene) {
             MessageScene.FRIEND -> 10
             MessageScene.GROUP -> 20
@@ -277,7 +277,7 @@ internal class MessageBuildingContext(
             else -> throw IllegalArgumentException("不支持的消息场景: $scene")
         }
 
-        uploadResp.respObj.get { uKey }.takeIf { it.isNotEmpty() }?.let {
+        uploadResp.get { uKey }.takeIf { it.isNotEmpty() }?.let {
             bot.client.flashTransferLogic.uploadFile(
                 uKey = it,
                 appId = if (scene == MessageScene.FRIEND) 1402 else 1403,
@@ -285,7 +285,7 @@ internal class MessageBuildingContext(
             )
         } ?: logger.d { "uKey 为空，服务器可能已存在该语音，跳过上传" }
 
-        val msgInfo = uploadResp.respObj.get { msgInfo }
+        val msgInfo = uploadResp.get { msgInfo }
         val businessType = when (scene) {
             MessageScene.FRIEND -> 12
             MessageScene.GROUP -> 22
@@ -361,7 +361,7 @@ internal class MessageBuildingContext(
         }
 
         // 上传视频文件
-        uploadResp.respObj.get { uKey }.takeIf { it.isNotEmpty() }?.let {
+        uploadResp.get { uKey }.takeIf { it.isNotEmpty() }?.let {
             bot.client.flashTransferLogic.uploadFile(
                 uKey = it,
                 appId = if (scene == MessageScene.FRIEND) 1413 else 1415,
@@ -370,7 +370,7 @@ internal class MessageBuildingContext(
         } ?: logger.d { "uKey 为空，服务器可能已存在该视频，跳过上传" }
 
         // 上传缩略图
-        uploadResp.respObj.get { subFileInfos }.getOrNull(0)?.get { uKey }
+        uploadResp.get { subFileInfos }.getOrNull(0)?.get { uKey }
             ?.takeIf { it.isNotEmpty() }?.let {
                 bot.client.flashTransferLogic.uploadFile(
                     uKey = it,
@@ -379,7 +379,7 @@ internal class MessageBuildingContext(
                 )
             } ?: logger.d { "视频缩略图 uKey 为空，服务器可能已存在该缩略图，跳过上传" }
 
-        val msgInfo = uploadResp.respObj.get { msgInfo }
+        val msgInfo = uploadResp.get { msgInfo }
         val businessType = when (scene) {
             MessageScene.FRIEND -> 11
             MessageScene.GROUP -> 21
@@ -407,7 +407,7 @@ internal class MessageBuildingContext(
                 peerUid = peerUid,
                 messages = fakeMessages.map { it.commonMsg }
             )
-        ).resId
+        )
 
         val uuid = Random.nextBytes(16).let {
             "${it.sliceArray(0..3).toHexString()}-${it.sliceArray(4..5).toHexString()}-" +

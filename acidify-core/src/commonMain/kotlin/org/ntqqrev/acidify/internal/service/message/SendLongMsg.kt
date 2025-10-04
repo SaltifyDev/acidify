@@ -11,7 +11,7 @@ import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
 
 internal object SendLongMsg :
-    Service<SendLongMsg.Req, SendLongMsg.Resp>("trpc.group.long_msg_interface.MsgService.SsoSendLongMsg") {
+    Service<SendLongMsg.Req, String>("trpc.group.long_msg_interface.MsgService.SsoSendLongMsg") {
     class Req(
         val scene: MessageScene,
         val peerUin: Long,
@@ -60,11 +60,10 @@ internal object SendLongMsg :
         return longMsg.toByteArray()
     }
 
-    override fun parse(client: LagrangeClient, payload: ByteArray): Resp {
+    override fun parse(client: LagrangeClient, payload: ByteArray): String {
         val rsp = PbObject(LongMsgInterfaceResp, payload)
-        val resId =
-            rsp.get { sendResp }?.get { this.resId } ?: throw IllegalStateException("No resId in LongMsgInterfaceResp")
-        return Resp(resId)
+        return rsp.get { sendResp }?.get { this.resId }
+            ?: throw IllegalStateException("No resId in LongMsgInterfaceResp")
     }
 }
 

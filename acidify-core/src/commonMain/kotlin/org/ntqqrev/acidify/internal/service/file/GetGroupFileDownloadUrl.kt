@@ -6,15 +6,10 @@ import org.ntqqrev.acidify.internal.packet.oidb.Oidb0x6D6Resp
 import org.ntqqrev.acidify.internal.service.OidbService
 import org.ntqqrev.acidify.pb.invoke
 
-internal object GetGroupFileDownloadUrl :
-    OidbService<GetGroupFileDownloadUrl.Req, GetGroupFileDownloadUrl.Resp>(0x6d6, 2, true) {
+internal object GetGroupFileDownloadUrl : OidbService<GetGroupFileDownloadUrl.Req, String>(0x6d6, 2, true) {
     class Req(
         val groupUin: Long,
         val fileId: String
-    )
-
-    class Resp(
-        val url: String
     )
 
     override fun buildOidb(client: LagrangeClient, payload: Req): ByteArray =
@@ -27,10 +22,10 @@ internal object GetGroupFileDownloadUrl :
             }
         }.toByteArray()
 
-    override fun parseOidb(client: LagrangeClient, payload: ByteArray): Resp {
+    override fun parseOidb(client: LagrangeClient, payload: ByteArray): String {
         val resp = Oidb0x6D6Resp(payload).get { downloadFile }
         val dns = resp.get { downloadDns }
         val url = resp.get { downloadUrl }.toHexString()
-        return Resp("https://$dns/ftn_handler/$url/?fname=")
+        return "https://$dns/ftn_handler/$url/?fname="
     }
 }

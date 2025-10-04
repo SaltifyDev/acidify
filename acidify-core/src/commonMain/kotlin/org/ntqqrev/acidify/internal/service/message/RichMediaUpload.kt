@@ -2,6 +2,7 @@ package org.ntqqrev.acidify.internal.service.message
 
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.message.media.*
+import org.ntqqrev.acidify.internal.packet.message.media.NTV2RichMediaResp
 import org.ntqqrev.acidify.internal.service.OidbService
 import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.pb.PbObject
@@ -15,9 +16,7 @@ internal abstract class RichMediaUpload<T>(
     val requestType: Int,
     val businessType: Int,
     val scene: MessageScene,
-) : OidbService<T, RichMediaUpload.UploadResponse>(oidbCommand, oidbService, true) {
-    class UploadResponse(val respObj: PbObject<UploadResp>)
-
+) : OidbService<T, PbObject<UploadResp>>(oidbCommand, oidbService, true) {
     class ImageUploadRequest(
         val imageData: ByteArray,
         val imageMd5: String,
@@ -102,9 +101,6 @@ internal abstract class RichMediaUpload<T>(
             it[noNeedCompatMsg] = false
         }
     }.toByteArray()
-
-    protected fun parseBaseUploadResp(payload: ByteArray): UploadResponse =
-        UploadResponse(NTV2RichMediaResp(payload).get { upload })
 
     protected fun buildImageUploadInfo(payload: ImageUploadRequest): PbObject<UploadInfo> =
         UploadInfo {
@@ -285,8 +281,8 @@ internal abstract class RichMediaUpload<T>(
             return buildBaseUploadReq(client, uploadInfoList, 1, extBizInfo)
         }
 
-        override fun parseOidb(client: LagrangeClient, payload: ByteArray): UploadResponse =
-            parseBaseUploadResp(payload)
+        override fun parseOidb(client: LagrangeClient, payload: ByteArray): PbObject<UploadResp> =
+            NTV2RichMediaResp(payload).get { upload }
     }
 
     object GroupImage : RichMediaUpload<ImageUploadRequest>(
@@ -303,8 +299,8 @@ internal abstract class RichMediaUpload<T>(
             return buildBaseUploadReq(client, uploadInfoList, 2, extBizInfo, payload.groupUin)
         }
 
-        override fun parseOidb(client: LagrangeClient, payload: ByteArray): UploadResponse =
-            parseBaseUploadResp(payload)
+        override fun parseOidb(client: LagrangeClient, payload: ByteArray): PbObject<UploadResp> =
+            NTV2RichMediaResp(payload).get { upload }
     }
 
     object PrivateRecord : RichMediaUpload<RecordUploadRequest>(
@@ -321,8 +317,8 @@ internal abstract class RichMediaUpload<T>(
             return buildBaseUploadReq(client, uploadInfoList, 1, extBizInfo)
         }
 
-        override fun parseOidb(client: LagrangeClient, payload: ByteArray): UploadResponse =
-            parseBaseUploadResp(payload)
+        override fun parseOidb(client: LagrangeClient, payload: ByteArray): PbObject<UploadResp> =
+            NTV2RichMediaResp(payload).get { upload }
     }
 
     object GroupRecord : RichMediaUpload<RecordUploadRequest>(
@@ -339,8 +335,8 @@ internal abstract class RichMediaUpload<T>(
             return buildBaseUploadReq(client, uploadInfoList, 2, extBizInfo, payload.groupUin)
         }
 
-        override fun parseOidb(client: LagrangeClient, payload: ByteArray): UploadResponse =
-            parseBaseUploadResp(payload)
+        override fun parseOidb(client: LagrangeClient, payload: ByteArray): PbObject<UploadResp> =
+            NTV2RichMediaResp(payload).get { upload }
     }
 
     object PrivateVideo : RichMediaUpload<VideoUploadRequest>(
@@ -357,8 +353,8 @@ internal abstract class RichMediaUpload<T>(
             return buildBaseUploadReq(client, uploadInfoList, 2, extBizInfo)
         }
 
-        override fun parseOidb(client: LagrangeClient, payload: ByteArray): UploadResponse =
-            parseBaseUploadResp(payload)
+        override fun parseOidb(client: LagrangeClient, payload: ByteArray): PbObject<UploadResp> =
+            NTV2RichMediaResp(payload).get { upload }
     }
 
     object GroupVideo : RichMediaUpload<VideoUploadRequest>(
@@ -375,7 +371,7 @@ internal abstract class RichMediaUpload<T>(
             return buildBaseUploadReq(client, uploadInfoList, 2, extBizInfo, payload.groupUin)
         }
 
-        override fun parseOidb(client: LagrangeClient, payload: ByteArray): UploadResponse =
-            parseBaseUploadResp(payload)
+        override fun parseOidb(client: LagrangeClient, payload: ByteArray): PbObject<UploadResp> =
+            NTV2RichMediaResp(payload).get { upload }
     }
 }

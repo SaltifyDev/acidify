@@ -6,7 +6,7 @@ import org.ntqqrev.acidify.internal.packet.oidb.Oidb0x6D6Resp
 import org.ntqqrev.acidify.internal.service.OidbService
 import org.ntqqrev.acidify.pb.invoke
 
-internal object GroupFileUpload : OidbService<GroupFileUpload.Req, GroupFileUpload.Resp>(0x6d6, 0, true) {
+internal object UploadGroupFile : OidbService<UploadGroupFile.Req, UploadGroupFile.Resp>(0x6d6, 0, true) {
     class Req(
         val groupUin: Long,
         val fileName: String,

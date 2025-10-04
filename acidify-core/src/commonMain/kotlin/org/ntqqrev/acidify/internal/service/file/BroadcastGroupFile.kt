@@ -6,7 +6,7 @@ import org.ntqqrev.acidify.internal.service.NoOutputOidbService
 import org.ntqqrev.acidify.pb.invoke
 import kotlin.random.Random
 
-internal object GroupFileBroadcast : NoOutputOidbService<GroupFileBroadcast.Req>(0x6d9, 4) {
+internal object BroadcastGroupFile : NoOutputOidbService<BroadcastGroupFile.Req>(0x6d9, 4) {
     class Req(
         val groupUin: Long,
         val fileId: String

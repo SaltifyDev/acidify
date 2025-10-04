@@ -5,7 +5,7 @@ import org.ntqqrev.acidify.internal.packet.oidb.SendGroupPokeReq
 import org.ntqqrev.acidify.internal.service.NoOutputOidbService
 import org.ntqqrev.acidify.pb.invoke
 
-internal object SendGroupPoke : NoOutputOidbService<SendGroupPoke.Req>(0xed3, 1) {
+internal object SendGroupNudge : NoOutputOidbService<SendGroupNudge.Req>(0xed3, 1) {
     class Req(
         val groupUin: Long,
         val targetUin: Long

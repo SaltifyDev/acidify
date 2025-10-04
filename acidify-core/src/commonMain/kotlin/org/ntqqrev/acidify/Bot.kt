@@ -26,13 +26,13 @@ import org.ntqqrev.acidify.event.internal.Signal
 import org.ntqqrev.acidify.exception.BotOnlineException
 import org.ntqqrev.acidify.exception.MessageSendException
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.media.FileId
-import org.ntqqrev.acidify.internal.packet.media.IndexNode
+import org.ntqqrev.acidify.internal.packet.message.media.FileId
+import org.ntqqrev.acidify.internal.packet.message.media.IndexNode
 import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceResponse
 import org.ntqqrev.acidify.internal.packet.misc.GroupAnnounceSendResponse
 import org.ntqqrev.acidify.internal.packet.misc.GroupEssenceResponse
-import org.ntqqrev.acidify.internal.service.file.GroupFileBroadcast
-import org.ntqqrev.acidify.internal.service.file.GroupFileUpload
+import org.ntqqrev.acidify.internal.service.file.BroadcastGroupFile
+import org.ntqqrev.acidify.internal.service.file.UploadGroupFile
 import org.ntqqrev.acidify.internal.service.group.*
 import org.ntqqrev.acidify.internal.service.message.*
 import org.ntqqrev.acidify.internal.service.system.*
@@ -1035,17 +1035,17 @@ class Bot(
     }
 
     /**
-     * 发送群戳一戳（poke）
+     * 发送群戳一戳
      * @param groupUin 群号
      * @param targetUin 被戳的成员 QQ 号
      */
-    suspend fun sendGroupPoke(
+    suspend fun sendGroupNudge(
         groupUin: Long,
         targetUin: Long
     ) {
         client.callService(
-            SendGroupPoke,
-            SendGroupPoke.Req(
+            SendGroupNudge,
+            SendGroupNudge.Req(
                 groupUin = groupUin,
                 targetUin = targetUin
             )
@@ -1067,8 +1067,8 @@ class Bot(
         parentFolderId: String = "/"
     ): String {
         val uploadResp = client.callService(
-            GroupFileUpload,
-            GroupFileUpload.Req(
+            UploadGroupFile,
+            UploadGroupFile.Req(
                 groupUin = groupUin,
                 fileName = fileName,
                 fileSize = fileData.size.toLong(),
@@ -1094,8 +1094,8 @@ class Bot(
         }
 
         client.callService(
-            GroupFileBroadcast,
-            GroupFileBroadcast.Req(
+            BroadcastGroupFile,
+            BroadcastGroupFile.Req(
                 groupUin = groupUin,
                 fileId = uploadResp.fileId
             )

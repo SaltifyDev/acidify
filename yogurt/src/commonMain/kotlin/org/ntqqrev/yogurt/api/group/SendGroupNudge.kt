@@ -15,7 +15,7 @@ val SendGroupNudge = ApiEndpoint.SendGroupNudge {
     groupCache[it.groupId, true]
         ?: throw MilkyApiException(-404, "Group not found")
 
-    bot.sendGroupPoke(it.groupId, it.userId)
+    bot.sendGroupNudge(it.groupId, it.userId)
 
     SendGroupNudgeOutput()
 }

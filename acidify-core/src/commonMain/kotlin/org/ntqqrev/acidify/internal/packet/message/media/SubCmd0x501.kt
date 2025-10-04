@@ -1,4 +1,4 @@
-package org.ntqqrev.acidify.internal.packet.media
+package org.ntqqrev.acidify.internal.packet.message.media
 
 import org.ntqqrev.acidify.pb.*
 

@@ -3,10 +3,10 @@ package org.ntqqrev.acidify.internal.logic
 import kotlinx.coroutines.async
 import org.ntqqrev.acidify.crypto.hash.SHA1Stream
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.media.FlashTransferSha1StateV
-import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadBody
-import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadReq
-import org.ntqqrev.acidify.internal.packet.media.FlashTransferUploadResp
+import org.ntqqrev.acidify.internal.packet.message.media.FlashTransferSha1StateV
+import org.ntqqrev.acidify.internal.packet.message.media.FlashTransferUploadBody
+import org.ntqqrev.acidify.internal.packet.message.media.FlashTransferUploadReq
+import org.ntqqrev.acidify.internal.packet.message.media.FlashTransferUploadResp
 import org.ntqqrev.acidify.internal.util.flashTransferPostWithBlock
 import org.ntqqrev.acidify.internal.util.sha1
 import org.ntqqrev.acidify.pb.invoke

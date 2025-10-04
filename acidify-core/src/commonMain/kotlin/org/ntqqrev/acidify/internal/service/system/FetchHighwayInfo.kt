@@ -1,8 +1,8 @@
 package org.ntqqrev.acidify.internal.service.system
 
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.media.FetchHighwayInfoReq
-import org.ntqqrev.acidify.internal.packet.media.FetchHighwayInfoResp
+import org.ntqqrev.acidify.internal.packet.message.media.FetchHighwayInfoReq
+import org.ntqqrev.acidify.internal.packet.message.media.FetchHighwayInfoResp
 import org.ntqqrev.acidify.internal.service.NoInputService
 import org.ntqqrev.acidify.internal.util.toIpString
 import org.ntqqrev.acidify.pb.invoke

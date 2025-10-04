@@ -1,7 +1,7 @@
 package org.ntqqrev.acidify.internal.service.message
 
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.media.*
+import org.ntqqrev.acidify.internal.packet.message.media.*
 import org.ntqqrev.acidify.internal.service.OidbService
 import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.pb.PbObject
@@ -131,7 +131,8 @@ internal abstract class RichMediaUpload<T>(
         ExtBizInfo {
             it[pic] = PicExtBizInfo {
                 it[bizType] = subType
-                it[bytesPbReserveC2C] = "0800180020004200500062009201009a0100a2010c080012001800200028003a00".hexToByteArray()
+                it[bytesPbReserveC2C] =
+                    "0800180020004200500062009201009a0100a2010c080012001800200028003a00".hexToByteArray()
                 it[this.textSummary] = textSummary.ifEmpty { if (subType == 1) "[动画表情]" else "[图片]" }
             }
         }
@@ -140,7 +141,8 @@ internal abstract class RichMediaUpload<T>(
         ExtBizInfo {
             it[pic] = PicExtBizInfo {
                 it[bizType] = subType
-                it[bytesPbReserveTroop] = "0800180020004200500062009201009a0100a2010c080012001800200028003a00".hexToByteArray()
+                it[bytesPbReserveTroop] =
+                    "0800180020004200500062009201009a0100a2010c080012001800200028003a00".hexToByteArray()
                 it[this.textSummary] = textSummary.ifEmpty { if (subType == 1) "[动画表情]" else "[图片]" }
             }
         }

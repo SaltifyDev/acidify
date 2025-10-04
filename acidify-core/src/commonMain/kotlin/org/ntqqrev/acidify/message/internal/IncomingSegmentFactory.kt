@@ -3,11 +3,11 @@ package org.ntqqrev.acidify.message.internal
 import korlibs.io.compression.deflate.ZLib
 import korlibs.io.compression.uncompress
 import kotlinx.serialization.decodeFromString
-import org.ntqqrev.acidify.internal.packet.media.MsgInfo
 import org.ntqqrev.acidify.internal.packet.message.elem.SourceMsg
 import org.ntqqrev.acidify.internal.packet.message.extra.GroupFileExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QBigFaceExtra
 import org.ntqqrev.acidify.internal.packet.message.extra.QSmallFaceExtra
+import org.ntqqrev.acidify.internal.packet.message.media.MsgInfo
 import org.ntqqrev.acidify.internal.packet.message.misc.IncomingForwardBody
 import org.ntqqrev.acidify.internal.packet.message.misc.LightAppPayload
 import org.ntqqrev.acidify.internal.util.BinaryReader

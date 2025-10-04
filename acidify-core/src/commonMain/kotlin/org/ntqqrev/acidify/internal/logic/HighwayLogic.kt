@@ -4,7 +4,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeout
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.media.*
+import org.ntqqrev.acidify.internal.packet.message.media.*
 import org.ntqqrev.acidify.internal.util.highwayPostWithBlock
 import org.ntqqrev.acidify.internal.util.md5
 import org.ntqqrev.acidify.pb.invoke

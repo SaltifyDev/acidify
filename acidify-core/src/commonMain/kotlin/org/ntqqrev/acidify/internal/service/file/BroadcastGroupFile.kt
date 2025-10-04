@@ -1,7 +1,7 @@
 package org.ntqqrev.acidify.internal.service.file
 
 import org.ntqqrev.acidify.internal.LagrangeClient
-import org.ntqqrev.acidify.internal.packet.oidb.Oidb0x6D6Req
+import org.ntqqrev.acidify.internal.packet.oidb.BroadcastGroupFileReq
 import org.ntqqrev.acidify.internal.service.NoOutputOidbService
 import org.ntqqrev.acidify.pb.invoke
 import kotlin.random.Random
@@ -13,11 +13,11 @@ internal object BroadcastGroupFile : NoOutputOidbService<BroadcastGroupFile.Req>
     )
 
     override fun buildOidb(client: LagrangeClient, payload: Req): ByteArray =
-        Oidb0x6D6Req {
-            it[broadcastFile] = Oidb0x6D6Req.BroadcastFile {
+        BroadcastGroupFileReq {
+            it[body] = BroadcastGroupFileReq.Body {
                 it[groupUin] = payload.groupUin
                 it[type] = 2
-                it[info] = Oidb0x6D6Req.BroadcastFile.Info {
+                it[info] = BroadcastGroupFileReq.Body.Info {
                     it[busiType] = 102
                     it[fileId] = payload.fileId
                     it[field3] = Random.nextInt()

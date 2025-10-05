@@ -10,29 +10,34 @@ Yogurt 是基于 Acidify 的 [Milky](https://milky.ntqqrev.org/) 实现，支持
 
 ## 启动
 
-Yogurt 支持的平台有 Kotlin/JVM 和 Kotlin/Native (Windows x64, macOS arm64, Linux x64/arm64)。
+Yogurt 支持的平台有 Kotlin/JVM 和 Kotlin/Native。
 
 ### 通过可执行文件启动 (Kotlin/Native)
 
-在 [Actions](https://github.com/LagrangeDev/acidify/actions/workflows/build-yogurt-native.yml)
-中下载对应平台的可执行文件，解压到工作目录后运行：
+在 [Actions](https://github.com/LagrangeDev/acidify/actions/workflows/build-yogurt-native.yml) 中下载对应平台的可执行文件，解压到工作目录后运行：
 
 ```
 ./yogurt.kexe   (for Linux and macOS)
 yogurt.exe      (for Windows)
 ```
 
+支持的平台如下：
+
+| OS      | Arch       |
+|---------|------------|
+| Windows | x64        |
+| Linux   | x64, arm64 |
+| macOS   | arm64      |
+
 ### 通过 Java 运行时启动 (Kotlin/JVM)
 
-配置 Java 21+ 运行时，然后在 [Actions](https://github.com/LagrangeDev/acidify/actions/workflows/build-yogurt-jvm.yml) 中下载
-JAR 文件，运行：
+配置 Java 21+ 运行时，然后在 [Actions](https://github.com/LagrangeDev/acidify/actions/workflows/build-yogurt-jvm.yml) 中下载 JAR 文件，运行：
 
 ```
 java -jar yogurt-jvm-all.jar
 ```
 
-注意：即使使用 Kotlin/JVM 版本，由于 Yogurt 依赖 [LagrangeCodec](https://github.com/LagrangeDev/LagrangeCodec)
-的预编译构建，因此只支持在以下平台**发送语音和视频消息**：
+注意：Yogurt 的 JVM 版本理论上可以在任何支持 Java 21+ 的平台上运行，但由于 Yogurt 依赖 [LagrangeCodec](https://github.com/LagrangeDev/LagrangeCodec) 的预编译构建，因此只支持在以下平台**发送语音和视频消息**：
 
 | OS      | Arch       |
 |---------|------------|
@@ -106,13 +111,11 @@ Ktor 日志
 要控制 Yogurt 日志的输出级别，可以在 `config.json` 中配置 `logging.coreLogLevel` 和 `logging.messageLogLevel`：
 
 - `coreLogLevel` 控制 Yogurt 核心模块的日志输出级别；
-- `messageLogLevel` 控制消息处理模块的日志输出级别。消息处理模块是 Yogurt 核心模块的一部分，因此如果 `coreLogLevel` 设置得比
-  `messageLogLevel` 更高，则不会打印任何消息处理模块的日志。
+- `messageLogLevel` 控制消息处理模块的日志输出级别。消息处理模块是 Yogurt 核心模块的一部分，因此如果 `coreLogLevel` 设置得比 `messageLogLevel` 更高，则不会打印任何消息处理模块的日志。
 
 上述两个配置项的可选值有 `VERBOSE`, `DEBUG`, `INFO`, `WARN`, `ERROR`。如果不设置这些配置项，则默认输出 `INFO` 级别的日志。
 
-要控制 Ktor 日志的输出级别，可以设置环境变量 `KTOR_LOG_LEVEL`，可选值有 `DEBUG`, `INFO`, `WARN`, `ERROR`。如果不设置该环境变量，则
-Ktor 默认输出 `INFO` 级别及以上的日志。
+要控制 Ktor 日志的输出级别，可以设置环境变量 `KTOR_LOG_LEVEL`，可选值有 `DEBUG`, `INFO`, `WARN`, `ERROR`。如果不设置该环境变量，则 Ktor 默认输出 `INFO` 级别及以上的日志。
 
 ### Kotlin/JVM 平台
 
@@ -134,8 +137,6 @@ Ktor 日志 (直接由 Logback 处理)
 标准输出 / 文件
 ```
 
-要控制 Yogurt 日志的输出级别，可以在 `config.json` 中配置 `logging.coreLogLevel` 和 `logging.messageLogLevel`，设置方式和
-Kotlin/Native 平台相同。
+要控制 Yogurt 日志的输出级别，可以在 `config.json` 中配置 `logging.coreLogLevel` 和 `logging.messageLogLevel`，设置方式和 Kotlin/Native 平台相同。
 
-Yogurt/JVM 的日志最终由 Logback 处理，因此可以通过配置 Logback 来控制日志的输出方式和格式。JAR 文件中已经包含了一个默认的
-`logback.xml`，如果需要自定义日志配置，可以在运行时通过 `-Dlogback.configurationFile=path/to/logback.xml` 指定自定义的配置文件。
+Yogurt/JVM 的日志最终由 Logback 处理，因此可以通过配置 Logback 来控制日志的输出方式和格式。JAR 文件中已经包含了一个默认的 `logback.xml`，如果需要自定义日志配置，可以在运行时通过 `-Dlogback.configurationFile=path/to/logback.xml` 指定自定义的配置文件。

@@ -141,10 +141,8 @@ internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.Ms
                 val memberUid = content.get { memberUid }
                 val memberUin = bot.getUinByUid(memberUid)
                 val operatorInfoBytes = content.get { operatorInfo }
-                val operatorUid = operatorInfoBytes?.let {
-                    GroupMemberChange.OperatorInfo(it).get { body }?.get { uid }
-                }
-                val operatorUin = operatorUid?.let { bot.getUinByUid(it) }
+                val operatorUid = operatorInfoBytes.toString()
+                val operatorUin = bot.getUinByUid(operatorUid)
 
                 when (GroupMemberChange.IncreaseType.from(content.get { type })) {
                     GroupMemberChange.IncreaseType.APPROVE -> listOf(

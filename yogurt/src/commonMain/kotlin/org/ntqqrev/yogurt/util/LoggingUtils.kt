@@ -273,10 +273,13 @@ fun Application.configureEventLogging() {
                     b.append("[${user.displayString}] ")
 
                     if (it.isAdd) {
-                        b.append("对消息 #${it.messageSeq} 添加了表情回应: ${it.faceId}")
+                        b.append("对消息 #${it.messageSeq} 添加了表情回应")
                     } else {
-                        b.append("取消了对消息 #${it.messageSeq} 的表情回应: ${it.faceId}")
+                        b.append("取消了对消息 #${it.messageSeq} 的表情回应")
                     }
+
+                    b.append(" ")
+                    b.append(bot.faceDetailMap[it.faceId]?.qDes ?: it.faceId)
 
                     logAsMessage { b.toString() }
                 }

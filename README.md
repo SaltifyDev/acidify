@@ -14,6 +14,20 @@
 - `yogurt-jvm` - Yogurt 的 JVM 平台实现 (Workaround for Ktor plugin's incompatibility issue)
 - `yogurt-media-codec` - Yogurt 的多媒体编解码支持模块
 
+## 使用
+
+### 基于 `acidify-core` 使用 Kotlin 进行开发
+
+在 Git 中引入该仓库作为 Submodule，然后在项目的 `settings.gradle.kts` 中添加：
+
+```kts
+include(":path:to:acidify-core")
+```
+
+### 通过 Milky 协议对接其他框架
+
+参考 [Yogurt 的文档](yogurt/README.md)下载并启动 Yogurt。
+
 ## 支持平台
 
 - Kotlin/JVM

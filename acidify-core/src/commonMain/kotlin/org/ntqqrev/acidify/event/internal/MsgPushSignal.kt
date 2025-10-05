@@ -1,11 +1,17 @@
 package org.ntqqrev.acidify.event.internal
 
+import io.ktor.http.parseUrl
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.event.*
 import org.ntqqrev.acidify.internal.packet.message.PushMsg
 import org.ntqqrev.acidify.internal.packet.message.PushMsgType
 import org.ntqqrev.acidify.internal.packet.message.extra.*
 import org.ntqqrev.acidify.message.BotIncomingMessage.Companion.parseMessage
+import org.ntqqrev.acidify.message.BotIncomingSegment
 import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.struct.BotGroupNotification
@@ -28,7 +34,30 @@ internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.Ms
             PushMsgType.GroupMessage -> {
                 val msg = bot.parseMessage(commonMsg) ?: return listOf()
                 val mutList = mutableListOf<AcidifyEvent>(MessageReceiveEvent(msg))
-                // TODO: resolve group invite card
+
+                msg.segments.filterIsInstance<BotIncomingSegment.LightApp>()
+                    .firstOrNull()
+                    ?.takeIf { it.appName == "com.tencent.qun.invite" || it.appName == "com.tencent.tuwen.lua" }
+                    ?.let {
+                        Json.decodeFromString<JsonElement>(it.jsonPayload)
+                            .jsonObject["data"]
+                            ?.jsonObject["meta"]
+                            ?.jsonObject["news"]
+                            ?.jsonObject["jumpUrl"]
+                            ?.jsonPrimitive?.content
+                    }?.let {
+                        parseUrl(it)
+                    }?.takeIf {
+                        it.parameters["groupcode"] != null && it.parameters["msgseq"] != null
+                    }?.let {
+                        mutList += GroupInvitationEvent(
+                            groupUin = it.parameters["groupcode"]!!.toLong(),
+                            invitationSeq = it.parameters["msgseq"]!!.toLong(),
+                            initiatorUin = msg.senderUin,
+                            initiatorUid = msg.senderUid
+                        )
+                    }
+
                 return mutList
             }
 

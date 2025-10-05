@@ -8,7 +8,7 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 const val milkyVersion = "1.0"
-const val milkyPackageVersion = "1.0.0-draft.19"
+const val milkyPackageVersion = "1.0.0"
 
 val milkyJsonModule = Json {
     ignoreUnknownKeys = true

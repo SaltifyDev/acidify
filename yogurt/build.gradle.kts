@@ -15,6 +15,7 @@ kotlin {
             implementation(libs.bundles.ktor.server)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.stately.concurrent.collections)
+            implementation(libs.mordant)
         }
         jvmMain.dependencies {
             implementation(libs.logback.classic)

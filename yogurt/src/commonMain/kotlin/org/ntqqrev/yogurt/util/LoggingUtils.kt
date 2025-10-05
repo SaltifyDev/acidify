@@ -1,5 +1,6 @@
 package org.ntqqrev.yogurt.util
 
+import com.github.ajalt.mordant.rendering.TextColors
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 import kotlinx.coroutines.launch
@@ -24,13 +25,13 @@ private val BotGroupMemberData.displayName
     get() = card.ifBlank { nickname }.joinToSingleLine()
 
 private val BotFriendData.displayString: String
-    get() = "$displayName ($uin)"
+    get() = TextColors.yellow("$displayName ($uin)")
 
 private val BotGroupData.displayString: String
-    get() = "$name ($uin)"
+    get() = TextColors.green("$name ($uin)")
 
 private val BotGroupMemberData.displayString: String
-    get() = "$displayName ($uin)"
+    get() = TextColors.blue("$displayName ($uin)")
 
 @Suppress("duplicatedCode")
 fun Application.configureEventLogging() {
@@ -116,7 +117,7 @@ fun Application.configureEventLogging() {
                         else -> return@collect
                     }
                     if (it.displaySuffix.isNotBlank()) {
-                        b.append(" (${it.displaySuffix})")
+                        b.append("，${it.displaySuffix}")
                     }
 
                     logAsMessage { b.toString() }
@@ -137,10 +138,12 @@ fun Application.configureEventLogging() {
                             b.append("自己")
                         } else {
                             b.append(friend.displayString)
+                            b.append(' ')
                         }
                         b.append(it.displaySuffix)
                     } else {
                         b.append(friend.displayString)
+                        b.append(' ')
                         b.append(it.displayAction)
                         if (it.isSelfReceive) {
                             b.append("你")
@@ -334,11 +337,23 @@ fun Application.configureEventLogging() {
                     val receiver = memberCache[it.receiverUin] ?: return@collect
 
                     b.append("[${group.displayString}] ")
-                    b.append(sender.displayString)
-                    b.append(" ")
+                    if (it.senderUin == bot.uin) {
+                        b.append("你")
+                    } else {
+                        b.append(sender.displayString)
+                        b.append(' ')
+                    }
                     b.append(it.displayAction)
-                    b.append(receiver.displayString)
-                    b.append(" ")
+                    if (it.receiverUin == bot.uin) {
+                        if (it.senderUin == bot.uin) {
+                            b.append("自己")
+                        } else {
+                            b.append("你")
+                        }
+                    } else {
+                        b.append(receiver.displayString)
+                        b.append(' ')
+                    }
                     b.append(it.displaySuffix)
 
                     logAsMessage { b.toString() }

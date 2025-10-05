@@ -271,7 +271,7 @@ class Bot(
         } catch (e: Exception) {
             logger.w(e) { "使用现有 Session 登录失败，尝试二维码登录" }
             sessionStore.clear()
-            sharedEventFlow.emit(SessionStoreUpdatedEvent(sessionStore))
+            // sharedEventFlow.emit(SessionStoreUpdatedEvent(sessionStore))
             qrCodeLogin()
         }
     }

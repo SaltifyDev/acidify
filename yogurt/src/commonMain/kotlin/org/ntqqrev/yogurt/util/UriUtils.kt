@@ -11,7 +11,7 @@ import kotlinx.io.readByteArray
 import org.ntqqrev.acidify.util.createHttpClient
 import kotlin.io.encoding.Base64
 
-val httpClient = createHttpClient {  }
+val httpClient = createHttpClient()
 
 suspend fun resolveUri(uri: String): ByteArray {
     return when {

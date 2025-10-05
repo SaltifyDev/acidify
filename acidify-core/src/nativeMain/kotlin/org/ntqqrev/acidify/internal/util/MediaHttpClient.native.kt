@@ -6,7 +6,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import org.ntqqrev.acidify.util.createHttpClient
 
-private val httpClient = createHttpClient { }
+private val httpClient = createHttpClient()
 
 actual fun flashTransferPostWithBlock(url: String, body: ByteArray): ByteArray = runBlocking {
     val response = httpClient.post(url) {

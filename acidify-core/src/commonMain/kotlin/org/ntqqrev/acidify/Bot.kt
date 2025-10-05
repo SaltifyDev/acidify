@@ -225,7 +225,7 @@ class Bot(
                 } catch (e: Exception) {
                     logger.w(e) { "心跳包发送失败" }
                 }
-                delay(300_000L)
+                delay(270_000L) // 4.5min
             }
         }
 

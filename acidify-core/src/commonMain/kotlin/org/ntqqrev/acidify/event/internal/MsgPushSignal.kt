@@ -40,8 +40,9 @@ internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.Ms
                     ?.takeIf { it.appName == "com.tencent.qun.invite" || it.appName == "com.tencent.tuwen.lua" }
                     ?.let {
                         Json.decodeFromString<JsonElement>(it.jsonPayload)
-                            .jsonObject["data"]
-                            ?.jsonObject["meta"]
+                            .jsonObject
+                            .takeIf { it["bizsrc"]?.jsonPrimitive?.content == "qun.invite" }
+                            ?.get("meta")
                             ?.jsonObject["news"]
                             ?.jsonObject["jumpUrl"]
                             ?.jsonPrimitive?.content
@@ -169,8 +170,8 @@ internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.Ms
                 val groupUin = content.get { groupUin }
                 val memberUid = content.get { memberUid }
                 val memberUin = bot.getUinByUid(memberUid)
-                val operatorInfoBytes = content.get { operatorInfo }
-                val operatorUid = operatorInfoBytes.toString()
+                val operatorInfoBytes = content.get { operatorInfo } ?: return listOf()
+                val operatorUid = operatorInfoBytes.decodeToString()
                 val operatorUin = bot.getUinByUid(operatorUid)
 
                 when (GroupMemberChange.IncreaseType.from(content.get { type })) {

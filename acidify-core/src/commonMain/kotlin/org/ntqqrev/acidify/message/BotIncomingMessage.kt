@@ -23,6 +23,7 @@ import org.ntqqrev.acidify.pb.invoke
  * @property senderUin 发送者的 QQ 号
  * @property senderUid 发送者的 uid
  * @property segments 消息内容
+ * @property extraInfo 群消息的附加信息，可用于刷新群昵称、群头衔等
  */
 class BotIncomingMessage internal constructor(
     val scene: MessageScene,
@@ -35,10 +36,23 @@ class BotIncomingMessage internal constructor(
     internal val messageUid: Long,
     internal val privateSequence: Long? = null,
 ) {
+    var extraInfo: ExtraInfo? = null
+        internal set
 
     internal val segmentsMut = mutableListOf<BotIncomingSegment>()
     val segments: List<BotIncomingSegment>
         get() = segmentsMut
+
+    /**
+     * @property nick 发送者的昵称
+     * @property groupCard 发送者的群名片
+     * @property specialTitle 发送者的群头衔
+     */
+    class ExtraInfo(
+        val nick: String,
+        val groupCard: String,
+        val specialTitle: String
+    )
 
     companion object {
         internal val factories = listOf<IncomingSegmentFactory<*>>(
@@ -97,6 +111,16 @@ class BotIncomingMessage internal constructor(
             if (pushMsgType != PushMsgType.FriendFileMessage) {
                 val ctx = MessageParsingContext(draftMsg, elems, this)
                 while (ctx.hasNext()) {
+                    ctx.tryPeekType { extraInfo }?.let {
+                        draftMsg.extraInfo = ExtraInfo(
+                            nick = it.get { nick },
+                            groupCard = it.get { groupCard },
+                            specialTitle = it.get { senderTitle },
+                        )
+                        ctx.consume()
+                        continue
+                    }
+
                     var matched = false
                     for (factory in factories) {
                         val segment = factory.tryParse(ctx) ?: continue

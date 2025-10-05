@@ -176,7 +176,8 @@ internal class MessageBuildingContext(
         subType: ImageSubType,
         summary: String
     ) = addAsync {
-        val imageMd5 = MD5.hashHex(raw)
+        val imageMd5Bytes = MD5.hash(raw)
+        val imageMd5 = imageMd5Bytes.toHexString()
         val imageSha1Bytes = raw.sha1()
         val imageSha1 = imageSha1Bytes.toHexString()
 
@@ -220,10 +221,12 @@ internal class MessageBuildingContext(
         }
 
         uploadResp.get { uKey }.takeIf { it.isNotEmpty() }?.let {
-            bot.client.flashTransferLogic.uploadFile(
-                uKey = it,
-                appId = if (scene == MessageScene.FRIEND) 1406 else 1407,
-                bodyStream = raw
+            bot.client.highwayLogic.uploadImage(
+                image = raw,
+                imageMd5 = imageMd5Bytes,
+                imageSha1 = imageSha1Bytes,
+                uploadResp = uploadResp,
+                messageScene = scene
             )
         } ?: logger.d { "uKey 为空，服务器可能已存在该图片，跳过上传" }
 
@@ -244,7 +247,8 @@ internal class MessageBuildingContext(
     }
 
     override fun record(rawSilk: ByteArray, duration: Long) = addAsync {
-        val recordMd5 = MD5.hashHex(rawSilk)
+        val recordMd5Bytes = MD5.hash(rawSilk)
+        val recordMd5 = recordMd5Bytes.toHexString()
         val recordSha1Bytes = rawSilk.sha1()
         val recordSha1 = recordSha1Bytes.toHexString()
 
@@ -278,10 +282,12 @@ internal class MessageBuildingContext(
         }
 
         uploadResp.get { uKey }.takeIf { it.isNotEmpty() }?.let {
-            bot.client.flashTransferLogic.uploadFile(
-                uKey = it,
-                appId = if (scene == MessageScene.FRIEND) 1402 else 1403,
-                bodyStream = rawSilk
+            bot.client.highwayLogic.uploadRecord(
+                record = rawSilk,
+                recordMd5 = recordMd5Bytes,
+                recordSha1 = recordSha1Bytes,
+                uploadResp = uploadResp,
+                messageScene = scene
             )
         } ?: logger.d { "uKey 为空，服务器可能已存在该语音，跳过上传" }
 
@@ -309,11 +315,13 @@ internal class MessageBuildingContext(
         thumb: ByteArray,
         thumbFormat: ImageFormat
     ) = addAsync {
-        val videoMd5 = MD5.hashHex(raw)
+        val videoMd5Bytes = MD5.hash(raw)
+        val videoMd5 = videoMd5Bytes.toHexString()
         val videoSha1Bytes = raw.sha1()
         val videoSha1 = videoSha1Bytes.toHexString()
 
-        val thumbMd5 = MD5.hashHex(thumb)
+        val thumbMd5Bytes = MD5.hash(thumb)
+        val thumbMd5 = thumbMd5Bytes.toHexString()
         val thumbSha1Bytes = thumb.sha1()
         val thumbSha1 = thumbSha1Bytes.toHexString()
 
@@ -368,16 +376,6 @@ internal class MessageBuildingContext(
                 bodyStream = raw
             )
         } ?: logger.d { "uKey 为空，服务器可能已存在该视频，跳过上传" }
-
-        // 上传缩略图
-        uploadResp.get { subFileInfos }.getOrNull(0)?.get { uKey }
-            ?.takeIf { it.isNotEmpty() }?.let {
-                bot.client.flashTransferLogic.uploadFile(
-                    uKey = it,
-                    appId = if (scene == MessageScene.FRIEND) 1414 else 1416,
-                    bodyStream = thumb
-                )
-            } ?: logger.d { "视频缩略图 uKey 为空，服务器可能已存在该缩略图，跳过上传" }
 
         val msgInfo = uploadResp.get { msgInfo }
         val businessType = when (scene) {

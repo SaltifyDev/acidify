@@ -7,6 +7,9 @@ import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.message.media.*
 import org.ntqqrev.acidify.internal.util.highwayPostWithBlock
 import org.ntqqrev.acidify.internal.util.md5
+import org.ntqqrev.acidify.internal.util.toIpString
+import org.ntqqrev.acidify.message.MessageScene
+import org.ntqqrev.acidify.pb.PbObject
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.util.createHttpClient
 
@@ -52,11 +55,91 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         }
     }
 
-    /**
-     * 上传群头像
-     * @param groupUin 群号
-     * @param imageData 图片数据
-     */
+    suspend fun uploadImage(
+        image: ByteArray,
+        imageMd5: ByteArray,
+        imageSha1: ByteArray,
+        uploadResp: PbObject<UploadResp>,
+        messageScene: MessageScene,
+    ) {
+        val cmd = if (messageScene == MessageScene.FRIEND) 1003 else 1004
+        upload(
+            cmd = cmd,
+            data = image,
+            md5 = imageMd5,
+            extendInfo = buildExtendInfo(uploadResp, imageSha1)
+        )
+    }
+
+    suspend fun uploadRecord(
+        record: ByteArray,
+        recordMd5: ByteArray,
+        recordSha1: ByteArray,
+        uploadResp: PbObject<UploadResp>,
+        messageScene: MessageScene,
+    ) {
+        upload(
+            cmd = if (messageScene == MessageScene.FRIEND) 1007 else 1008,
+            data = record,
+            md5 = recordMd5,
+            extendInfo = buildExtendInfo(uploadResp, recordSha1)
+        )
+    }
+
+    suspend fun uploadVideo(
+        video: ByteArray,
+        videoMd5: ByteArray,
+        videoSha1: ByteArray,
+        thumbnail: ByteArray,
+        thumbnailMd5: ByteArray,
+        thumbnailSha1: ByteArray,
+        uploadResp: PbObject<UploadResp>,
+        messageScene: MessageScene,
+    ) {
+        val videoCmd = if (messageScene == MessageScene.FRIEND) 1001 else 1005
+        upload(
+            cmd = videoCmd,
+            data = video,
+            md5 = videoMd5,
+            extendInfo = buildExtendInfo(uploadResp, videoSha1, bodyIndex = 0)
+        )
+
+        val thumbnailCmd = if (messageScene == MessageScene.FRIEND) 1002 else 1006
+        upload(
+            cmd = thumbnailCmd,
+            data = thumbnail,
+            md5 = thumbnailMd5,
+            extendInfo = buildExtendInfo(uploadResp, thumbnailSha1, bodyIndex = 1)
+        )
+    }
+
+    private fun buildExtendInfo(uploadResp: PbObject<UploadResp>, sha1: ByteArray, bodyIndex: Int = 0): ByteArray {
+        val msgInfoBodyList = uploadResp.get { msgInfo }.get { msgInfoBody }
+        val index = msgInfoBodyList.getOrNull(bodyIndex)?.get { index }
+        val fileUuidValue = index?.get { fileUuid } ?: ""
+
+        return NTV2RichMediaHighwayExt {
+            it[fileUuid] = fileUuidValue
+            it[uKey] = uploadResp.get { uKey }
+            it[network] = NTHighwayNetwork {
+                it[iPv4s] = uploadResp.get { iPv4s }.map { ipv4 ->
+                    NTHighwayIPv4 {
+                        it[domain] = NTHighwayDomain {
+                            it[isEnable] = true
+                            it[iP] = ipv4.get { outIP }.toIpString(reverseEndian = true)
+                        }
+                        it[port] = ipv4.get { outPort }
+                    }
+                }
+            }
+            it[msgInfoBody] = msgInfoBodyList
+            it[blockSize] = MAX_BLOCK_SIZE
+            it[hash] = NTHighwayHash {
+                it[fileSha1] = listOf(sha1)
+            }
+        }.toByteArray()
+    }
+
     suspend fun uploadGroupAvatar(groupUin: Long, imageData: ByteArray) {
         val md5 = imageData.md5()
         val extra = GroupAvatarExtra {
@@ -71,19 +154,6 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         upload(3000, imageData, md5, extra)
     }
 
-    /**
-     * 上传私聊文件
-     * @param receiverUin 接收者 uin（好友 QQ 号）
-     * @param fileName 文件名
-     * @param fileData 文件数据
-     * @param fileMd5 文件 MD5
-     * @param fileSha1 文件 SHA1
-     * @param md510M 前10MB的MD5
-     * @param fileTriSha1 文件 TriSHA1
-     * @param fileId 文件 ID
-     * @param uploadKey 上传密钥
-     * @param uploadIpAndPorts 上传服务器 IP 和端口列表
-     */
     suspend fun uploadPrivateFile(
         receiverUin: Long,
         fileName: String,
@@ -142,18 +212,6 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         upload(95, fileData, fileMd5, ext)
     }
 
-    /**
-     * 上传群文件
-     * @param senderUin 发送者 UIN
-     * @param groupUin 群号
-     * @param fileName 文件名
-     * @param fileData 文件数据
-     * @param fileId 文件 ID
-     * @param fileKey 文件密钥
-     * @param checkKey 校验密钥
-     * @param uploadIp 上传服务器 IP
-     * @param uploadPort 上传服务器端口
-     */
     suspend fun uploadGroupFile(
         senderUin: Long,
         groupUin: Long,

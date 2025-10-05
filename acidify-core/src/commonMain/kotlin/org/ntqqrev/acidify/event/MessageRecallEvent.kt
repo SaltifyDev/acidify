@@ -1,9 +1,11 @@
 package org.ntqqrev.acidify.event
 
+import org.ntqqrev.acidify.message.MessageScene
+
 /**
  * 消息撤回事件
- * @property messageScene 消息场景
- * @property peerId 好友 QQ 号或群号
+ * @property scene 消息场景
+ * @property peerUin 好友 QQ 号或群号
  * @property messageSeq 消息序列号
  * @property senderUin 被撤回的消息的发送者 QQ 号
  * @property senderUid 被撤回的消息的发送者 uid
@@ -12,8 +14,8 @@ package org.ntqqrev.acidify.event
  * @property displaySuffix 撤回提示的后缀文本
  */
 class MessageRecallEvent(
-    val messageScene: String,
-    val peerId: Long,
+    val scene: MessageScene,
+    val peerUin: Long,
     val messageSeq: Long,
     val senderUin: Long,
     val senderUid: String,

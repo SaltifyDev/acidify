@@ -81,9 +81,9 @@ fun Application.configureEventLogging() {
 
                 is MessageRecallEvent -> {
                     val b = StringBuilder()
-                    when (it.messageScene) {
-                        "friend" -> {
-                            val friend = friendCache[it.peerId] ?: return@collect
+                    when (it.scene) {
+                        MessageScene.FRIEND -> {
+                            val friend = friendCache[it.peerUin] ?: return@collect
                             b.append("[${friend.displayString}] ")
                             if (it.senderUin == bot.uin) {
                                 b.append("你撤回了一条消息")
@@ -92,9 +92,9 @@ fun Application.configureEventLogging() {
                             }
                         }
 
-                        "group" -> {
-                            val group = groupCache[it.peerId] ?: return@collect
-                            val memberCache = resolveGroupMemberCache(it.peerId) ?: return@collect
+                        MessageScene.GROUP -> {
+                            val group = groupCache[it.peerUin] ?: return@collect
+                            val memberCache = resolveGroupMemberCache(it.peerUin) ?: return@collect
                             val sender = memberCache[it.senderUin] ?: return@collect
                             val operator = memberCache[it.operatorUin] ?: return@collect
 
@@ -107,6 +107,8 @@ fun Application.configureEventLogging() {
                                 b.append("的消息被 [${operator.displayString}] 撤回")
                             }
                         }
+
+                        else -> return@collect
                     }
                     if (it.displaySuffix.isNotBlank()) {
                         b.append(" (${it.displaySuffix})")

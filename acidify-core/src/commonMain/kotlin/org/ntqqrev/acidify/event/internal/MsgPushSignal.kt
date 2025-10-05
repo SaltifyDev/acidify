@@ -6,6 +6,7 @@ import org.ntqqrev.acidify.internal.packet.message.PushMsg
 import org.ntqqrev.acidify.internal.packet.message.PushMsgType
 import org.ntqqrev.acidify.internal.packet.message.extra.*
 import org.ntqqrev.acidify.message.BotIncomingMessage.Companion.parseMessage
+import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.struct.BotGroupNotification
 import org.ntqqrev.acidify.struct.RequestState
@@ -264,8 +265,8 @@ internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.Ms
 
                         listOf(
                             MessageRecallEvent(
-                                messageScene = "friend",
-                                peerId = if (subType == 0x122) toUin else fromUin,
+                                scene = MessageScene.FRIEND,
+                                peerUin = if (subType == 0x122) toUin else fromUin,
                                 messageSeq = sequence,
                                 senderUin = fromUin,
                                 senderUid = fromUid,
@@ -385,8 +386,8 @@ internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.Ms
                             val authorUid = recall.get { authorUid }
                             val authorUin = bot.getUinByUid(authorUid)
                             MessageRecallEvent(
-                                messageScene = "group",
-                                peerId = groupUin,
+                                scene = MessageScene.GROUP,
+                                peerUin = groupUin,
                                 messageSeq = recall.get { sequence }.toLong(),
                                 senderUin = authorUin,
                                 senderUid = authorUid,

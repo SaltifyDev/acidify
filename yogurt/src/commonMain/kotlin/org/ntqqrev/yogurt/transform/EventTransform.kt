@@ -4,6 +4,7 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.event.*
+import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.milky.Event
 import org.ntqqrev.yogurt.YogurtApp.config
 
@@ -28,8 +29,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
 
         is MessageRecallEvent -> Event.MessageRecall(
             data = Event.MessageRecall.Data(
-                messageScene = event.messageScene,
-                peerId = event.peerId,
+                messageScene = event.scene.toMilkyString(),
+                peerId = event.peerUin,
                 messageSeq = event.messageSeq,
                 senderId = event.senderUin,
                 operatorId = event.operatorUin,
@@ -186,4 +187,10 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
 
         else -> null
     }
+}
+
+fun MessageScene.toMilkyString() = when (this) {
+    MessageScene.FRIEND -> "friend"
+    MessageScene.GROUP -> "group"
+    MessageScene.TEMP -> "temp"
 }

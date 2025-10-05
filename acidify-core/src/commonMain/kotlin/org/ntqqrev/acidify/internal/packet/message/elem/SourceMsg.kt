@@ -16,6 +16,6 @@ internal object SourceMsg : PbSchema() {
     val troopName = PbBytes[11]
 
     internal object PbReserve : PbSchema() {
-        val friendSequence = PbInt64[1]
+        val friendSequence = PbInt64[8]
     }
 }

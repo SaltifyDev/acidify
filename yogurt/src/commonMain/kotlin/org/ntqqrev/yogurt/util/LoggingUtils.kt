@@ -2,7 +2,6 @@ package org.ntqqrev.yogurt.util
 
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
-import io.ktor.server.routing.application
 import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.event.*
@@ -22,7 +21,7 @@ private val BotFriendData.displayName
     get() = remark.ifBlank { nickname }
 
 private val BotGroupMemberData.displayName
-    get() = card.ifBlank { nickname }
+    get() = card.ifBlank { nickname }.joinToSingleLine()
 
 private val BotFriendData.displayString: String
     get() = "$displayName ($uin)"
@@ -76,7 +75,11 @@ fun Application.configureEventLogging() {
                         }
                     }
                     b.append(" ")
-                    b.append(it.message.segments.joinToString(""))
+                    b.append(
+                        it.message.segments.joinToString("")
+                            .joinToSingleLine()
+                            .shorten(50)
+                    )
 
                     logAsMessage { b.toString() }
                 }
@@ -343,4 +346,22 @@ fun Application.configureEventLogging() {
             }
         }
     }
+}
+
+fun String.joinToSingleLine(): String {
+    val b = StringBuilder()
+    for (c in this) {
+        if (c == '\n' || c == '\r') {
+            b.append(' ')
+        } else {
+            b.append(c)
+        }
+    }
+    return b.toString()
+}
+
+fun String.shorten(maxLength: Int, ellipsis: String = "..."): String {
+    if (this.length <= maxLength) return this
+    if (maxLength <= ellipsis.length) return this.take(maxLength)
+    return this.take(maxLength - ellipsis.length) + ellipsis
 }

@@ -267,7 +267,13 @@ class Bot(
      */
     suspend fun tryLogin() {
         try {
-            online()
+            try {
+                online()
+            } catch (e: Exception) {
+                logger.w(e) { "使用现有 Session 登录失败，尝试刷新 DeviceGuid 后重新登录" }
+                sessionStore.refreshDeviceGuid()
+                online()
+            }
         } catch (e: Exception) {
             logger.w(e) { "使用现有 Session 登录失败，尝试二维码登录" }
             sessionStore.clear()

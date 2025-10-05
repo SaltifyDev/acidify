@@ -22,7 +22,7 @@ class SessionStore(
 
     var qrSig: ByteArray,
 
-    val guid: ByteArray,
+    var guid: ByteArray,
     val deviceName: String,
 ) {
     @Transient
@@ -63,5 +63,9 @@ class SessionStore(
         keySig = null
         exchangeKey = null
         unusualCookies = null
+    }
+
+    fun refreshDeviceGuid() {
+        guid = Random.nextBytes(16)
     }
 }

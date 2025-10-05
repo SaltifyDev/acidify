@@ -525,7 +525,7 @@ internal class MessageBuildingContext(
                         }
                         it[random] = Random.nextInt()
                         it[sequence] = Random.nextInt(1000000, 9999999).toLong()
-                        it[time] = Clock.System.now().toEpochMilliseconds() / 1000L
+                        it[time] = Clock.System.now().epochSeconds
                         it[clientSequence] = it[sequence]
                         it[msgUid] = Random.nextLong(1000000000000, 9999999999999)
                         it[forwardExt] = ContentHead.Forward {

@@ -52,7 +52,7 @@ internal object BroadcastPrivateFile :
                         it[fileSize] = payload.fileSize
                         it[subCmd] = 1
                         it[dangerLevel] = 0
-                        it[expireTime] = Clock.System.now().toEpochMilliseconds() / 1000L + 7 * 24 * 3600L
+                        it[expireTime] = Clock.System.now().epochSeconds + 86400 * 7
                         it[fileIdCrcMedia] = payload.crcMedia
                     }
                 }.toByteArray()

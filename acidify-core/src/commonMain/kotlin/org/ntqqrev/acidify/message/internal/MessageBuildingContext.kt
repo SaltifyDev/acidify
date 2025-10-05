@@ -368,14 +368,25 @@ internal class MessageBuildingContext(
             else -> throw IllegalArgumentException("不支持的消息场景: $scene")
         }
 
-        // 上传视频文件
         uploadResp.get { uKey }.takeIf { it.isNotEmpty() }?.let {
-            bot.client.flashTransferLogic.uploadFile(
-                uKey = it,
-                appId = if (scene == MessageScene.FRIEND) 1413 else 1415,
-                bodyStream = raw
+            bot.client.highwayLogic.uploadVideo(
+                video = raw,
+                videoMd5 = videoMd5Bytes,
+                videoSha1 = videoSha1Bytes,
+                uploadResp = uploadResp,
+                messageScene = scene
             )
         } ?: logger.d { "uKey 为空，服务器可能已存在该视频，跳过上传" }
+
+        uploadResp.get { subFileInfos }[0].get { uKey }.takeIf { it.isNotEmpty() }?.let {
+            bot.client.highwayLogic.uploadVideoThumbnail(
+                thumbnail = thumb,
+                thumbnailMd5 = thumbMd5Bytes,
+                thumbnailSha1 = thumbSha1Bytes,
+                uploadResp = uploadResp,
+                messageScene = scene
+            )
+        } ?: logger.d { "视频缩略图 uKey 为空，服务器可能已存在该缩略图，跳过上传" }
 
         val msgInfo = uploadResp.get { msgInfo }
         val businessType = when (scene) {

@@ -90,39 +90,53 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         video: ByteArray,
         videoMd5: ByteArray,
         videoSha1: ByteArray,
+        uploadResp: PbObject<UploadResp>,
+        messageScene: MessageScene,
+    ) {
+        upload(
+            cmd = if (messageScene == MessageScene.FRIEND) 1001 else 1005,
+            data = video,
+            md5 = videoMd5,
+            extendInfo = buildExtendInfo(uploadResp, videoSha1)
+        )
+    }
+
+    suspend fun uploadVideoThumbnail(
         thumbnail: ByteArray,
         thumbnailMd5: ByteArray,
         thumbnailSha1: ByteArray,
         uploadResp: PbObject<UploadResp>,
         messageScene: MessageScene,
     ) {
-        val videoCmd = if (messageScene == MessageScene.FRIEND) 1001 else 1005
         upload(
-            cmd = videoCmd,
-            data = video,
-            md5 = videoMd5,
-            extendInfo = buildExtendInfo(uploadResp, videoSha1, bodyIndex = 0)
-        )
-
-        val thumbnailCmd = if (messageScene == MessageScene.FRIEND) 1002 else 1006
-        upload(
-            cmd = thumbnailCmd,
+            cmd = if (messageScene == MessageScene.FRIEND) 1002 else 1006,
             data = thumbnail,
             md5 = thumbnailMd5,
-            extendInfo = buildExtendInfo(uploadResp, thumbnailSha1, bodyIndex = 1)
+            extendInfo = buildExtendInfo(uploadResp, thumbnailSha1, subFileInfoIdx = 0)
         )
     }
 
-    private fun buildExtendInfo(uploadResp: PbObject<UploadResp>, sha1: ByteArray, bodyIndex: Int = 0): ByteArray {
+    private fun buildExtendInfo(
+        uploadResp: PbObject<UploadResp>,
+        sha1: ByteArray,
+        subFileInfoIdx: Int? = null
+    ): ByteArray {
         val msgInfoBodyList = uploadResp.get { msgInfo }.get { msgInfoBody }
-        val index = msgInfoBodyList.getOrNull(bodyIndex)?.get { index }
-        val fileUuidValue = index?.get { fileUuid } ?: ""
+        val index = msgInfoBodyList[0].get { index }
 
         return NTV2RichMediaHighwayExt {
-            it[fileUuid] = fileUuidValue
-            it[uKey] = uploadResp.get { uKey }
+            it[fileUuid] = index.get { fileUuid }
+            it[uKey] = if (subFileInfoIdx != null) {
+                uploadResp.get { subFileInfos }[subFileInfoIdx].get { uKey }
+            } else {
+                uploadResp.get { uKey }
+            }
             it[network] = NTHighwayNetwork {
-                it[iPv4s] = uploadResp.get { iPv4s }.map { ipv4 ->
+                it[iPv4s] = (if (subFileInfoIdx != null) {
+                    uploadResp.get { subFileInfos }[subFileInfoIdx].get { iPv4s }
+                } else {
+                    uploadResp.get { iPv4s }
+                }).map { ipv4 ->
                     NTHighwayIPv4 {
                         it[domain] = NTHighwayDomain {
                             it[isEnable] = true

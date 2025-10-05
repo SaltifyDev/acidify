@@ -233,14 +233,9 @@ internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.Ms
                 val groupUin = content.get { groupUin }
                 val memberUid = content.get { memberUid }
                 val memberUin = bot.getUinByUid(memberUid)
-                val changeType = content.get { type }
-                val operatorInfoBytes = content.get { operatorInfo }
-                val operatorUid =
-                    if (changeType == GroupMemberChange.DecreaseType.KICK_SELF.value && operatorInfoBytes != null) {
-                        GroupMemberChange.OperatorInfo(operatorInfoBytes).get { body }?.get { uid }
-                    } else {
-                        operatorInfoBytes?.decodeToString()
-                    }
+                val operatorUid = content.get { operatorInfo }?.let {
+                    GroupMemberChange.OperatorInfo(it).get { body }?.get { uid }
+                }
                 val operatorUin = operatorUid?.let { bot.getUinByUid(it) }
 
                 listOf(

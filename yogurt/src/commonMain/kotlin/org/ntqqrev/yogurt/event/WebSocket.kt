@@ -10,14 +10,15 @@ import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.yogurt.transform.transformAcidifyEvent
+import org.ntqqrev.yogurt.util.PreprocessedEventFlow
 
 fun Route.configureMilkyEventWebSocket() {
     webSocket {
-        val bot = application.dependencies.resolve<Bot>()
+        val eventFlow = application.dependencies.resolve<PreprocessedEventFlow>()
         val logger = application.dependencies.resolve<Logger>()
         logger.i { "${call.request.local.remoteAddress} 通过 WebSocket 连接" }
         launch {
-            bot.eventFlow.collect { event ->
+            eventFlow.collect { event ->
                 application.transformAcidifyEvent(event)?.let { sendSerialized(it) }
             }
         }

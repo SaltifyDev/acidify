@@ -2,6 +2,7 @@ package org.ntqqrev.yogurt.util
 
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
+import io.ktor.server.routing.application
 import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.event.*
@@ -36,6 +37,7 @@ private val BotGroupMemberData.displayString: String
 fun Application.configureEventLogging() {
     launch {
         val bot = dependencies.resolve<Bot>()
+        val eventFlow = dependencies.resolve<PreprocessedEventFlow>()
         val friendCache = dependencies.resolve<FriendCache>()
         val groupCache = dependencies.resolve<GroupCache>()
         val logger = dependencies.resolve<Logger>()
@@ -50,7 +52,7 @@ fun Application.configureEventLogging() {
             }).invoke(supplier)
         }
 
-        bot.eventFlow.collect {
+        eventFlow.collect {
             when (it) {
                 is MessageReceiveEvent -> {
                     val b = StringBuilder()

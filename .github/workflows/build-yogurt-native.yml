@@ -1,5 +1,10 @@
 name: Build Yogurt Native Executables
 on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
 
 

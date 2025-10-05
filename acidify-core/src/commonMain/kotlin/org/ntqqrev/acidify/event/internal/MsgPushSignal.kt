@@ -59,6 +59,31 @@ internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.Ms
                         )
                     }
 
+                msg.segments.filterIsInstance<BotIncomingSegment.File>()
+                    .firstOrNull()
+                    ?.let {
+                        if (msg.scene == MessageScene.FRIEND) {
+                            mutList += FriendFileUploadEvent(
+                                userUin = msg.senderUin,
+                                userUid = msg.senderUid,
+                                isSelf = msg.senderUin == bot.uin,
+                                fileName = it.fileName,
+                                fileSize = it.fileSize,
+                                fileId = it.fileId,
+                                fileHash = it.fileHash!!
+                            )
+                        } else if (msg.scene == MessageScene.GROUP) {
+                            mutList += GroupFileUploadEvent(
+                                groupUin = msg.peerUin,
+                                userUin = msg.senderUin,
+                                userUid = msg.senderUid,
+                                fileName = it.fileName,
+                                fileSize = it.fileSize,
+                                fileId = it.fileId
+                            )
+                        }
+                    }
+
                 return mutList
             }
 

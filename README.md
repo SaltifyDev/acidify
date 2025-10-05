@@ -39,7 +39,9 @@ include(":path:to:acidify-core")
 ## Special Thanks
 
 - [Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core)
-  最初的 PC NTQQ 协议实现，提供项目的基础架构和绝大多数协议包定义
+  提供项目的基础架构和绝大多数协议包定义
+- [Konata.Core](https://github.com/KonataDev/Konata.Core)
+  最初的 PC NTQQ 协议实现
 - [lagrange-kotlin](https://github.com/LagrangeDev/lagrange-kotlin)
   提供 TEA & 登录认证的实现
 - @Linwenxuan04

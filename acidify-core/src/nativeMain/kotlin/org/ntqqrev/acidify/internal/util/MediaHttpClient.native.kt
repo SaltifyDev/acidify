@@ -20,16 +20,3 @@ actual fun flashTransferPostWithBlock(url: String, body: ByteArray): ByteArray =
     }
     response.readRawBytes()
 }
-
-actual fun highwayPostWithBlock(url: String, body: ByteArray): ByteArray = runBlocking {
-    val response = httpClient.post(url) {
-        headers {
-            append(HttpHeaders.Connection, "Keep-Alive")
-            append(HttpHeaders.AcceptEncoding, "identity")
-            append(HttpHeaders.UserAgent, "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2)")
-            append(HttpHeaders.ContentLength, body.size.toString())
-        }
-        setBody(body)
-    }
-    response.readRawBytes()
-}

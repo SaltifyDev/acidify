@@ -1,11 +1,15 @@
 package org.ntqqrev.acidify.internal.logic
 
+import io.ktor.client.HttpClient
+import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.readRawBytes
+import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeout
 import org.ntqqrev.acidify.internal.LagrangeClient
 import org.ntqqrev.acidify.internal.packet.message.media.*
-import org.ntqqrev.acidify.internal.util.highwayPostWithBlock
 import org.ntqqrev.acidify.internal.util.md5
 import org.ntqqrev.acidify.internal.util.toIpString
 import org.ntqqrev.acidify.message.MessageScene
@@ -17,7 +21,7 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
     private var highwayHost: String = ""
     private var highwayPort: Int = 0
     private var sigSession: ByteArray = ByteArray(0)
-    private val httpClient = createHttpClient { }
+    private val httpClient = createHttpClient()
 
     companion object {
         const val MAX_BLOCK_SIZE = 1024 * 1024 // 1MB
@@ -40,6 +44,7 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
             withTimeout(timeout) {
                 val session = HttpSession(
                     client = client,
+                    httpClient = httpClient,
                     highwayHost = highwayHost,
                     highwayPort = highwayPort,
                     sigSession = sigSession,
@@ -288,6 +293,7 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
 
     private class HttpSession(
         private val client: LagrangeClient,
+        private val httpClient: HttpClient,
         private val highwayHost: String,
         private val highwayPort: Int,
         private val sigSession: ByteArray,
@@ -314,10 +320,16 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
             val serverUrl =
                 "http://$highwayHost:$highwayPort/cgi-bin/httpconn?htcmd=0x6FF0087&uin=${client.sessionStore.uin}"
 
-            val response = client.async {
-                highwayPostWithBlock(serverUrl, frame)
-            }.await()
-            val (responseHead, _) = unpackFrame(response)
+            val response = httpClient.post(serverUrl) {
+                headers {
+                    append(HttpHeaders.Connection, "Keep-Alive")
+                    append(HttpHeaders.AcceptEncoding, "identity")
+                    append(HttpHeaders.UserAgent, "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2)")
+                    append(HttpHeaders.ContentLength, frame.size.toString())
+                }
+                setBody(frame)
+            }
+            val (responseHead, _) = unpackFrame(response.readRawBytes())
 
             val headData = RespDataHighwayHead(responseHead)
             val errorCode = headData.get { errorCode }

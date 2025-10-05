@@ -146,10 +146,14 @@ internal fun Int.encodeToLittleEndian(): IntArray {
     return result
 }
 
-internal fun Int.toIpString(): String {
+internal fun Int.toIpString(reverseEndian: Boolean = false): String {
     val byte1 = (this ushr 24) and 0xFF
     val byte2 = (this ushr 16) and 0xFF
     val byte3 = (this ushr 8) and 0xFF
     val byte4 = this and 0xFF
-    return "$byte1.$byte2.$byte3.$byte4"
+    return if (reverseEndian) {
+        "$byte4.$byte3.$byte2.$byte1"
+    } else {
+        "$byte1.$byte2.$byte3.$byte4"
+    }
 }

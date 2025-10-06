@@ -2,12 +2,14 @@
 
 package org.ntqqrev.yogurt
 
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.di.*
 import io.ktor.server.routing.*
 import io.ktor.server.sse.*
@@ -74,6 +76,15 @@ object YogurtApp {
             contentConverter = KotlinxWebsocketSerializationConverter(milkyJsonModule)
         }
         install(SSE)
+        install(CORS) {
+            if (config.httpConfig.corsOrigins.isEmpty()) {
+                anyHost()
+            } else {
+                config.httpConfig.corsOrigins.forEach { allowHost(it) }
+            }
+            allowHeader(HttpHeaders.ContentType)
+            allowHeader(HttpHeaders.Authorization)
+        }
 
         dependencies {
             provide { bot } cleanup {

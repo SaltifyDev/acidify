@@ -18,7 +18,8 @@ class YogurtConfig(
     val reportSelfMessage: Boolean = true,
     val httpConfig: MilkyHttpConfig = MilkyHttpConfig(),
     val webhookConfig: MilkyWebhookConfig = MilkyWebhookConfig(),
-    val logging: LoggingConfig = LoggingConfig()
+    val logging: LoggingConfig = LoggingConfig(),
+    val skipSecurityCheck: Boolean = false,
 ) {
     @Serializable
     class LoggingConfig(

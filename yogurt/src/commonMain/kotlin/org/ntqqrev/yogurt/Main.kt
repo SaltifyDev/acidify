@@ -3,6 +3,7 @@
 package org.ntqqrev.yogurt
 
 import org.ntqqrev.yogurt.util.addSigIntHandler
+import org.ntqqrev.yogurt.util.checkSecurity
 import kotlin.jvm.JvmName
 
 fun main() {
@@ -18,6 +19,7 @@ fun main() {
         | '--------------------------------------'
     """.trimMargin()
     )
+    checkSecurity()
     YogurtApp.createServer()
         .addSigIntHandler()
         .start(wait = true)

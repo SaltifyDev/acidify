@@ -56,7 +56,8 @@ Yogurt 在启动后，会在当前工作目录下生成 `config.json` 文件，�
   "httpConfig": {
     "host": "127.0.0.1",
     "port": 3000,
-    "accessToken": ""
+    "accessToken": "",
+    "corsOrigins": []
   },
   "webhookConfig": {
     "url": []
@@ -64,7 +65,8 @@ Yogurt 在启动后，会在当前工作目录下生成 `config.json` 文件，�
   "logging": {
     "coreLogLevel": "INFO",
     "messageLogLevel": "INFO"
-  }
+  },
+  "skipSecurityCheck": false
 }
 ```
 
@@ -82,9 +84,20 @@ Yogurt 在启动后，会在当前工作目录下生成 `config.json` 文件，�
 
 Milky 协议服务的有关配置，参考 [Milky 文档的“通信”部分](https://milky.ntqqrev.org/guide/communication)。
 
+### `httpConfig.corsOrigins`
+
+允许跨域请求的来源列表。若为空数组，则允许所有来源。
+
+在允许所有来源时，依然可以通过 Authorization 头携带访问令牌，因为 `Access-Control-Allow-Headers` 头会包含 `Authorization`。
+
 ### `logging`
 
 见下面的“日志配置”部分。
+
+### `skipSecurityCheck`
+
+是否跳过安全检查。安全检查的内容目前有：
+- 检测是否在非 Docker 环境下将 HTTP 服务绑定到 `0.0.0.0` 并且未设置访问令牌。
 
 ## 日志配置
 

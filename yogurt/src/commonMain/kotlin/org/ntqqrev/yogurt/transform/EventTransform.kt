@@ -7,11 +7,16 @@ import org.ntqqrev.acidify.event.*
 import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.milky.Event
 import org.ntqqrev.yogurt.YogurtApp.config
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
     val bot = dependencies.resolve<Bot>()
     return when (event) {
         is BotOfflineEvent -> Event.BotOffline(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.BotOffline.Data(
                 reason = event.reason
             )
@@ -20,6 +25,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         is MessageReceiveEvent -> {
             if (config.reportSelfMessage || event.message.senderUin != bot.uin) {
                 Event.MessageReceive(
+                    time = Clock.System.now().epochSeconds,
+                    selfId = bot.uin,
                     data = transformMessage(event.message) ?: return null
                 )
             } else {
@@ -28,6 +35,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         }
 
         is MessageRecallEvent -> Event.MessageRecall(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.MessageRecall.Data(
                 messageScene = event.scene.toMilkyString(),
                 peerId = event.peerUin,
@@ -39,6 +48,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is FriendRequestEvent -> Event.FriendRequest(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.FriendRequest.Data(
                 initiatorId = event.initiatorUin,
                 initiatorUid = event.initiatorUid,
@@ -48,6 +59,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupJoinRequestEvent -> Event.GroupJoinRequest(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupJoinRequest.Data(
                 groupId = event.groupUin,
                 notificationSeq = event.notificationSeq,
@@ -58,6 +71,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupInvitedJoinRequestEvent -> Event.GroupInvitedJoinRequest(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupInvitedJoinRequest.Data(
                 groupId = event.groupUin,
                 notificationSeq = event.notificationSeq,
@@ -67,6 +82,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupInvitationEvent -> Event.GroupInvitation(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupInvitation.Data(
                 groupId = event.groupUin,
                 invitationSeq = event.invitationSeq,
@@ -75,6 +92,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is FriendNudgeEvent -> Event.FriendNudge(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.FriendNudge.Data(
                 userId = event.userUin,
                 isSelfSend = event.isSelfSend,
@@ -86,6 +105,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is FriendFileUploadEvent -> Event.FriendFileUpload(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.FriendFileUpload.Data(
                 userId = event.userUin,
                 fileId = event.fileId,
@@ -97,6 +118,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupAdminChangeEvent -> Event.GroupAdminChange(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupAdminChange.Data(
                 groupId = event.groupUin,
                 userId = event.userUin,
@@ -105,6 +128,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupEssenceMessageChangeEvent -> Event.GroupEssenceMessageChange(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupEssenceMessageChange.Data(
                 groupId = event.groupUin,
                 messageSeq = event.messageSeq,
@@ -113,6 +138,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupMemberIncreaseEvent -> Event.GroupMemberIncrease(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupMemberIncrease.Data(
                 groupId = event.groupUin,
                 userId = event.userUin,
@@ -122,6 +149,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupMemberDecreaseEvent -> Event.GroupMemberDecrease(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupMemberDecrease.Data(
                 groupId = event.groupUin,
                 userId = event.userUin,
@@ -130,6 +159,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupNameChangeEvent -> Event.GroupNameChange(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupNameChange.Data(
                 groupId = event.groupUin,
                 newGroupName = event.newGroupName,
@@ -138,6 +169,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupMessageReactionEvent -> Event.GroupMessageReaction(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupMessageReaction.Data(
                 groupId = event.groupUin,
                 userId = event.userUin,
@@ -148,6 +181,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupMuteEvent -> Event.GroupMute(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupMute.Data(
                 groupId = event.groupUin,
                 userId = event.userUin,
@@ -157,6 +192,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupWholeMuteEvent -> Event.GroupWholeMute(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupWholeMute.Data(
                 groupId = event.groupUin,
                 operatorId = event.operatorUin,
@@ -165,6 +202,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupNudgeEvent -> Event.GroupNudge(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupNudge.Data(
                 groupId = event.groupUin,
                 senderId = event.senderUin,
@@ -176,6 +215,8 @@ suspend fun Application.transformAcidifyEvent(event: AcidifyEvent): Event? {
         )
 
         is GroupFileUploadEvent -> Event.GroupFileUpload(
+            time = Clock.System.now().epochSeconds,
+            selfId = bot.uin,
             data = Event.GroupFileUpload.Data(
                 groupId = event.groupUin,
                 userId = event.userUin,

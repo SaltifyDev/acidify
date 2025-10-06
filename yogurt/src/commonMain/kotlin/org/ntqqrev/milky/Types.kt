@@ -27,7 +27,12 @@ sealed class Event {
     @Serializable
     @SerialName("bot_offline")
     class BotOffline(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -40,14 +45,24 @@ sealed class Event {
     @Serializable
     @SerialName("message_receive")
     class MessageReceive(
-        val data: IncomingMessage
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: IncomingMessage
     ) : Event()
 
     /** 消息撤回事件 */
     @Serializable
     @SerialName("message_recall")
     class MessageRecall(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -70,7 +85,12 @@ sealed class Event {
     @Serializable
     @SerialName("friend_request")
     class FriendRequest(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -89,7 +109,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_join_request")
     class GroupJoinRequest(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -110,7 +135,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_invited_join_request")
     class GroupInvitedJoinRequest(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -129,7 +159,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_invitation")
     class GroupInvitation(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -146,7 +181,12 @@ sealed class Event {
     @Serializable
     @SerialName("friend_nudge")
     class FriendNudge(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -169,7 +209,12 @@ sealed class Event {
     @Serializable
     @SerialName("friend_file_upload")
     class FriendFileUpload(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -192,7 +237,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_admin_change")
     class GroupAdminChange(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -209,7 +259,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_essence_message_change")
     class GroupEssenceMessageChange(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -226,7 +281,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_member_increase")
     class GroupMemberIncrease(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -245,7 +305,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_member_decrease")
     class GroupMemberDecrease(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -262,7 +327,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_name_change")
     class GroupNameChange(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -279,7 +349,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_message_reaction")
     class GroupMessageReaction(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -300,7 +375,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_mute")
     class GroupMute(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -319,7 +399,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_whole_mute")
     class GroupWholeMute(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -336,7 +421,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_nudge")
     class GroupNudge(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -359,7 +449,12 @@ sealed class Event {
     @Serializable
     @SerialName("group_file_upload")
     class GroupFileUpload(
-        val data: Data
+        /** 事件 Unix 时间戳（秒） */
+        @SerialName("time") val time: Long,
+        /** 机器人 QQ 号 */
+        @SerialName("self_id") val selfId: Long,
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : Event() {
         @Serializable
         class Data(
@@ -717,7 +812,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("text")
     class Text(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -730,7 +826,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("mention")
     class Mention(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -743,7 +840,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("mention_all")
     class MentionAll(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -754,7 +852,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("face")
     class Face(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -767,7 +866,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("reply")
     class Reply(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -780,7 +880,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("image")
     class Image(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -803,7 +904,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("record")
     class Record(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -820,7 +922,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("video")
     class Video(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -841,7 +944,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("file")
     class File(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -860,7 +964,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("forward")
     class Forward(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -873,7 +978,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("market_face")
     class MarketFace(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -886,7 +992,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("light_app")
     class LightApp(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -901,7 +1008,8 @@ sealed class IncomingSegment {
     @Serializable
     @SerialName("xml")
     class Xml(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : IncomingSegment() {
         @Serializable
         class Data(
@@ -932,7 +1040,8 @@ sealed class OutgoingSegment {
     @Serializable
     @SerialName("text")
     class Text(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : OutgoingSegment() {
         @Serializable
         class Data(
@@ -945,7 +1054,8 @@ sealed class OutgoingSegment {
     @Serializable
     @SerialName("mention")
     class Mention(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : OutgoingSegment() {
         @Serializable
         class Data(
@@ -958,7 +1068,8 @@ sealed class OutgoingSegment {
     @Serializable
     @SerialName("mention_all")
     class MentionAll(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : OutgoingSegment() {
         @Serializable
         class Data(
@@ -969,7 +1080,8 @@ sealed class OutgoingSegment {
     @Serializable
     @SerialName("face")
     class Face(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : OutgoingSegment() {
         @Serializable
         class Data(
@@ -982,7 +1094,8 @@ sealed class OutgoingSegment {
     @Serializable
     @SerialName("reply")
     class Reply(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : OutgoingSegment() {
         @Serializable
         class Data(
@@ -995,7 +1108,8 @@ sealed class OutgoingSegment {
     @Serializable
     @SerialName("image")
     class Image(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : OutgoingSegment() {
         @Serializable
         class Data(
@@ -1012,7 +1126,8 @@ sealed class OutgoingSegment {
     @Serializable
     @SerialName("record")
     class Record(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : OutgoingSegment() {
         @Serializable
         class Data(
@@ -1025,7 +1140,8 @@ sealed class OutgoingSegment {
     @Serializable
     @SerialName("video")
     class Video(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : OutgoingSegment() {
         @Serializable
         class Data(
@@ -1040,7 +1156,8 @@ sealed class OutgoingSegment {
     @Serializable
     @SerialName("forward")
     class Forward(
-        val data: Data
+        /** 数据字段 */
+        @SerialName("data") val data: Data
     ) : OutgoingSegment() {
         @Serializable
         class Data(

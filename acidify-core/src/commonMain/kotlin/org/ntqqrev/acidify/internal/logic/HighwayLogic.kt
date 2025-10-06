@@ -302,12 +302,16 @@ internal class HighwayLogic(client: LagrangeClient) : AbstractLogic(client) {
         private val md5: ByteArray,
         private val extendInfo: ByteArray
     ) {
+        private val logger = client.createLogger(this)
+
         suspend fun upload() {
             var offset = 0
             while (offset < data.size) {
                 val blockSize = minOf(MAX_BLOCK_SIZE, data.size - offset)
                 val block = data.copyOfRange(offset, offset + blockSize)
                 uploadBlock(block, offset)
+                val progress = (offset.toLong() + blockSize.toLong()) * 100L / data.size.toLong()
+                logger.d { "Highway 上传进度: $progress%" }
                 offset += blockSize
             }
         }

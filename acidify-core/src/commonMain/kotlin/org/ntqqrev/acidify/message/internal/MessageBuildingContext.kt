@@ -161,6 +161,11 @@ internal class MessageBuildingContext(
                             it[atMemberUid] = replied.senderUid
                         }.toByteArray()
                     }
+                },
+                Elem {
+                    it[text] = Text {
+                        it[textMsg] = " "
+                    }
                 }
             )
         } else {

@@ -33,13 +33,15 @@ class BotIncomingMessage(
     val timestamp: Long,
     val senderUin: Long,
     val senderUid: String,
-    internal val messageUid: Long,
-    internal val privateSequence: Long? = null,
+    val clientSequence: Long,
+    val random: Int,
+    val initSegments: List<BotIncomingSegment> = emptyList(),
+    val messageUid: Long
 ) {
     var extraInfo: ExtraInfo? = null
         internal set
 
-    internal val segmentsMut = mutableListOf<BotIncomingSegment>()
+    internal val segmentsMut = mutableListOf<BotIncomingSegment>().apply { addAll(initSegments) }
     val segments: List<BotIncomingSegment>
         get() = segmentsMut
 
@@ -87,8 +89,9 @@ class BotIncomingMessage(
                         timestamp = contentHead.get { time },
                         senderUin = routingHead.get { fromUin },
                         senderUid = routingHead.get { fromUid },
+                        clientSequence = contentHead.get { sequence }, // weird
+                        random = contentHead.get { random },
                         messageUid = contentHead.get { msgUid },
-                        privateSequence = contentHead.get { sequence }
                     )
                 }
 
@@ -101,6 +104,8 @@ class BotIncomingMessage(
                         timestamp = contentHead.get { time },
                         senderUin = routingHead.get { fromUin },
                         senderUid = routingHead.get { fromUid },
+                        clientSequence = contentHead.get { clientSequence },
+                        random = contentHead.get { random },
                         messageUid = contentHead.get { msgUid },
                     )
                 }

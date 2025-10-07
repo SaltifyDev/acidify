@@ -133,7 +133,7 @@ internal class MessageBuildingContext(
         val srcMsgElem = Elem {
             it[srcMsg] = SourceMsg {
                 it[origSeqs] = listOf(
-                    if (scene == MessageScene.FRIEND) replied.privateSequence!!
+                    if (scene == MessageScene.FRIEND) replied.clientSequence
                     else replied.sequence
                 )
                 it[senderUin] = 0L

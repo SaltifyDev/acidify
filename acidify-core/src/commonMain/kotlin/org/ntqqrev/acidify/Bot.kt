@@ -52,6 +52,7 @@ import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.LogMessage
 import org.ntqqrev.acidify.util.log.Logger
 import kotlin.io.encoding.Base64
+import kotlin.random.Random
 
 /**
  * Acidify Bot 实例
@@ -398,10 +399,14 @@ class Bot(
     /**
      * 发送好友消息
      * @param friendUin 好友 QQ 号
+     * @param clientSequence 客户端消息序列号，默认随机生成，可用于 IM 开发
+     * @param random 消息随机数，默认随机生成，可用于 IM 开发
      * @param build 消息构建器
      */
     suspend fun sendFriendMessage(
         friendUin: Long,
+        clientSequence: Long = Random.nextLong(),
+        random: Int = Random.nextInt(),
         build: suspend BotOutgoingMessageBuilder.() -> Unit
     ): BotOutgoingMessageResult {
         val friendUid = getUidByUin(friendUin)
@@ -413,7 +418,16 @@ class Bot(
         )
         build(context)
         val elems = context.build()
-        val resp = client.callService(SendFriendMessage, SendFriendMessage.Req(friendUin, friendUid, elems))
+        val resp = client.callService(
+            SendFriendMessage,
+            SendFriendMessage.Req(
+                friendUin,
+                friendUid,
+                elems,
+                clientSequence,
+                random
+            )
+        )
         if (resp.result != 0) {
             throw MessageSendException(resp.result, resp.errMsg)
         }
@@ -427,6 +441,8 @@ class Bot(
      */
     suspend fun sendGroupMessage(
         groupUin: Long,
+        clientSequence: Long = Random.nextLong(),
+        random: Int = Random.nextInt(),
         build: suspend BotOutgoingMessageBuilder.() -> Unit
     ): BotOutgoingMessageResult {
         val context = MessageBuildingContext(
@@ -437,7 +453,15 @@ class Bot(
         )
         build(context)
         val elems = context.build()
-        val resp = client.callService(SendGroupMessage, SendGroupMessage.Req(groupUin, elems))
+        val resp = client.callService(
+            SendGroupMessage,
+            SendGroupMessage.Req(
+                groupUin,
+                elems,
+                clientSequence,
+                random
+            )
+        )
         if (resp.result != 0) {
             throw MessageSendException(resp.result, resp.errMsg)
         }

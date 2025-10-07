@@ -45,7 +45,9 @@ class BotForwardedMessage(
                 timestamp = contentHead.get { time },
                 senderUin = routingHead.get { fromUin },
                 senderUid = routingHead.get { fromUid },
-                messageUid = contentHead.get { msgUid }
+                clientSequence = 0L,
+                random = 0,
+                messageUid = contentHead.get { msgUid },
             )
 
             val ctx = MessageParsingContext(tempMessage, elems, this)

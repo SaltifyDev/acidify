@@ -18,6 +18,8 @@ internal object SendFriendMessage : Service<SendFriendMessage.Req, SendFriendMes
         val friendUin: Long,
         val friendUid: String,
         val elems: List<PbObject<Elem>>,
+        val clientSequence: Long,
+        val random: Int,
     )
 
     class Resp(
@@ -43,8 +45,8 @@ internal object SendFriendMessage : Service<SendFriendMessage.Req, SendFriendMes
                     it[elems] = payload.elems
                 }
             }
-            it[clientSequence] = Random.nextLong()
-            it[random] = Random.nextInt()
+            it[clientSequence] = payload.clientSequence
+            it[random] = payload.random
         }.toByteArray()
     }
 

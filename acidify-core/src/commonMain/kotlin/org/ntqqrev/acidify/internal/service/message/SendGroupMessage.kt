@@ -17,6 +17,8 @@ internal object SendGroupMessage : Service<SendGroupMessage.Req, SendGroupMessag
     class Req(
         val groupUin: Long,
         val elems: List<PbObject<Elem>>,
+        val clientSequence: Long,
+        val random: Int,
     )
 
     class Resp(
@@ -41,8 +43,8 @@ internal object SendGroupMessage : Service<SendGroupMessage.Req, SendGroupMessag
                     it[elems] = payload.elems
                 }
             }
-            it[clientSequence] = Random.nextLong()
-            it[random] = Random.nextInt()
+            it[clientSequence] = payload.clientSequence
+            it[random] = payload.random
         }.toByteArray()
     }
 

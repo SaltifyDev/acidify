@@ -84,12 +84,12 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     suspend fun sendPacket(cmd: String, payload: ByteArray): SsoResponse {
         val sequence = this.sequence++
         val sso = buildSso(cmd, payload, sequence)
-        val service = buildService(sso)
+        val service = buildService(sso).readByteArray()
 
         val deferred = CompletableDeferred<SsoResponse>()
         pending[sequence] = deferred
 
-        output.writePacket(service)
+        output.writeByteArray(service)
         logger.v { "[seq=$sequence] -> $cmd" }
 
         return deferred.await()

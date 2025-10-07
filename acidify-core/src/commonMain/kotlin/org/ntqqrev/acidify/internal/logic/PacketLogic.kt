@@ -8,6 +8,8 @@ import io.ktor.utils.io.core.*
 import korlibs.io.compression.deflate.ZLib
 import korlibs.io.compression.uncompress
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import org.ntqqrev.acidify.common.SignProvider
@@ -33,6 +35,7 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private lateinit var output: ByteWriteChannel
     private val pending = ConcurrentMap<Int, CompletableDeferred<SsoResponse>>()
     private val headerLength = 4
+    private val sendPacketMutex = Mutex()
     val signRequiredCommand = setOf(
         "MessageSvc.PbSendMsg",
         "wtlogin.trans_emp",
@@ -84,12 +87,14 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     suspend fun sendPacket(cmd: String, payload: ByteArray): SsoResponse {
         val sequence = this.sequence++
         val sso = buildSso(cmd, payload, sequence)
-        val service = buildService(sso).readByteArray()
+        val service = buildService(sso)
 
         val deferred = CompletableDeferred<SsoResponse>()
         pending[sequence] = deferred
 
-        output.writeByteArray(service)
+        sendPacketMutex.withLock {
+            output.writePacket(service)
+        }
         logger.v { "[seq=$sequence] -> $cmd" }
 
         return deferred.await()

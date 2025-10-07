@@ -21,7 +21,15 @@
 在 Git 中引入该仓库作为 Submodule，然后在项目的 `settings.gradle.kts` 中添加：
 
 ```kts
-include(":path:to:acidify-core")
+includeBuild("acidify")
+```
+
+然后，需要引用时，在项目的 `build.gradle.kts` 中添加：
+
+```kts
+dependencies {
+    implementation("acidify:acidify-core")
+}
 ```
 
 ### 通过 Milky 协议对接其他框架

@@ -8,7 +8,7 @@ sealed class BotIncomingSegment {
      * 文本消息段
      * @property text 文本内容
      */
-    class Text internal constructor(
+    class Text(
         val text: String,
     ) : BotIncomingSegment() {
         override fun toString(): String = text
@@ -19,7 +19,7 @@ sealed class BotIncomingSegment {
      * @property uin 被提及的用户的 QQ 号，为 `null` 表示提及了所有人（`@全体成员`）
      * @property name 被提及的用户的名称，视情况有可能是昵称 / 备注 / 群名片 / `@全体成员`
      */
-    class Mention internal constructor(
+    class Mention(
         val uin: Long? = null,
         val name: String,
     ) : BotIncomingSegment() {
@@ -32,7 +32,7 @@ sealed class BotIncomingSegment {
      * @property summary 表情的文本描述
      * @property isLarge 是否为超级表情
      */
-    class Face internal constructor(
+    class Face(
         val faceId: Int,
         val summary: String,
         val isLarge: Boolean,
@@ -44,7 +44,7 @@ sealed class BotIncomingSegment {
      * 回复消息段
      * @property sequence 被回复的消息的序列号
      */
-    class Reply internal constructor(
+    class Reply(
         val sequence: Long,
     ) : BotIncomingSegment() {
         override fun toString(): String = "[引用消息 #$sequence] "
@@ -58,7 +58,7 @@ sealed class BotIncomingSegment {
      * @property subType 图片子类型
      * @property summary 图片的文本描述
      */
-    class Image internal constructor(
+    class Image(
         val fileId: String,
         val width: Int,
         val height: Int,
@@ -73,7 +73,7 @@ sealed class BotIncomingSegment {
      * @property fileId 语音的文件 ID
      * @property duration 语音的时长（秒）
      */
-    class Record internal constructor(
+    class Record(
         val fileId: String,
         val duration: Int,
     ) : BotIncomingSegment() {
@@ -87,7 +87,7 @@ sealed class BotIncomingSegment {
      * @property width 视频的宽度
      * @property height 视频的高度
      */
-    class Video internal constructor(
+    class Video(
         val fileId: String,
         val duration: Int,
         val width: Int,
@@ -103,7 +103,7 @@ sealed class BotIncomingSegment {
      * @property fileSize 文件大小（字节）
      * @property fileHash 文件的 TriSHA1 哈希值，仅在私聊文件中存在
      */
-    class File internal constructor(
+    class File(
         val fileId: String,
         val fileName: String,
         val fileSize: Long,
@@ -116,7 +116,7 @@ sealed class BotIncomingSegment {
      * 转发消息段
      * @property resId 转发消息的资源 ID
      */
-    class Forward internal constructor(
+    class Forward(
         val resId: String,
     ) : BotIncomingSegment() {
         override fun toString(): String = "[转发消息]"
@@ -127,7 +127,7 @@ sealed class BotIncomingSegment {
      * @property url 表情的图像 URL
      * @property summary 表情的文本描述
      */
-    class MarketFace internal constructor(
+    class MarketFace(
         val url: String,
         val summary: String,
     ) : BotIncomingSegment() {
@@ -139,7 +139,7 @@ sealed class BotIncomingSegment {
      * @property appName 小程序 App Name
      * @property jsonPayload 小程序的 JSON 负载
      */
-    class LightApp internal constructor(
+    class LightApp(
         val appName: String,
         val jsonPayload: String,
     ) : BotIncomingSegment() {

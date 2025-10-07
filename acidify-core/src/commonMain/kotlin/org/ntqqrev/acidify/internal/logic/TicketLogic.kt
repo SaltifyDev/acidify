@@ -13,7 +13,7 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 internal class TicketLogic(client: LagrangeClient) : AbstractLogic(client) {
-    internal class KeyWithLifetime internal constructor(var value: String, var expireTime: Long) {
+    internal class KeyWithLifetime(var value: String, var expireTime: Long) {
         companion object {
             fun dummy() = KeyWithLifetime("", 0L)
             fun create(key: String, lifetimeSeconds: Long): KeyWithLifetime {

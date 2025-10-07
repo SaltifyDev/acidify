@@ -12,7 +12,7 @@ import org.ntqqrev.acidify.pb.PbObject
  * @property timestamp 消息发送的 Unix 时间戳（秒）
  * @property segments 消息内容
  */
-class BotForwardedMessage internal constructor(
+class BotForwardedMessage(
     val senderName: String,
     val avatarUrl: String,
     val timestamp: Long,

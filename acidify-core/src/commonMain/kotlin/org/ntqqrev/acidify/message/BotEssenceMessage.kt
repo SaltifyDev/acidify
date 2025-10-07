@@ -16,7 +16,7 @@ import org.ntqqrev.acidify.internal.packet.misc.GroupEssenceMsgItem
  * @property operationTime 消息被设置精华时的 Unix 时间戳（秒）
  * @property segments 消息段列表
  */
-class BotEssenceMessage internal constructor(
+class BotEssenceMessage(
     val groupUin: Long,
     val messageSeq: Long,
     val messageTime: Long,

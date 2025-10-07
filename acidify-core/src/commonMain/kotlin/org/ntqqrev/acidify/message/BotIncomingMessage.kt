@@ -25,7 +25,7 @@ import org.ntqqrev.acidify.pb.invoke
  * @property segments 消息内容
  * @property extraInfo 群消息的附加信息，可用于刷新群昵称、群头衔等
  */
-class BotIncomingMessage internal constructor(
+class BotIncomingMessage(
     val scene: MessageScene,
     val peerUin: Long,
     val peerUid: String,

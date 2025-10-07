@@ -461,7 +461,7 @@ internal class MessageBuildingContext(
             ver = "0.0.0.5",
             view = "contact"
         )
-        val str = Json.encodeToString(lightApp).also { println(it) }
+        val str = Json.encodeToString(lightApp)
         val buffer = Buffer()
         buffer.writeByte(0x01)
         buffer.write(ZLib.compress(str.encodeToByteArray()))

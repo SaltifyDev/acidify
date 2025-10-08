@@ -167,6 +167,13 @@ class Bot(
     }
 
     /**
+     * 根据一个自定义的 tag 创建一个 [Logger] 实例，通常用于匿名类或方法的日志记录，并将产生的日志发送到提供的 [LogHandler]。
+     */
+    fun createLogger(fromTag: String): Logger {
+        return Logger(this, fromTag)
+    }
+
+    /**
      * 发起二维码登录请求。过程中会触发事件：
      * - [QRCodeGeneratedEvent]：当二维码生成时触发，包含二维码链接和 PNG 图片数据
      * - [QRCodeStateQueryEvent]：每次查询二维码状态时触发，包含当前二维码状态（例如未扫码、已扫码未确认、已确认等）

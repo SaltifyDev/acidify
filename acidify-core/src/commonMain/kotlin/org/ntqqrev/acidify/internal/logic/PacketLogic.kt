@@ -1,8 +1,8 @@
 package org.ntqqrev.acidify.internal.logic
 
+import co.touchlab.stately.collections.ConcurrentMutableMap
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
-import io.ktor.util.collections.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import korlibs.io.compression.deflate.ZLib
@@ -30,10 +30,10 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     private val port = 8080
 
     private val selectorManager = SelectorManager(client.coroutineContext)
-    private val socket = aSocket(selectorManager).tcp()
+    private var currentSocket: Socket? = null
     private lateinit var input: ByteReadChannel
     private lateinit var output: ByteWriteChannel
-    private val pending = ConcurrentMap<Int, CompletableDeferred<SsoResponse>>()
+    private val pending = ConcurrentMutableMap<Int, CompletableDeferred<SsoResponse>>()
     private val headerLength = 4
     private val sendPacketMutex = Mutex()
     val signRequiredCommand = setOf(
@@ -62,13 +62,14 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
                             logger.e(t) { "发送上线包时出现错误" }
                         }) {
                             client.callService(BotOnline)
+                            logger.i { "上线包发送成功，重连完成" }
                         }
                     }
                     handleReceiveLoop()
                 } catch (e: Exception) {
                     logger.e(e) { "接收数据包时出现错误，5s 后尝试重新连接" }
-                    input.cancel()
-                    output.flushAndClose()
+                    cleanupPendingRequests(e)
+                    closeConnection()
                     delay(5000)
                     isReconnect = true
                     connect()
@@ -78,13 +79,16 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
     }
 
     private suspend fun connect() {
-        val s = socket.connect(host, port)
-        input = s.openReadChannel()
-        output = s.openWriteChannel(autoFlush = true)
+        val newSocket = aSocket(selectorManager).tcp().connect(host, port) {
+            keepAlive = true
+        }
+        currentSocket = newSocket
+        input = newSocket.openReadChannel()
+        output = newSocket.openWriteChannel(autoFlush = true)
         logger.d { "已连接到 $host:$port" }
     }
 
-    suspend fun sendPacket(cmd: String, payload: ByteArray): SsoResponse {
+    suspend fun sendPacket(cmd: String, payload: ByteArray, timeoutMillis: Long): SsoResponse {
         val sequence = this.sequence++
         val sso = buildSso(cmd, payload, sequence)
         val service = buildService(sso)
@@ -97,7 +101,14 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
         }
         logger.v { "[seq=$sequence] -> $cmd" }
 
-        return deferred.await()
+        return try {
+            withTimeout(timeoutMillis) {
+                deferred.await()
+            }
+        } catch (e: Exception) {
+            pending.remove(sequence)
+            throw e
+        }
     }
 
     private suspend fun handleReceiveLoop() {
@@ -221,6 +232,31 @@ internal class PacketLogic(client: LagrangeClient) : AbstractLogic(client) {
             it[sign] = this@toSsoSecureInfo.sign
             it[token] = this@toSsoSecureInfo.token
             it[extra] = this@toSsoSecureInfo.extra
+        }
+    }
+
+    private fun cleanupPendingRequests(error: Throwable) {
+        val pendingCount = pending.size
+        if (pendingCount > 0) {
+            logger.w { "清理 $pendingCount 个待处理的请求" }
+            pending.forEach { (seq, deferred) ->
+                deferred.completeExceptionally(
+                    Exception("连接已断开: ${error.message}", error)
+                )
+            }
+            pending.clear()
+        }
+    }
+
+    private suspend fun closeConnection() {
+        try {
+            input.cancel()
+            output.flushAndClose()
+            currentSocket?.close()
+            currentSocket = null
+            logger.d { "已关闭连接" }
+        } catch (e: Exception) {
+            logger.w(e) { "关闭连接时出现错误" }
         }
     }
 }

@@ -27,9 +27,11 @@ internal class LagrangeClient(
 
     val pushChannel = Channel<SsoResponse>(capacity = 15, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
-    suspend fun <T, R> callService(service: Service<T, R>, payload: T): R {
+    val sendPacketDefaultTimeout = 10_000L
+
+    suspend fun <T, R> callService(service: Service<T, R>, payload: T, timeout: Long = sendPacketDefaultTimeout): R {
         val byteArray = service.build(this, payload)
-        val resp = packetLogic.sendPacket(service.cmd, byteArray)
+        val resp = packetLogic.sendPacket(service.cmd, byteArray, timeout)
         if (resp.retCode != 0) {
             throw ServiceException(
                 service.cmd,
@@ -40,7 +42,7 @@ internal class LagrangeClient(
         return service.parse(this, resp.response)
     }
 
-    suspend fun <R> callService(service: Service<Unit, R>): R {
-        return callService(service, Unit)
+    suspend fun <R> callService(service: Service<Unit, R>, timeout: Long = sendPacketDefaultTimeout): R {
+        return callService(service, Unit, timeout)
     }
 }

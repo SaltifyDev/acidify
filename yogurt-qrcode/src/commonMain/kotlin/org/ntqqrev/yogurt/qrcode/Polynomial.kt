@@ -3,13 +3,13 @@
  *
  * This file is part of [qrcode-kotlin](https://github.com/g0dkar/qrcode-kotlin/)
  * and is licensed under the MIT License.
- * See the MIT-LICENSE file in the module root (/acidify-qrcode) for license information.
+ * See the MIT-LICENSE file in the module root (/yogurt-qrcode) for license information.
  */
 
-package org.ntqqrev.acidify.qrcode
+package org.ntqqrev.yogurt.qrcode
 
-import org.ntqqrev.acidify.qrcode.QRMath.gexp
-import org.ntqqrev.acidify.qrcode.QRMath.glog
+import org.ntqqrev.yogurt.qrcode.QRMath.gexp
+import org.ntqqrev.yogurt.qrcode.QRMath.glog
 
 /**
  * Rewritten in Kotlin from the [original (GitHub)](https://github.com/kazuhikoarase/qrcode-generator/blob/master/java/src/main/java/com/d_project/qrcode/Polynomial.java)

@@ -9,8 +9,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":acidify-core"))
-            implementation(project(":acidify-qrcode"))
             implementation(project(":yogurt-media-codec"))
+            implementation(project(":yogurt-qrcode"))
             implementation(libs.bundles.ktor.client)
             implementation(libs.bundles.ktor.server)
             implementation(libs.ktor.serialization.kotlinx.json)

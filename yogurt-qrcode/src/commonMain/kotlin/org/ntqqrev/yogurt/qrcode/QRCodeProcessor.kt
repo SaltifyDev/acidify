@@ -3,19 +3,19 @@
  *
  * This file is part of [qrcode-kotlin](https://github.com/g0dkar/qrcode-kotlin/)
  * and is licensed under the MIT License.
- * See the MIT-LICENSE file in the module root (/acidify-qrcode) for license information.
+ * See the MIT-LICENSE file in the module root (/yogurt-qrcode) for license information.
  */
 
-package org.ntqqrev.acidify.qrcode
+package org.ntqqrev.yogurt.qrcode
 
-import org.ntqqrev.acidify.qrcode.QRCodeSetup.applyMaskPattern
-import org.ntqqrev.acidify.qrcode.QRCodeSetup.setupBottomLeftPositionProbePattern
-import org.ntqqrev.acidify.qrcode.QRCodeSetup.setupPositionAdjustPattern
-import org.ntqqrev.acidify.qrcode.QRCodeSetup.setupTimingPattern
-import org.ntqqrev.acidify.qrcode.QRCodeSetup.setupTopLeftPositionProbePattern
-import org.ntqqrev.acidify.qrcode.QRCodeSetup.setupTopRightPositionProbePattern
-import org.ntqqrev.acidify.qrcode.QRCodeSetup.setupTypeInfo
-import org.ntqqrev.acidify.qrcode.QRCodeSetup.setupTypeNumber
+import org.ntqqrev.yogurt.qrcode.QRCodeSetup.applyMaskPattern
+import org.ntqqrev.yogurt.qrcode.QRCodeSetup.setupBottomLeftPositionProbePattern
+import org.ntqqrev.yogurt.qrcode.QRCodeSetup.setupPositionAdjustPattern
+import org.ntqqrev.yogurt.qrcode.QRCodeSetup.setupTimingPattern
+import org.ntqqrev.yogurt.qrcode.QRCodeSetup.setupTopLeftPositionProbePattern
+import org.ntqqrev.yogurt.qrcode.QRCodeSetup.setupTopRightPositionProbePattern
+import org.ntqqrev.yogurt.qrcode.QRCodeSetup.setupTypeInfo
+import org.ntqqrev.yogurt.qrcode.QRCodeSetup.setupTypeNumber
 
 typealias QRCodeRawData = Array<Array<QRCodeSquare>>
 

@@ -1,4 +1,4 @@
-# acidify-qrcode
+# yogurt-qrcode
 
 简化版本的 [qrcode-kotlin](https://github.com/g0dkar/qrcode-kotlin/)，仅保留了二维码矩阵生成部分。
 

@@ -9,10 +9,11 @@
 - `acidify-core` - PC NTQQ 协议的核心实现
 - `acidify-crypto` - 加密与 Hash 算法的高效实现
 - `acidify-pb` - Protobuf 编解码基础设施
-- `acidify-qrcode` - 二维码矩阵生成
+
 - `yogurt` - 基于 Acidify 的 [Milky](https://milky.ntqqrev.org/) 实现
 - `yogurt-jvm` - Yogurt 的 JVM 平台实现 (Workaround for Ktor plugin's incompatibility issue)
 - `yogurt-media-codec` - Yogurt 的多媒体编解码支持模块
+- `yogurt-qrcode` - Yogurt 二维码矩阵生成
 
 ## 使用
 
@@ -31,6 +32,8 @@ dependencies {
     implementation("acidify:acidify-core")
 }
 ```
+
+也可以用同样的方式引用其他模块。
 
 ### 通过 Milky 协议对接其他框架
 

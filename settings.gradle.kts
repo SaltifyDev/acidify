@@ -20,9 +20,9 @@ plugins {
 include(":acidify-core")
 include(":acidify-crypto")
 include(":acidify-pb")
-include(":acidify-qrcode")
 include(":yogurt")
 include(":yogurt-jvm")
 include(":yogurt-media-codec")
+include(":yogurt-qrcode")
 
 rootProject.name = "acidify"

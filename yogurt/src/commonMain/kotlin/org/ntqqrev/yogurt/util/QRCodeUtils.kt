@@ -8,8 +8,8 @@ import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
-import org.ntqqrev.acidify.qrcode.ErrorCorrectionLevel
-import org.ntqqrev.acidify.qrcode.QRCodeProcessor
+import org.ntqqrev.yogurt.qrcode.ErrorCorrectionLevel
+import org.ntqqrev.yogurt.qrcode.QRCodeProcessor
 import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.yogurt.YogurtApp.qrCodePath
 

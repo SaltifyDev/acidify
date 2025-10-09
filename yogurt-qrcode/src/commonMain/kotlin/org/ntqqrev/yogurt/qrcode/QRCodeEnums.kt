@@ -3,10 +3,10 @@
  *
  * This file is part of [qrcode-kotlin](https://github.com/g0dkar/qrcode-kotlin/)
  * and is licensed under the MIT License.
- * See the MIT-LICENSE file in the module root (/acidify-qrcode) for license information.
+ * See the MIT-LICENSE file in the module root (/yogurt-qrcode) for license information.
  */
 
-package org.ntqqrev.acidify.qrcode
+package org.ntqqrev.yogurt.qrcode
 
 /**
  * The level of Error Correction to apply to the QR Code image. The Higher the Error Correction, the lower quality

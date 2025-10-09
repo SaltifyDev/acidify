@@ -90,35 +90,13 @@ class Bot(
 
     private val friendCache = CacheUtility(
         bot = this,
-        updateCache = { bot ->
-            var nextUin: Long? = null
-            val friendDataMap = mutableMapOf<Long, BotFriendData>()
-
-            // 分页获取所有好友
-            do {
-                val resp = bot.client.callService(FetchFriends, FetchFriends.Req(nextUin))
-
-                // 更新 uin/uid 映射缓存
-                resp.friendDataList.forEach { friendData ->
-                    bot.uin2uidMap[friendData.uin] = friendData.uid
-                    bot.uid2uinMap[friendData.uid] = friendData.uin
-                    friendDataMap[friendData.uin] = friendData
-                }
-
-                nextUin = resp.nextUin
-            } while (nextUin != null)
-
-            friendDataMap
-        },
+        updateCache = { bot -> bot.fetchFriends().associateBy { it.uin } },
         entityFactory = ::BotFriend
     )
 
     private val groupCache = CacheUtility(
         bot = this,
-        updateCache = { bot ->
-            val groupDataList = bot.client.callService(FetchGroups)
-            groupDataList.associateBy { it.uin }
-        },
+        updateCache = { bot -> bot.fetchGroups().associateBy { it.uin } },
         entityFactory = ::BotGroup
     )
 
@@ -436,16 +414,13 @@ class Bot(
      * 否则，会尝试从好友列表中查找。
      */
     suspend fun getUidByUin(uin: Long, mayComeFromGroupUin: Long? = null): String {
-        return uin2uidMap[uin] ?: if (mayComeFromGroupUin != null) {
-            fetchGroupMembers(mayComeFromGroupUin).firstOrNull { it.uin == uin }?.uid?.also {
-                uin2uidMap[uin] = it
-                uid2uinMap[it] = uin
+        return uin2uidMap[uin] ?: run {
+            if (mayComeFromGroupUin != null) {
+                fetchGroupMembers(mayComeFromGroupUin)
+            } else {
+                fetchFriends()
             }
-        } else {
-            fetchFriends().firstOrNull { it.uin == uin }?.uid?.also {
-                uin2uidMap[uin] = it
-                uid2uinMap[it] = uin
-            }
+            uin2uidMap[uin]
         } ?: throw NoSuchElementException("无法解析 uin $uin 对应的 uid")
     }
 

@@ -19,29 +19,7 @@ class BotGroup internal constructor(
      */
     private val memberCache = CacheUtility<Long, BotGroupMember, BotGroupMemberData>(
         bot = bot,
-        updateCache = { bot ->
-            var cookie: ByteArray? = null
-            val memberDataMap = mutableMapOf<Long, BotGroupMemberData>()
-
-            // 分页获取所有群成员
-            do {
-                val resp = bot.client.callService(
-                    FetchGroupMembers,
-                    FetchGroupMembers.Req(this.data.uin, cookie)
-                )
-
-                // 更新 uin/uid 映射缓存
-                resp.memberDataList.forEach { memberData ->
-                    bot.uin2uidMap[memberData.uin] = memberData.uid
-                    bot.uid2uinMap[memberData.uid] = memberData.uin
-                    memberDataMap[memberData.uin] = memberData
-                }
-
-                cookie = resp.cookie
-            } while (cookie != null)
-
-            memberDataMap
-        },
+        updateCache = { bot -> bot.fetchGroupMembers(uin).associateBy { it.uin } },
         entityFactory = { bot, data -> BotGroupMember(bot, data, this) }
     )
 

@@ -17,6 +17,7 @@ import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.entity.BotFriend
 import org.ntqqrev.acidify.entity.BotGroup
+import org.ntqqrev.acidify.entity.BotGroupMember
 import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QRCodeStateQueryEvent
@@ -316,7 +317,7 @@ class Bot(
     suspend fun fetchUserInfoByUid(uid: String) = client.callService(FetchUserInfo.ByUid, uid)
 
     /**
-     * 获取好友与好友分组信息。
+     * 拉取好友与好友分组信息。此操作不会被缓存。
      */
     suspend fun fetchFriends(): List<BotFriendData> {
         var nextUin: Long? = null
@@ -337,48 +338,14 @@ class Bot(
     }
 
     /**
-     * 获取所有好友实体。
-     * @param forceUpdate 是否强制更新缓存
-     */
-    suspend fun getFriends(forceUpdate: Boolean = false): List<BotFriend> {
-        return friendCache.getAll(forceUpdate)
-    }
-
-    /**
-     * 根据 uin 获取好友实体。
-     * @param uin 好友的 QQ 号
-     * @param forceUpdate 是否强制更新缓存
-     */
-    suspend fun getFriend(uin: Long, forceUpdate: Boolean = false): BotFriend? {
-        return friendCache.get(uin, forceUpdate)
-    }
-
-    /**
-     * 获取群信息。
+     * 拉取群信息。此操作不会被缓存。
      */
     suspend fun fetchGroups(): List<BotGroupData> {
         return client.callService(FetchGroups)
     }
 
     /**
-     * 获取所有群实体。
-     * @param forceUpdate 是否强制更新缓存
-     */
-    suspend fun getGroups(forceUpdate: Boolean = false): List<BotGroup> {
-        return groupCache.getAll(forceUpdate)
-    }
-
-    /**
-     * 根据 uin 获取群实体。
-     * @param uin 群号
-     * @param forceUpdate 是否强制更新缓存
-     */
-    suspend fun getGroup(uin: Long, forceUpdate: Boolean = false): BotGroup? {
-        return groupCache.get(uin, forceUpdate)
-    }
-
-    /**
-     * 获取指定群的成员信息。
+     * 拉取指定群的成员信息。此操作不会被缓存。
      */
     suspend fun fetchGroupMembers(groupUin: Long): List<BotGroupMemberData> {
         var cookie: ByteArray? = null
@@ -397,6 +364,47 @@ class Bot(
             }
         }
     }
+
+    /**
+     * 获取所有好友实体。
+     * @param forceUpdate 是否强制更新缓存
+     */
+    suspend fun getFriends(forceUpdate: Boolean = false) = friendCache.getAll(forceUpdate)
+
+    /**
+     * 根据 uin 获取好友实体。
+     * @param uin 好友的 QQ 号
+     * @param forceUpdate 是否强制更新缓存
+     */
+    suspend fun getFriend(uin: Long, forceUpdate: Boolean = false) = friendCache.get(uin, forceUpdate)
+
+    /**
+     * 获取所有群实体。
+     * @param forceUpdate 是否强制更新缓存
+     */
+    suspend fun getGroups(forceUpdate: Boolean = false) = groupCache.getAll(forceUpdate)
+
+    /**
+     * 根据 uin 获取群实体。
+     * @param uin 群号
+     * @param forceUpdate 是否强制更新缓存
+     */
+    suspend fun getGroup(uin: Long, forceUpdate: Boolean = false) = groupCache.get(uin, forceUpdate)
+
+    /**
+     * 获取指定群的所有群成员实体。
+     * @param groupUin 群号
+     * @param forceUpdate 是否强制更新缓存
+     */
+    suspend fun getGroupMembers(groupUin: Long, forceUpdate: Boolean = false) = getGroup(groupUin)?.getMembers(forceUpdate)
+
+    /**
+     * 根据 uin 获取指定群的群成员实体。
+     * @param groupUin 群号
+     * @param memberUin 群成员的 QQ 号
+     */
+    suspend fun getGroupMember(groupUin: Long, memberUin: Long, forceUpdate: Boolean = false) =
+        getGroup(groupUin)?.getMember(memberUin, forceUpdate)
 
     /**
      * 解析 uid 到 QQ 号。

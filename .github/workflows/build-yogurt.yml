@@ -1,0 +1,171 @@
+name: Build Yogurt Executables
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+
+jobs:
+  build-native:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        include:
+          - target: mingwX64
+            gradle-target: MingwX64
+            platform: windows-x64
+            ext: .exe
+            dynamic-lib-prefix: ''
+            dynamic-lib-ext: .dll
+          - target: macosArm64
+            gradle-target: MacosArm64
+            platform: macos-arm64
+            ext: .kexe
+            dynamic-lib-prefix: lib
+            dynamic-lib-ext: .dylib
+          - target: linuxX64
+            gradle-target: LinuxX64
+            platform: linux-x64
+            ext: .kexe
+            dynamic-lib-prefix: lib
+            dynamic-lib-ext: .so
+          - target: linuxArm64
+            gradle-target: LinuxArm64
+            platform: linux-arm64
+            ext: .kexe
+            dynamic-lib-prefix: lib
+            dynamic-lib-ext: .so
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Cache gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/libs.versions.toml') }}
+
+      - name: Cache konan
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ matrix.target }}-${{ hashFiles('**/gradle/libs.versions.toml') }}
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build Yogurt for ${{ matrix.target }}
+        run: ./gradlew :yogurt:linkReleaseExecutable${{ matrix.gradle-target }}
+
+      - name: Copy artifacts
+        run: |
+          mkdir -p artifacts/lib/${{ matrix.platform }}
+          cp ./yogurt/build/bin/${{ matrix.target }}/releaseExecutable/yogurt${{ matrix.ext }} artifacts/
+          cp ./yogurt-media-codec/lib/${{ matrix.platform }}/${{ matrix.dynamic-lib-prefix }}lagrangecodec${{ matrix.dynamic-lib-ext }} artifacts/lib/${{ matrix.platform }}/
+
+      - name: Upload ${{ matrix.target }} executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: yogurt-${{ matrix.platform }}
+          path: artifacts/**
+  
+  build-jvm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Cache gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/libs.versions.toml') }}
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build yogurt-jvm fat jar
+        run: ./gradlew :yogurt-jvm:buildFatJar --no-daemon
+
+      - name: Upload fat jar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yogurt-jvm
+          path: yogurt-jvm/build/libs/yogurt-jvm-all.jar
+  
+  release-nightly:
+    needs:
+      - build-native
+      - build-jvm
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          
+          # Package Windows x64
+          cd artifacts/yogurt-windows-x64
+          zip -r ../../release-assets/yogurt-windows-x64.zip .
+          cd ../..
+          
+          # Package macOS ARM64
+          cd artifacts/yogurt-macos-arm64
+          tar -czf ../../release-assets/yogurt-macos-arm64.tar.gz .
+          cd ../..
+          
+          # Package Linux x64
+          cd artifacts/yogurt-linux-x64
+          tar -czf ../../release-assets/yogurt-linux-x64.tar.gz .
+          cd ../..
+          
+          # Package Linux ARM64
+          cd artifacts/yogurt-linux-arm64
+          tar -czf ../../release-assets/yogurt-linux-arm64.tar.gz .
+          cd ../..
+          
+          # Copy JVM jar
+          cp artifacts/yogurt-jvm/yogurt-jvm-all.jar release-assets/
+      
+      - name: Delete existing nightly release
+        uses: dev-drprasad/delete-tag-and-release@v1.1
+        with:
+          tag_name: nightly
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+      
+      - name: Create nightly release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: Nightly Build
+          body: |
+            🚀自动构建的 Yogurt 可执行文件
+            
+            构建时间: ${{ github.event.head_commit.timestamp }}
+            提交: ${{ github.sha }}
+          files: release-assets/*
+          prerelease: false
+          draft: false
+          make_latest: true

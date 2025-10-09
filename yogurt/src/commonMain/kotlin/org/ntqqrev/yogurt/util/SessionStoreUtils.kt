@@ -14,14 +14,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.encodeToSink
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.event.SessionStoreUpdatedEvent
-import org.ntqqrev.acidify.util.log.Logger
 
 val sessionStorePath = Path("session-store.json")
 
 fun Application.configureSessionStoreAutoSave() {
     launch {
         val bot = dependencies.resolve<Bot>()
-        val logger = dependencies.resolve<Logger>()
+        val logger = bot.createLogger("SessionStoreUtils")
         bot.eventFlow.filterIsInstance<SessionStoreUpdatedEvent>().collect {
             logger.i { "SessionStore 已更新，正在保存至文件..." }
             SystemFileSystem.sink(sessionStorePath).buffered().use { source ->

@@ -9,7 +9,6 @@ import io.ktor.server.plugins.di.*
 import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.util.createHttpClient
-import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.milky.milkyJsonModule
 import org.ntqqrev.yogurt.YogurtApp.config
 import org.ntqqrev.yogurt.transform.transformAcidifyEvent
@@ -22,7 +21,7 @@ fun Application.configureMilkyEventWebhook() {
     }
     launch {
         val bot = dependencies.resolve<Bot>()
-        val logger = dependencies.resolve<Logger>()
+        val logger = bot.createLogger("WebhookModule")
         bot.eventFlow.collect { event ->
             transformAcidifyEvent(event)?.let {
                 config.webhookConfig.url.forEach { webhookUrl ->

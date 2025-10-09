@@ -6,7 +6,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.message.*
-import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.milky.GroupEssenceMessage
 import org.ntqqrev.milky.IncomingMessage
 import org.ntqqrev.milky.IncomingSegment
@@ -151,7 +150,8 @@ class YogurtMessageBuildingContext(
 }
 
 suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) {
-    val logger = application.dependencies.resolve<Logger>()
+    val bot = application.dependencies.resolve<Bot>()
+    val logger = bot.createLogger("MessageTransform")
     when (segment) {
         is OutgoingSegment.Text -> {
             text(segment.data.text)

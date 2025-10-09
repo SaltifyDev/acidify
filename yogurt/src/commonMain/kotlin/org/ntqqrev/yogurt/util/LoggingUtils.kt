@@ -12,7 +12,6 @@ import org.ntqqrev.acidify.event.*
 import org.ntqqrev.acidify.message.MessageScene
 import org.ntqqrev.acidify.util.log.LogHandler
 import org.ntqqrev.acidify.util.log.LogLevel
-import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.acidify.util.log.MessageSupplier
 import org.ntqqrev.yogurt.YogurtApp.config
 
@@ -37,7 +36,7 @@ private val BotGroupMember.displayString: String
 fun Application.configureEventLogging() {
     launch {
         val bot = dependencies.resolve<Bot>()
-        val logger = dependencies.resolve<Logger>()
+        val logger = bot.createLogger("Logging")
 
         fun logAsMessage(supplier: MessageSupplier) {
             (when (config.logging.messageLogLevel) {
@@ -53,8 +52,6 @@ fun Application.configureEventLogging() {
             when (it) {
                 is MessageReceiveEvent -> {
                     val b = StringBuilder()
-                    val isSelfSend = it.message.senderUin == bot.uin
-                    b.append(if (isSelfSend) "发送 -> " else "接收 <- ")
                     when (it.message.scene) {
                         MessageScene.FRIEND -> {
                             val friend = bot.getFriend(it.message.peerUin) ?: return@collect

@@ -6,9 +6,9 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.encodeToJsonElement
+import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.exception.OidbException
 import org.ntqqrev.acidify.exception.ServiceException
-import org.ntqqrev.acidify.util.log.Logger
 import org.ntqqrev.milky.ApiGeneralResponse
 import org.ntqqrev.milky.milkyJsonModule
 import org.ntqqrev.yogurt.api.file.*
@@ -21,7 +21,8 @@ import kotlin.time.measureTime
 
 private inline fun <reified T : Any, reified R : Any> Route.serve(handler: MilkyApiHandler<T, R>) {
     post(handler.path) {
-        val logger = application.dependencies.resolve<Logger>()
+        val bot = application.dependencies.resolve<Bot>()
+        val logger = bot.createLogger("HttpModule")
         try {
             val payload = call.receive<T>()
             call.respond(

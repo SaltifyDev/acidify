@@ -67,8 +67,6 @@ object YogurtApp {
             logHandler = logHandler
         )
 
-        val logger = bot.createLogger(this@YogurtApp)
-
         install(ContentNegotiation) {
             json(milkyJsonModule)
         }
@@ -90,7 +88,6 @@ object YogurtApp {
             provide { bot } cleanup {
                 runBlocking { bot.offline() }
             }
-            provide { logger }
         }
         configureCacheDeps()
 
@@ -115,7 +112,7 @@ object YogurtApp {
             if (config.webhookConfig.url.isNotEmpty()) {
                 configureMilkyEventWebhook()
             }
-            configureQrCodeDisplay()
+            configureQRCodeDisplay()
             configureSessionStoreAutoSave()
             configureEventLogging()
 

@@ -8,10 +8,9 @@ import kotlinx.io.buffered
 import kotlinx.io.files.SystemFileSystem
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
+import org.ntqqrev.yogurt.YogurtApp.qrCodePath
 import org.ntqqrev.yogurt.qrcode.ErrorCorrectionLevel
 import org.ntqqrev.yogurt.qrcode.QRCodeProcessor
-import org.ntqqrev.acidify.util.log.Logger
-import org.ntqqrev.yogurt.YogurtApp.qrCodePath
 
 object Palette {
     const val WHITE_WHITE = '\u2588'
@@ -45,10 +44,10 @@ fun generateTerminalQRCode(data: String): String {
     return b.toString()
 }
 
-fun Application.configureQrCodeDisplay() {
+fun Application.configureQRCodeDisplay() {
     launch {
         val bot = dependencies.resolve<Bot>()
-        val logger = dependencies.resolve<Logger>()
+        val logger = bot.createLogger("QRCode")
         bot.eventFlow.filterIsInstance<QRCodeGeneratedEvent>().collect {
             logger.i { "请用手机 QQ 扫描二维码：\n" + generateTerminalQRCode(it.url) }
             logger.i { "或使用以下 URL 生成二维码并扫描：" }

@@ -15,6 +15,8 @@ import kotlinx.serialization.json.Json
 import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
+import org.ntqqrev.acidify.entity.BotFriend
+import org.ntqqrev.acidify.entity.BotGroup
 import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QRCodeStateQueryEvent
@@ -45,6 +47,7 @@ import org.ntqqrev.acidify.pb.invoke
 import org.ntqqrev.acidify.struct.*
 import org.ntqqrev.acidify.struct.BotFriendRequest.Companion.parseFilteredFriendRequest
 import org.ntqqrev.acidify.struct.BotFriendRequest.Companion.parseFriendRequest
+import org.ntqqrev.acidify.util.CacheUtility
 import org.ntqqrev.acidify.util.HtmlEntities
 import org.ntqqrev.acidify.util.createHttpClient
 import org.ntqqrev.acidify.util.log.LogHandler
@@ -84,6 +87,40 @@ class Bot(
     internal val uid2uinMap = ConcurrentMutableMap<String, Long>()
     internal var heartbeatJob: Job? = null
     internal var eventCollectJob: Job? = null
+
+    private val friendCache = CacheUtility(
+        bot = this,
+        updateCache = { bot ->
+            var nextUin: Long? = null
+            val friendDataMap = mutableMapOf<Long, BotFriendData>()
+
+            // 分页获取所有好友
+            do {
+                val resp = bot.client.callService(FetchFriends, FetchFriends.Req(nextUin))
+
+                // 更新 uin/uid 映射缓存
+                resp.friendDataList.forEach { friendData ->
+                    bot.uin2uidMap[friendData.uin] = friendData.uid
+                    bot.uid2uinMap[friendData.uid] = friendData.uin
+                    friendDataMap[friendData.uin] = friendData
+                }
+
+                nextUin = resp.nextUin
+            } while (nextUin != null)
+
+            friendDataMap
+        },
+        entityFactory = ::BotFriend
+    )
+
+    private val groupCache = CacheUtility(
+        bot = this,
+        updateCache = { bot ->
+            val groupDataList = bot.client.callService(FetchGroups)
+            groupDataList.associateBy { it.uin }
+        },
+        entityFactory = ::BotGroup
+    )
 
     /**
      * [AcidifyEvent] 流，可用于监听各种事件
@@ -220,7 +257,7 @@ class Bot(
         }
         isLoggedIn = true
         logger.i { "用户 $uin 已上线" }
-        
+
         val highwayInfo = client.callService(FetchHighwayInfo)
         val (host, port) = highwayInfo.servers[1]!![0]
         client.highwayLogic.setHighwayUrl(host, port, highwayInfo.sigSession)
@@ -322,10 +359,44 @@ class Bot(
     }
 
     /**
+     * 获取所有好友实体。
+     * @param forceUpdate 是否强制更新缓存
+     */
+    suspend fun getFriends(forceUpdate: Boolean = false): List<BotFriend> {
+        return friendCache.getAll(forceUpdate)
+    }
+
+    /**
+     * 根据 uin 获取好友实体。
+     * @param uin 好友的 QQ 号
+     * @param forceUpdate 是否强制更新缓存
+     */
+    suspend fun getFriend(uin: Long, forceUpdate: Boolean = false): BotFriend? {
+        return friendCache.get(uin, forceUpdate)
+    }
+
+    /**
      * 获取群信息。
      */
     suspend fun fetchGroups(): List<BotGroupData> {
         return client.callService(FetchGroups)
+    }
+
+    /**
+     * 获取所有群实体。
+     * @param forceUpdate 是否强制更新缓存
+     */
+    suspend fun getGroups(forceUpdate: Boolean = false): List<BotGroup> {
+        return groupCache.getAll(forceUpdate)
+    }
+
+    /**
+     * 根据 uin 获取群实体。
+     * @param uin 群号
+     * @param forceUpdate 是否强制更新缓存
+     */
+    suspend fun getGroup(uin: Long, forceUpdate: Boolean = false): BotGroup? {
+        return groupCache.get(uin, forceUpdate)
     }
 
     /**

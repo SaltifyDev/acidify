@@ -532,28 +532,35 @@ class Bot(
     /**
      * 撤回好友消息
      * @param friendUin 好友 QQ 号
-     * @param sequence 消息序列号（clientSequence）
-     * @param privateSequence 消息的私聊序列号（用于获取消息详情）
-     * @param timestamp 消息时间戳（秒）
+     * @param sequence 消息序列号
      */
     suspend fun recallFriendMessage(
-        friendUin: Long, sequence: Long, privateSequence: Long, timestamp: Long
+        friendUin: Long,
+        sequence: Long
     ) {
         val friendUid = getUidByUin(friendUin)
 
         // 从原始消息包中提取 random 字段
         val raw = client.callService(
-            FetchFriendMessages, FetchFriendMessages.Req(friendUid, privateSequence, privateSequence)
+            FetchFriendMessages,
+            FetchFriendMessages.Req(
+                friendUid,
+                sequence,
+                sequence
+            )
         ).firstOrNull() ?: throw IllegalStateException("消息不存在")
 
         val contentHead = raw.get { contentHead }
         val random = contentHead.get { random }
+        val timestamp = contentHead.get { time }
+        val privateSequence = contentHead.get { this.sequence }
 
         client.callService(
-            RecallFriendMessage, RecallFriendMessage.Req(
+            RecallFriendMessage,
+            RecallFriendMessage.Req(
                 targetUid = friendUid,
-                clientSequence = sequence,
-                messageSequence = privateSequence,
+                clientSequence = privateSequence,
+                messageSequence = sequence,
                 random = random,
                 timestamp = timestamp
             )

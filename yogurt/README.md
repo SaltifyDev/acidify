@@ -14,7 +14,7 @@ Yogurt 支持的平台有 Kotlin/JVM 和 Kotlin/Native。
 
 ### 通过可执行文件启动 (Kotlin/Native)
 
-在 [Actions](https://github.com/LagrangeDev/acidify/actions/workflows/build-yogurt-native.yml) 中下载对应平台的可执行文件，解压到工作目录后运行：
+在 [Releases](https://github.com/LagrangeDev/acidify/releases) 中下载对应平台的可执行文件，解压到工作目录后运行：
 
 ```
 ./yogurt.kexe   (for Linux and macOS)
@@ -31,7 +31,7 @@ yogurt.exe      (for Windows)
 
 ### 通过 Java 运行时启动 (Kotlin/JVM)
 
-配置 Java 21+ 运行时，然后在 [Actions](https://github.com/LagrangeDev/acidify/actions/workflows/build-yogurt-jvm.yml) 中下载 JAR 文件，运行：
+配置 Java 21+ 运行时，然后在 [Releases](https://github.com/LagrangeDev/acidify/releases) 中下载 JAR 文件，运行：
 
 ```
 java -jar yogurt-jvm-all.jar

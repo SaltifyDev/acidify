@@ -1,9 +1,12 @@
 package org.ntqqrev.yogurt.transform
 
+import org.ntqqrev.acidify.entity.BotFriend
+import org.ntqqrev.acidify.entity.BotGroup
+import org.ntqqrev.acidify.entity.BotGroupMember
 import org.ntqqrev.acidify.struct.*
 import org.ntqqrev.milky.*
 
-fun BotFriendData.toMilkyEntity() =
+fun BotFriend.toMilkyEntity() =
     FriendEntity(
         userId = uin,
         nickname = nickname,
@@ -16,7 +19,7 @@ fun BotFriendData.toMilkyEntity() =
         )
     )
 
-fun BotGroupData.toMilkyEntity() =
+fun BotGroup.toMilkyEntity() =
     GroupEntity(
         groupId = uin,
         groupName = name,
@@ -24,12 +27,12 @@ fun BotGroupData.toMilkyEntity() =
         maxMemberCount = capacity
     )
 
-fun BotGroupMemberData.toMilkyEntity(withGroupUin: Long) =
+fun BotGroupMember.toMilkyEntity() =
     GroupMemberEntity(
         userId = uin,
         nickname = nickname,
         sex = "unknown",
-        groupId = withGroupUin,
+        groupId = group.uin,
         card = card,
         title = specialTitle,
         level = level,

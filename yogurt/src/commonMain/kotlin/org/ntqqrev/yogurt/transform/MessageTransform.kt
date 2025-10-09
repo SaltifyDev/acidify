@@ -12,16 +12,13 @@ import org.ntqqrev.milky.IncomingMessage
 import org.ntqqrev.milky.IncomingSegment
 import org.ntqqrev.milky.OutgoingSegment
 import org.ntqqrev.yogurt.codec.*
-import org.ntqqrev.yogurt.util.FriendCache
-import org.ntqqrev.yogurt.util.GroupCache
-import org.ntqqrev.yogurt.util.resolveGroupMemberCache
 import org.ntqqrev.yogurt.util.resolveUri
 
 suspend fun Application.transformMessage(msg: BotIncomingMessage): IncomingMessage? {
+    val bot = dependencies.resolve<Bot>()
     return when (msg.scene) {
         MessageScene.FRIEND -> {
-            val friendCache = dependencies.resolve<FriendCache>()
-            val friend = friendCache[msg.peerUin] ?: return null
+            val friend = bot.getFriend(msg.peerUin) ?: return null
             IncomingMessage.Friend(
                 peerId = msg.peerUin,
                 messageSeq = msg.sequence,
@@ -33,10 +30,8 @@ suspend fun Application.transformMessage(msg: BotIncomingMessage): IncomingMessa
         }
 
         MessageScene.GROUP -> {
-            val groupCache = dependencies.resolve<GroupCache>()
-            val group = groupCache[msg.peerUin] ?: return null
-            val memberCache = resolveGroupMemberCache(msg.peerUin) ?: return null
-            val member = memberCache[msg.senderUin] ?: return null
+            val group = bot.getGroup(msg.peerUin) ?: return null
+            val member = group.getMember(msg.senderUin) ?: return null
             IncomingMessage.Group(
                 peerId = msg.peerUin,
                 messageSeq = msg.sequence,
@@ -44,7 +39,7 @@ suspend fun Application.transformMessage(msg: BotIncomingMessage): IncomingMessa
                 time = msg.timestamp,
                 segments = msg.segments.map { transformSegment(it) },
                 group = group.toMilkyEntity(),
-                groupMember = member.toMilkyEntity(group.uin),
+                groupMember = member.toMilkyEntity(),
             )
         }
 
@@ -168,10 +163,12 @@ suspend fun YogurtMessageBuildingContext.applySegment(segment: OutgoingSegment) 
                 text("@${segment.data.userId} ")
                 return
             }
-            val groupMemberCache = application.resolveGroupMemberCache(peerUin)
+            val bot = application.dependencies.resolve<Bot>()
+            val group = bot.getGroup(peerUin)
+            val member = group?.getMember(segment.data.userId)
             mention(
                 segment.data.userId,
-                groupMemberCache?.get(segment.data.userId)?.nickname ?: segment.data.userId.toString()
+                member?.nickname ?: segment.data.userId.toString()
             )
         }
 

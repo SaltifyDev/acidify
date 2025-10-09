@@ -7,13 +7,12 @@ import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.GetGroupAnnouncementsOutput
 import org.ntqqrev.milky.GroupAnnouncementEntity
 import org.ntqqrev.yogurt.api.MilkyApiException
-import org.ntqqrev.yogurt.util.GroupCache
+
 import org.ntqqrev.yogurt.util.invoke
 
 val GetGroupAnnouncements = ApiEndpoint.GetGroupAnnouncements {
     val bot = application.dependencies.resolve<Bot>()
-    val groupCache = application.dependencies.resolve<GroupCache>()
-    groupCache[it.groupId, true]
+    bot.getGroup(it.groupId)
         ?: throw MilkyApiException(-404, "Group not found")
 
     val announcements = bot.getGroupAnnouncements(it.groupId)

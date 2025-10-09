@@ -5,11 +5,11 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.Bot
+import org.ntqqrev.acidify.entity.BotFriend
+import org.ntqqrev.acidify.entity.BotGroup
+import org.ntqqrev.acidify.entity.BotGroupMember
 import org.ntqqrev.acidify.event.*
 import org.ntqqrev.acidify.message.MessageScene
-import org.ntqqrev.acidify.struct.BotFriendData
-import org.ntqqrev.acidify.struct.BotGroupData
-import org.ntqqrev.acidify.struct.BotGroupMemberData
 import org.ntqqrev.acidify.util.log.LogHandler
 import org.ntqqrev.acidify.util.log.LogLevel
 import org.ntqqrev.acidify.util.log.Logger
@@ -18,28 +18,25 @@ import org.ntqqrev.yogurt.YogurtApp.config
 
 expect val logHandler: LogHandler
 
-private val BotFriendData.displayName
+private val BotFriend.displayName
     get() = remark.ifBlank { nickname }
 
-private val BotGroupMemberData.displayName
+private val BotGroupMember.displayName
     get() = card.ifBlank { nickname }.joinToSingleLine()
 
-private val BotFriendData.displayString: String
+private val BotFriend.displayString: String
     get() = TextColors.yellow("$displayName ($uin)")
 
-private val BotGroupData.displayString: String
+private val BotGroup.displayString: String
     get() = TextColors.green("$name ($uin)")
 
-private val BotGroupMemberData.displayString: String
+private val BotGroupMember.displayString: String
     get() = TextColors.blue("$displayName ($uin)")
 
 @Suppress("duplicatedCode")
 fun Application.configureEventLogging() {
     launch {
         val bot = dependencies.resolve<Bot>()
-        val eventFlow = dependencies.resolve<PreprocessedEventFlow>()
-        val friendCache = dependencies.resolve<FriendCache>()
-        val groupCache = dependencies.resolve<GroupCache>()
         val logger = dependencies.resolve<Logger>()
 
         fun logAsMessage(supplier: MessageSupplier) {
@@ -52,7 +49,7 @@ fun Application.configureEventLogging() {
             }).invoke(supplier)
         }
 
-        eventFlow.collect {
+        bot.eventFlow.collect {
             when (it) {
                 is MessageReceiveEvent -> {
                     val b = StringBuilder()
@@ -60,14 +57,13 @@ fun Application.configureEventLogging() {
                     b.append(if (isSelfSend) "发送 -> " else "接收 <- ")
                     when (it.message.scene) {
                         MessageScene.FRIEND -> {
-                            val friend = friendCache[it.message.peerUin] ?: return@collect
+                            val friend = bot.getFriend(it.message.peerUin) ?: return@collect
                             b.append("[${friend.displayString}]")
                         }
 
                         MessageScene.GROUP -> {
-                            val group = groupCache[it.message.peerUin] ?: return@collect
-                            val memberCache = resolveGroupMemberCache(it.message.peerUin)
-                            val member = memberCache?.get(it.message.senderUin) ?: return@collect
+                            val group = bot.getGroup(it.message.peerUin) ?: return@collect
+                            val member = group.getMember(it.message.senderUin) ?: return@collect
                             b.append("[${group.displayString}] [${member.displayString}]")
                         }
 
@@ -89,7 +85,7 @@ fun Application.configureEventLogging() {
                     val b = StringBuilder()
                     when (it.scene) {
                         MessageScene.FRIEND -> {
-                            val friend = friendCache[it.peerUin] ?: return@collect
+                            val friend = bot.getFriend(it.peerUin) ?: return@collect
                             b.append("[${friend.displayString}] ")
                             if (it.senderUin == bot.uin) {
                                 b.append("你撤回了一条消息")
@@ -99,10 +95,9 @@ fun Application.configureEventLogging() {
                         }
 
                         MessageScene.GROUP -> {
-                            val group = groupCache[it.peerUin] ?: return@collect
-                            val memberCache = resolveGroupMemberCache(it.peerUin) ?: return@collect
-                            val sender = memberCache[it.senderUin] ?: return@collect
-                            val operator = memberCache[it.operatorUin] ?: return@collect
+                            val group = bot.getGroup(it.peerUin) ?: return@collect
+                            val sender = group.getMember(it.senderUin) ?: return@collect
+                            val operator = group.getMember(it.operatorUin) ?: return@collect
 
                             b.append("[${group.displayString}] ")
                             b.append("[${sender.displayString}] ")
@@ -129,7 +124,7 @@ fun Application.configureEventLogging() {
 
                 is FriendNudgeEvent -> {
                     val b = StringBuilder()
-                    val friend = friendCache[it.userUin] ?: return@collect
+                    val friend = bot.getFriend(it.userUin) ?: return@collect
 
                     if (it.isSelfSend) {
                         b.append("你")
@@ -162,9 +157,8 @@ fun Application.configureEventLogging() {
 
                 is GroupAdminChangeEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
-                    val memberCache = resolveGroupMemberCache(it.groupUin)
-                    val operator = memberCache?.get(it.userUin) ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
+                    val operator = group.getMember(it.userUin) ?: return@collect
 
                     b.append("[${group.displayString}] [${operator.displayString}] ")
                     b.append(if (it.isSet) "被设置为" else "被取消")
@@ -175,7 +169,7 @@ fun Application.configureEventLogging() {
 
                 is GroupEssenceMessageChangeEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     b.append("消息 #${it.messageSeq} ")
@@ -191,9 +185,8 @@ fun Application.configureEventLogging() {
 
                 is GroupInvitedJoinRequestEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
-                    val memberCache = resolveGroupMemberCache(it.groupUin)
-                    val initiator = memberCache?.get(it.initiatorUin) ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
+                    val initiator = group.getMember(it.initiatorUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     b.append("[${initiator.displayString}] ")
@@ -204,7 +197,7 @@ fun Application.configureEventLogging() {
 
                 is GroupJoinRequestEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     b.append("收到 ${it.initiatorUin} 的入群申请，附加信息：${it.comment} ")
@@ -214,21 +207,19 @@ fun Application.configureEventLogging() {
 
                 is GroupMemberIncreaseEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     b.append("${it.userUin} ")
 
                     when {
                         it.operatorUin != null -> {
-                            val memberCache = resolveGroupMemberCache(it.groupUin) ?: return@collect
-                            val operator = memberCache[it.operatorUin!!] ?: return@collect
+                            val operator = group.getMember(it.operatorUin!!) ?: return@collect
                             b.append("被 [${operator.displayString}] 同意加入群聊")
                         }
 
                         it.invitorUin != null -> {
-                            val memberCache = resolveGroupMemberCache(it.groupUin) ?: return@collect
-                            val invitor = memberCache[it.invitorUin!!] ?: return@collect
+                            val invitor = group.getMember(it.invitorUin!!) ?: return@collect
                             b.append("被 [${invitor.displayString}] 邀请加入群聊")
                         }
 
@@ -242,14 +233,13 @@ fun Application.configureEventLogging() {
 
                 is GroupMemberDecreaseEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     b.append("${it.userUin} ")
 
                     if (it.operatorUin != null && it.operatorUin != it.userUin) {
-                        val memberCache = resolveGroupMemberCache(it.groupUin) ?: return@collect
-                        val operator = memberCache[it.operatorUin!!] ?: return@collect
+                        val operator = group.getMember(it.operatorUin!!) ?: return@collect
                         b.append("被 [${operator.displayString}] 移出群聊")
                     } else {
                         b.append("退出了群聊")
@@ -260,9 +250,8 @@ fun Application.configureEventLogging() {
 
                 is GroupNameChangeEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
-                    val memberCache = resolveGroupMemberCache(it.groupUin) ?: return@collect
-                    val operator = memberCache[it.operatorUin] ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
+                    val operator = group.getMember(it.operatorUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     b.append("[${operator.displayString}] ")
@@ -273,9 +262,8 @@ fun Application.configureEventLogging() {
 
                 is GroupMessageReactionEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
-                    val memberCache = resolveGroupMemberCache(it.groupUin) ?: return@collect
-                    val user = memberCache[it.userUin] ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
+                    val user = group.getMember(it.userUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     b.append("[${user.displayString}] ")
@@ -294,10 +282,9 @@ fun Application.configureEventLogging() {
 
                 is GroupMuteEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
-                    val memberCache = resolveGroupMemberCache(it.groupUin) ?: return@collect
-                    val user = memberCache[it.userUin] ?: return@collect
-                    val operator = memberCache[it.operatorUin] ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
+                    val user = group.getMember(it.userUin) ?: return@collect
+                    val operator = group.getMember(it.operatorUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     b.append("[${user.displayString}] ")
@@ -313,9 +300,8 @@ fun Application.configureEventLogging() {
 
                 is GroupWholeMuteEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
-                    val memberCache = resolveGroupMemberCache(it.groupUin) ?: return@collect
-                    val operator = memberCache[it.operatorUin] ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
+                    val operator = group.getMember(it.operatorUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     b.append("[${operator.displayString}] ")
@@ -331,10 +317,9 @@ fun Application.configureEventLogging() {
 
                 is GroupNudgeEvent -> {
                     val b = StringBuilder()
-                    val group = groupCache[it.groupUin] ?: return@collect
-                    val memberCache = resolveGroupMemberCache(it.groupUin) ?: return@collect
-                    val sender = memberCache[it.senderUin] ?: return@collect
-                    val receiver = memberCache[it.receiverUin] ?: return@collect
+                    val group = bot.getGroup(it.groupUin) ?: return@collect
+                    val sender = group.getMember(it.senderUin) ?: return@collect
+                    val receiver = group.getMember(it.receiverUin) ?: return@collect
 
                     b.append("[${group.displayString}] ")
                     if (it.senderUin == bot.uin) {

@@ -9,8 +9,6 @@ import org.ntqqrev.milky.GetHistoryMessagesOutput
 import org.ntqqrev.yogurt.api.MilkyApiException
 import org.ntqqrev.yogurt.transform.toMessageScene
 import org.ntqqrev.yogurt.transform.transformMessage
-import org.ntqqrev.yogurt.util.FriendCache
-import org.ntqqrev.yogurt.util.GroupCache
 import org.ntqqrev.yogurt.util.invoke
 
 val GetHistoryMessages = ApiEndpoint.GetHistoryMessages {
@@ -22,9 +20,7 @@ val GetHistoryMessages = ApiEndpoint.GetHistoryMessages {
 
     val historyMessages = when (it.messageScene.toMessageScene()) {
         MessageScene.FRIEND -> {
-            val friendCache = application.dependencies.resolve<FriendCache>()
-            friendCache[it.peerId, true]
-                ?: throw MilkyApiException(-404, "Friend not found")
+            bot.getFriend(it.peerId) ?: throw MilkyApiException(-404, "Friend not found")
 
             bot.getFriendHistoryMessages(
                 friendUin = it.peerId,
@@ -34,9 +30,7 @@ val GetHistoryMessages = ApiEndpoint.GetHistoryMessages {
         }
 
         MessageScene.GROUP -> {
-            val groupCache = application.dependencies.resolve<GroupCache>()
-            groupCache[it.peerId, true]
-                ?: throw MilkyApiException(-404, "Group not found")
+            bot.getGroup(it.peerId) ?: throw MilkyApiException(-404, "Group not found")
 
             bot.getGroupHistoryMessages(
                 groupUin = it.peerId,

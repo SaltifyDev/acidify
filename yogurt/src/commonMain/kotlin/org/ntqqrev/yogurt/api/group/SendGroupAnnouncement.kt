@@ -6,13 +6,12 @@ import org.ntqqrev.acidify.Bot
 import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.SendGroupAnnouncementOutput
 import org.ntqqrev.yogurt.api.MilkyApiException
-import org.ntqqrev.yogurt.util.GroupCache
+
 import org.ntqqrev.yogurt.util.invoke
 
 val SendGroupAnnouncement = ApiEndpoint.SendGroupAnnouncement {
     val bot = application.dependencies.resolve<Bot>()
-    val groupCache = application.dependencies.resolve<GroupCache>()
-    groupCache[it.groupId, true]
+    bot.getGroup(it.groupId)
         ?: throw MilkyApiException(-404, "Group not found")
 
     bot.sendGroupAnnouncement(it.groupId, it.content, it.imageUri)

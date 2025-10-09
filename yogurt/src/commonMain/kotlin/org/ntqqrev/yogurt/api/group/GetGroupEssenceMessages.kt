@@ -9,13 +9,12 @@ import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.GetGroupEssenceMessagesOutput
 import org.ntqqrev.yogurt.api.MilkyApiException
 import org.ntqqrev.yogurt.transform.transformEssenceMessage
-import org.ntqqrev.yogurt.util.GroupCache
+
 import org.ntqqrev.yogurt.util.invoke
 
 val GetGroupEssenceMessages = ApiEndpoint.GetGroupEssenceMessages {
     val bot = application.dependencies.resolve<Bot>()
-    val groupCache = application.dependencies.resolve<GroupCache>()
-    groupCache[it.groupId, true]
+    bot.getGroup(it.groupId)
         ?: throw MilkyApiException(-404, "Group not found")
 
     val essenceMessageResult = bot.getGroupEssenceMessages(

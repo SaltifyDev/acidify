@@ -93,7 +93,6 @@ object YogurtApp {
             provide { logger }
         }
         configureCacheDeps()
-        configurePreprocessedEventFlow(bot)
 
         routing {
             route("/api") {

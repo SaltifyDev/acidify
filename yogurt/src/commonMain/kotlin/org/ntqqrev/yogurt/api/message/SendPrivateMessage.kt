@@ -9,15 +9,13 @@ import org.ntqqrev.milky.SendPrivateMessageOutput
 import org.ntqqrev.yogurt.api.MilkyApiException
 import org.ntqqrev.yogurt.transform.YogurtMessageBuildingContext
 import org.ntqqrev.yogurt.transform.applySegment
-import org.ntqqrev.yogurt.util.FriendCache
 import org.ntqqrev.yogurt.util.invoke
 
 val SendPrivateMessage = ApiEndpoint.SendPrivateMessage {
     val bot = application.dependencies.resolve<Bot>()
-    val friendCache = application.dependencies.resolve<FriendCache>()
     
     // 检查好友是否存在
-    friendCache[it.userId, true]
+    bot.getFriend(it.userId)
         ?: throw MilkyApiException(-404, "Friend not found")
     
     val result = bot.sendFriendMessage(it.userId) {

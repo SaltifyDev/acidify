@@ -8,8 +8,6 @@ import org.ntqqrev.milky.ApiEndpoint
 import org.ntqqrev.milky.MarkMessageAsReadOutput
 import org.ntqqrev.yogurt.api.MilkyApiException
 import org.ntqqrev.yogurt.transform.toMessageScene
-import org.ntqqrev.yogurt.util.FriendCache
-import org.ntqqrev.yogurt.util.GroupCache
 import org.ntqqrev.yogurt.util.invoke
 
 val MarkMessageAsRead = ApiEndpoint.MarkMessageAsRead {
@@ -17,9 +15,7 @@ val MarkMessageAsRead = ApiEndpoint.MarkMessageAsRead {
 
     when (it.messageScene.toMessageScene()) {
         MessageScene.FRIEND -> {
-            val friendCache = application.dependencies.resolve<FriendCache>()
-            friendCache[it.peerId, true]
-                ?: throw MilkyApiException(-404, "Friend not found")
+            bot.getFriend(it.peerId) ?: throw MilkyApiException(-404, "Friend not found")
 
             // Get the message time from history
             val messages = bot.getFriendHistoryMessages(
@@ -38,9 +34,7 @@ val MarkMessageAsRead = ApiEndpoint.MarkMessageAsRead {
         }
 
         MessageScene.GROUP -> {
-            val groupCache = application.dependencies.resolve<GroupCache>()
-            groupCache[it.peerId, true]
-                ?: throw MilkyApiException(-404, "Group not found")
+            bot.getGroup(it.peerId) ?: throw MilkyApiException(-404, "Group not found")
 
             bot.markGroupMessagesAsRead(
                 groupUin = it.peerId,

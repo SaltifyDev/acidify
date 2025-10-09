@@ -14,7 +14,7 @@ val SetGroupEssenceMessage = ApiEndpoint.SetGroupEssenceMessage {
     bot.getGroup(it.groupId)
         ?: throw MilkyApiException(-404, "Group not found")
 
-    bot.setGroupEssenceMessage(it.groupId, it.messageSeq.toInt())
+    bot.setGroupEssenceMessage(it.groupId, it.messageSeq, it.isSet)
 
     SetGroupEssenceMessageOutput()
 }

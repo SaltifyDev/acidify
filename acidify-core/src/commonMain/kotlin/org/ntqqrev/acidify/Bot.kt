@@ -1063,19 +1063,18 @@ class Bot(
      * 设置群精华消息
      * @param groupUin 群号
      * @param sequence 消息序列号
-     * @param random 消息 random 字段
+     * @param isSet 是否设置为精华消息，`false` 表示取消精华
      */
     suspend fun setGroupEssenceMessage(
         groupUin: Long,
-        sequence: Int
+        sequence: Long,
+        isSet: Boolean
     ) {
-        val random = client.callService(
-            FetchGroupMessages,
-            FetchGroupMessages.Req(groupUin, sequence.toLong(), sequence.toLong())
-        ).firstOrNull()?.get { contentHead }?.get { random }
+        val random = getGroupHistoryMessages(groupUin, 1, sequence).messages.firstOrNull()
+            ?.random
             ?: throw IllegalStateException("消息不存在，无法获取 random 字段")
         client.callService(
-            SetGroupEssenceMessage,
+            if (isSet) SetGroupEssenceMessage.Set else SetGroupEssenceMessage.Unset,
             SetGroupEssenceMessage.Req(
                 groupUin = groupUin,
                 sequence = sequence,

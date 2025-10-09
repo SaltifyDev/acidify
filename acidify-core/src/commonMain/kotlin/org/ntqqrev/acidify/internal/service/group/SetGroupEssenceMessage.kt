@@ -5,10 +5,11 @@ import org.ntqqrev.acidify.internal.packet.oidb.SetGroupEssenceMessageReq
 import org.ntqqrev.acidify.internal.service.NoOutputOidbService
 import org.ntqqrev.acidify.pb.invoke
 
-internal object SetGroupEssenceMessage : NoOutputOidbService<SetGroupEssenceMessage.Req>(0xeac, 1) {
+internal abstract class SetGroupEssenceMessage(isSet: Boolean) :
+    NoOutputOidbService<SetGroupEssenceMessage.Req>(0xeac, if (isSet) 1 else 2) {
     class Req(
         val groupUin: Long,
-        val sequence: Int,
+        val sequence: Long,
         val random: Int
     )
 
@@ -18,5 +19,9 @@ internal object SetGroupEssenceMessage : NoOutputOidbService<SetGroupEssenceMess
             it[sequence] = payload.sequence
             it[random] = payload.random
         }.toByteArray()
+
+    object Set : SetGroupEssenceMessage(true)
+
+    object Unset : SetGroupEssenceMessage(false)
 }
 

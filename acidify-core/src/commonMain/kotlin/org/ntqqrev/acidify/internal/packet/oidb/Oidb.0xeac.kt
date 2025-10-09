@@ -6,7 +6,7 @@ import org.ntqqrev.acidify.pb.PbSchema
 
 internal object SetGroupEssenceMessageReq : PbSchema() {
     val groupCode = PbInt64[1]
-    val sequence = PbInt32[2]
+    val sequence = PbInt64[2]
     val random = PbInt32[3]
 }
 

@@ -22,6 +22,9 @@ import org.ntqqrev.acidify.pb.invoke
  * @property timestamp 消息发送的 Unix 事件戳（秒）
  * @property senderUin 发送者的 QQ 号
  * @property senderUid 发送者的 uid
+ * @property random 透传的随机数
+ * @property clientSequence 透传的客户端序列号
+ * @property messageUid 消息的全局唯一 ID
  * @property segments 消息内容
  * @property extraInfo 群消息的附加信息，可用于刷新群昵称、群头衔等
  */
@@ -35,15 +38,14 @@ class BotIncomingMessage(
     val senderUid: String,
     val clientSequence: Long,
     val random: Int,
-    val initSegments: List<BotIncomingSegment> = emptyList(),
     val messageUid: Long
 ) {
-    var extraInfo: ExtraInfo? = null
-        internal set
-
-    internal val segmentsMut = mutableListOf<BotIncomingSegment>().apply { addAll(initSegments) }
+    internal val segmentsMut = mutableListOf<BotIncomingSegment>()
     val segments: List<BotIncomingSegment>
         get() = segmentsMut
+
+    var extraInfo: ExtraInfo? = null
+        internal set
 
     /**
      * @property nick 发送者的昵称

@@ -17,7 +17,6 @@ import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.common.SignProvider
 import org.ntqqrev.acidify.entity.BotFriend
 import org.ntqqrev.acidify.entity.BotGroup
-import org.ntqqrev.acidify.entity.BotGroupMember
 import org.ntqqrev.acidify.event.AcidifyEvent
 import org.ntqqrev.acidify.event.QRCodeGeneratedEvent
 import org.ntqqrev.acidify.event.QRCodeStateQueryEvent
@@ -1109,12 +1108,12 @@ class Bot(
         code: String,
         isAdd: Boolean = true
     ) = client.callService(
-        SetGroupMessageReaction,
+        if (isAdd) SetGroupMessageReaction.Add else SetGroupMessageReaction.Remove,
         SetGroupMessageReaction.Req(
             groupUin = groupUin,
             sequence = sequence,
             code = code,
-            isAdd = isAdd
+            type = if (code in faceDetailMap) 1 else 2
         )
     )
 

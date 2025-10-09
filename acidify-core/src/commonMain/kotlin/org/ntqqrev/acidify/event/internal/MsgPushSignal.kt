@@ -33,6 +33,19 @@ internal object MsgPushSignal : AbstractSignal("trpc.msg.olpush.OlPushService.Ms
             PushMsgType.FriendFileMessage,
             PushMsgType.GroupMessage -> {
                 val msg = bot.parseMessage(commonMsg) ?: return listOf()
+                
+                // 根据 extraInfo 刷新群成员信息
+                if (msg.scene == MessageScene.GROUP && msg.extraInfo != null) {
+                    val member = bot.getGroup(msg.peerUin)?.getMember(msg.senderUin)
+                    member?.updateBinding(
+                        member.data.copy(
+                            nickname = msg.extraInfo!!.nick,
+                            card = msg.extraInfo!!.groupCard,
+                            specialTitle = msg.extraInfo!!.specialTitle
+                        )
+                    )
+                }
+                
                 val mutList = mutableListOf<AcidifyEvent>(MessageReceiveEvent(msg))
 
                 msg.segments.filterIsInstance<BotIncomingSegment.LightApp>()

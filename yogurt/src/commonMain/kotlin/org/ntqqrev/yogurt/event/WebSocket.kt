@@ -5,7 +5,9 @@ import io.ktor.server.routing.*
 import io.ktor.server.routing.application
 import io.ktor.server.websocket.sendSerialized
 import io.ktor.server.websocket.webSocket
+import io.ktor.websocket.CloseReason
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.ntqqrev.acidify.Bot
 import org.ntqqrev.acidify.util.log.Logger
@@ -21,10 +23,11 @@ fun Route.configureMilkyEventWebSocket() {
                 application.transformAcidifyEvent(event)?.let { sendSerialized(it) }
             }
         }
-        try {
-            incoming.receive()
-        } catch (_: ClosedReceiveChannelException) {
+        val reason = closeReason.await()
+        if (reason?.code == CloseReason.Codes.NORMAL.code) {
             logger.i { "${call.request.local.remoteAddress} 断开 WebSocket 连接" }
+        } else {
+            logger.w { "${call.request.local.remoteAddress} 异常断开 WebSocket 连接 $reason" }
         }
     }
 }

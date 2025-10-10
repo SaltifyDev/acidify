@@ -47,6 +47,9 @@ jobs:
             dynamic-lib-prefix: lib
             dynamic-lib-ext: .so
 
+    env:
+      GITHUB_ACTIONS_BUILD_TARGET: ${{ matrix.target }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5

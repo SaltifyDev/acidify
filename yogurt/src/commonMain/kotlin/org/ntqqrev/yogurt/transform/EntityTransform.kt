@@ -6,55 +6,51 @@ import org.ntqqrev.acidify.entity.BotGroupMember
 import org.ntqqrev.acidify.struct.*
 import org.ntqqrev.milky.*
 
-fun BotFriend.toMilkyEntity() =
-    FriendEntity(
-        userId = uin,
-        nickname = nickname,
-        sex = gender.toMilkyString(),
-        qid = qid,
-        remark = remark,
-        category = FriendCategoryEntity(
-            categoryId = categoryId,
-            categoryName = categoryName
-        )
+fun BotFriend.toMilkyEntity() = FriendEntity(
+    userId = uin,
+    nickname = nickname,
+    sex = gender.toMilkyString(),
+    qid = qid,
+    remark = remark,
+    category = FriendCategoryEntity(
+        categoryId = categoryId,
+        categoryName = categoryName
     )
+)
 
-fun BotGroup.toMilkyEntity() =
-    GroupEntity(
-        groupId = uin,
-        groupName = name,
-        memberCount = memberCount,
-        maxMemberCount = capacity
-    )
+fun BotGroup.toMilkyEntity() = GroupEntity(
+    groupId = uin,
+    groupName = name,
+    memberCount = memberCount,
+    maxMemberCount = capacity
+)
 
-fun BotGroupMember.toMilkyEntity() =
-    GroupMemberEntity(
-        userId = uin,
-        nickname = nickname,
-        sex = "unknown",
-        groupId = group.uin,
-        card = card,
-        title = specialTitle,
-        level = level,
-        role = role.toMilkyString(),
-        joinTime = joinedAt,
-        lastSentTime = lastSpokeAt,
-        shutUpEndTime = mutedUntil
-    )
+fun BotGroupMember.toMilkyEntity() = GroupMemberEntity(
+    userId = uin,
+    nickname = nickname,
+    sex = "unknown",
+    groupId = group.uin,
+    card = card,
+    title = specialTitle,
+    level = level,
+    role = role.toMilkyString(),
+    joinTime = joinedAt,
+    lastSentTime = lastSpokeAt,
+    shutUpEndTime = mutedUntil
+)
 
-fun BotUserInfo.toMilkyOutput() =
-    GetUserProfileOutput(
-        nickname = nickname,
-        qid = qid,
-        age = age,
-        sex = gender.toMilkyString(),
-        remark = remark,
-        bio = bio,
-        level = level,
-        country = country,
-        city = city,
-        school = school
-    )
+fun BotUserInfo.toMilkyOutput() = GetUserProfileOutput(
+    nickname = nickname,
+    qid = qid,
+    age = age,
+    sex = gender.toMilkyString(),
+    remark = remark,
+    bio = bio,
+    level = level,
+    country = country,
+    city = city,
+    school = school
+)
 
 fun UserInfoGender.toMilkyString() = when (this) {
     UserInfoGender.MALE -> "male"
@@ -68,43 +64,40 @@ fun GroupMemberRole.toMilkyString() = when (this) {
     GroupMemberRole.MEMBER -> "member"
 }
 
-fun BotGroupFileEntry.toMilkyEntity(groupId: Long) =
-    GroupFileEntity(
-        groupId = groupId,
-        fileId = fileId,
-        fileName = fileName,
-        parentFolderId = parentFolderId,
-        fileSize = fileSize,
-        uploadedTime = uploadedTime,
-        expireTime = expireTime,
-        uploaderId = uploaderUin,
-        downloadedTimes = downloadedTimes
-    )
+fun BotGroupFileEntry.toMilkyEntity(groupId: Long) = GroupFileEntity(
+    groupId = groupId,
+    fileId = fileId,
+    fileName = fileName,
+    parentFolderId = parentFolderId,
+    fileSize = fileSize,
+    uploadedTime = uploadedTime,
+    expireTime = expireTime,
+    uploaderId = uploaderUin,
+    downloadedTimes = downloadedTimes
+)
 
-fun BotGroupFolderEntry.toMilkyEntity(groupId: Long) =
-    GroupFolderEntity(
-        groupId = groupId,
-        folderId = folderId,
-        parentFolderId = parentFolderId,
-        folderName = folderName,
-        createdTime = createTime,
-        lastModifiedTime = modifiedTime,
-        creatorId = creatorUin,
-        fileCount = totalFileCount
-    )
+fun BotGroupFolderEntry.toMilkyEntity(groupId: Long) = GroupFolderEntity(
+    groupId = groupId,
+    folderId = folderId,
+    parentFolderId = parentFolderId,
+    folderName = folderName,
+    createdTime = createTime,
+    lastModifiedTime = modifiedTime,
+    creatorId = creatorUin,
+    fileCount = totalFileCount
+)
 
-fun BotFriendRequest.toMilkyEntity() =
-    FriendRequest(
-        time = time,
-        initiatorId = initiatorUin,
-        initiatorUid = initiatorUid,
-        targetUserId = targetUserUin,
-        targetUserUid = targetUserUid,
-        state = state.toMilkyString(),
-        comment = comment,
-        via = via,
-        isFiltered = isFiltered
-    )
+fun BotFriendRequest.toMilkyEntity() = FriendRequest(
+    time = time,
+    initiatorId = initiatorUin,
+    initiatorUid = initiatorUid,
+    targetUserId = targetUserUin,
+    targetUserUid = targetUserUid,
+    state = state.toMilkyString(),
+    comment = comment,
+    via = via,
+    isFiltered = isFiltered
+)
 
 fun BotGroupNotification.toMilkyEntity() = when (this) {
     is BotGroupNotification.JoinRequest -> GroupNotification.JoinRequest(

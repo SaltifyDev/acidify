@@ -10,6 +10,7 @@ import org.ntqqrev.milky.GroupEssenceMessage
 import org.ntqqrev.milky.IncomingMessage
 import org.ntqqrev.milky.IncomingSegment
 import org.ntqqrev.milky.OutgoingSegment
+import org.ntqqrev.yogurt.YogurtApp
 import org.ntqqrev.yogurt.codec.*
 import org.ntqqrev.yogurt.util.resolveUri
 
@@ -123,11 +124,24 @@ suspend fun Application.transformSegment(segment: BotIncomingSegment): IncomingS
             )
         )
 
-        is BotIncomingSegment.MarketFace -> IncomingSegment.MarketFace(
-            data = IncomingSegment.MarketFace.Data(
-                url = segment.url,
+        is BotIncomingSegment.MarketFace -> if (YogurtApp.config.transformIncomingMFaceToImage) {
+            IncomingSegment.Image(
+                data = IncomingSegment.Image.Data(
+                    resourceId = segment.url,
+                    tempUrl = segment.url,
+                    width = 300,
+                    height = 300,
+                    summary = segment.summary,
+                    subType = "sticker"
+                )
             )
-        )
+        } else {
+            IncomingSegment.MarketFace(
+                data = IncomingSegment.MarketFace.Data(
+                    url = segment.url,
+                )
+            )
+        }
 
         is BotIncomingSegment.LightApp -> IncomingSegment.LightApp(
             data = IncomingSegment.LightApp.Data(

@@ -16,6 +16,7 @@ import org.ntqqrev.acidify.util.log.LogLevel
 class YogurtConfig(
     val signApiUrl: String = "https://sign.lagrangecore.org/api/sign/39038",
     val reportSelfMessage: Boolean = true,
+    val transformIncomingMFaceToImage: Boolean = false,
     val httpConfig: MilkyHttpConfig = MilkyHttpConfig(),
     val webhookConfig: MilkyWebhookConfig = MilkyWebhookConfig(),
     val logging: LoggingConfig = LoggingConfig(),

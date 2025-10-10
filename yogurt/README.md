@@ -53,6 +53,7 @@ Yogurt 在启动后，会在当前工作目录下生成 `config.json` 文件，�
 {
   "signApiUrl": "https://sign.lagrangecore.org/api/sign/39038",
   "reportSelfMessage": true,
+  "transformIncomingMFaceToImage": false,
   "httpConfig": {
     "host": "127.0.0.1",
     "port": 3000,
@@ -79,6 +80,24 @@ Yogurt 在启动后，会在当前工作目录下生成 `config.json` 文件，�
 ### `reportSelfMessage`
 
 是否上报自己发送的消息。
+
+### `transformIncomingMFaceToImage`
+
+是否将接收的市场表情消息段转换成普通的图片消息段。如果为 `true`，则转换的具体格式如下：
+
+```json
+{
+  "type": "image",
+  "data": {
+    "resource_id": "市场表情的 URL",
+    "temp_url": "市场表情的 URL",
+    "width": 300,
+    "height": 300,
+    "summary": "市场表情的描述文本",
+    "sub_type": "sticker"
+  }
+}
+```
 
 ### `httpConfig` 和 `webhookConfig`
 

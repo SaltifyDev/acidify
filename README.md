@@ -4,18 +4,11 @@
 
 </div>
 
-## 模块一览
-
-- `acidify-core` - PC NTQQ 协议的核心实现
-- `acidify-crypto` - 加密与 Hash 算法的高效实现
-- `acidify-pb` - Protobuf 编解码基础设施
-
-- `yogurt` - 基于 Acidify 的 [Milky](https://milky.ntqqrev.org/) 实现
-- `yogurt-jvm` - Yogurt 的 JVM 平台实现 (Workaround for Ktor plugin's incompatibility issue)
-- `yogurt-media-codec` - Yogurt 的多媒体编解码支持模块
-- `yogurt-qrcode` - Yogurt 二维码矩阵生成
-
 ## 使用
+
+### 通过 Milky 协议对接其他框架
+
+使用 **[Yogurt](yogurt/)**。参考 Yogurt 的文档下载并启动 Yogurt。
 
 ### 基于 `acidify-core` 使用 Kotlin 进行开发
 
@@ -35,9 +28,15 @@ dependencies {
 
 也可以用同样的方式引用其他模块。
 
-### 通过 Milky 协议对接其他框架
+## 模块一览
 
-参考 [Yogurt 的文档](yogurt/README.md)下载并启动 Yogurt。
+- `acidify-core` - PC NTQQ 协议的核心实现
+- `acidify-crypto` - 加密与 Hash 算法的高效实现
+- `acidify-pb` - Protobuf 编解码基础设施
+- `yogurt` - 基于 Acidify 的 [Milky](https://milky.ntqqrev.org/) 实现
+- `yogurt-jvm` - Yogurt 的 JVM 平台实现 (Workaround for Ktor plugin's incompatibility issue)
+- `yogurt-media-codec` - Yogurt 的多媒体编解码支持模块
+- `yogurt-qrcode` - Yogurt 二维码矩阵生成
 
 ## 支持平台
 
@@ -55,12 +54,12 @@ dependencies {
   最初的 PC NTQQ 协议实现
 - [lagrange-kotlin](https://github.com/LagrangeDev/lagrange-kotlin)
   提供 TEA & 登录认证的实现
-- @Linwenxuan04
-  编写 `acidify-crypto` 模块
 - [qrcode-kotlin](https://github.com/g0dkar/qrcode-kotlin/)
   提供二维码矩阵生成的实现
 - [LagrangeCodec](https://github.com/LagrangeDev/LagrangeCodec)
   提供多媒体编解码的实现
+- [@Linwenxuan04](https://github.com/Linwenxuan04)
+  编写 `acidify-crypto` 模块
 - ... and all the contributors along the way!
 
 ## Contributors

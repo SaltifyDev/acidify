@@ -2,6 +2,7 @@ package org.ntqqrev.yogurt.util
 
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.io.buffered
@@ -18,7 +19,9 @@ suspend fun resolveUri(uri: String): ByteArray {
         uri.startsWith("file://") -> {
             val filePath = uri.removePrefix("file://")
             withContext(Dispatchers.Default) {
-                SystemFileSystem.source(Path(filePath)).buffered().use { it.readByteArray() }
+                SystemFileSystem.source(Path(filePath.decodeURLPart()))
+                    .buffered()
+                    .use { it.readByteArray() }
             }
         }
 

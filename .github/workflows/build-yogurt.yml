@@ -68,7 +68,7 @@ jobs:
           cache: gradle
 
       - name: Build Yogurt for ${{ matrix.target }}
-        run: ./gradlew :yogurt:linkReleaseExecutable${{ matrix.gradle-target }}
+        run: ./gradlew :yogurt:linkReleaseExecutable${{ matrix.gradle-target }} --no-daemon
 
       - name: Copy artifacts
         run: |

@@ -22,8 +22,8 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.io.decodeFromSource
-import kotlinx.serialization.json.io.encodeToSink
 import org.ntqqrev.acidify.Bot
+import org.ntqqrev.acidify.common.AppInfo
 import org.ntqqrev.acidify.common.SessionStore
 import org.ntqqrev.acidify.util.UrlSignProvider
 import org.ntqqrev.milky.milkyJsonModule
@@ -50,14 +50,12 @@ object YogurtApp {
             SystemFileSystem.source(sessionStorePath).buffered().use {
                 Json.decodeFromSource<SessionStore>(it)
             }
-        } else {
-            val emptySessionStore = SessionStore.empty()
-            SystemFileSystem.sink(sessionStorePath).buffered().use {
-                Json.encodeToSink(emptySessionStore, it)
-            }
-            emptySessionStore
+        } else SessionStore.empty()
+        val appInfo: AppInfo = signProvider.getAppInfo() ?: run {
+            println("获取 AppInfo 失败，使用内置默认值")
+            AppInfo.Bundled.Linux
         }
-        val appInfo = signProvider.getAppInfo()!!
+        println("使用协议 ${appInfo.os} ${appInfo.currentVersion} (AppId: ${appInfo.subAppId})")
         val bot = Bot(
             appInfo = appInfo,
             sessionStore = sessionStore,

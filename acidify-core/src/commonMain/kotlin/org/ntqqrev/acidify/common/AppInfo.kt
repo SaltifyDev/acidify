@@ -23,4 +23,24 @@ class AppInfo(
     @SerialName("MainSigMap") val mainSigMap: Int,
     @SerialName("SubSigMap") val subSigMap: Int,
     @SerialName("NTLoginType") val ntLoginType: Int
-)
+) {
+    object Bundled {
+        val Linux = AppInfo(
+            os = "Linux",
+            kernel = "Linux",
+            vendorOs = "linux",
+            currentVersion = "3.2.19-39038",
+            miscBitmap = 32764,
+            ptVersion = "2.0.0",
+            ssoVersion = 19,
+            packageName = "com.tencent.qq",
+            wtLoginSdk = "nt.wtlogin.0.0.1",
+            appId = 1600001615,
+            subAppId = 537313942,
+            appClientVersion = 39038,
+            mainSigMap = 169742560,
+            subSigMap = 0,
+            ntLoginType = 1
+        )
+    }
+}

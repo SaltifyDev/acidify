@@ -2,6 +2,8 @@
 
 ![acidify](https://socialify.git.ci/LagrangeDev/acidify/image?custom_description=&description=1&font=Inter&forks=1&issues=1&language=1&logo=https%3A%2F%2Fstatic.live.moe%2Flagrange.jpg&name=1&owner=1&pulls=1&stargazers=1&theme=Light)
 
+[QQ 群](https://qm.qq.com/q/C04kPQzayk) | [Telegram](https://t.me/WeavingStar)
+
 </div>
 
 ## 使用
@@ -33,7 +35,7 @@ dependencies {
 - `acidify-core` - PC NTQQ 协议的核心实现
 - `acidify-crypto` - 加密与 Hash 算法的高效实现
 - `acidify-pb` - Protobuf 编解码基础设施
-- `yogurt` - 基于 Acidify 的 [Milky](https://milky.ntqqrev.org/) 实现
+- `yogurt` - 基于 Acidify 的 Milky 实现
 - `yogurt-jvm` - Yogurt 的 JVM 平台实现 (Workaround for Ktor plugin's incompatibility issue)
 - `yogurt-media-codec` - Yogurt 的多媒体编解码支持模块
 - `yogurt-qrcode` - Yogurt 二维码矩阵生成
